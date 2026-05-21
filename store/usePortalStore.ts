@@ -136,8 +136,8 @@ export const usePortalStore = create<PortalState>()(
             fetch(getApiUrl('/api/culko?endpoint=marks'), { headers }),
           ])
 
-          // 401 on all data endpoints = session truly died
-          if (attendRes.status === 401 && profileRes.status === 401) {
+          // 401 on data endpoints = session truly died
+          if (attendRes.status === 401 || profileRes.status === 401) {
             console.error('[usePortalStore] Session expired (401 from server).')
             set({ portalStatus: 'no_session', isSyncing: false })
             return false

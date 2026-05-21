@@ -272,6 +272,8 @@ interface AttendanceRecord {
   eligibleAttended: string
   eligiblePercentage: string
   detailsUrl?: string
+  chk?: string
+  obj?: string
 }
 
 interface MarkEvaluation {
@@ -484,35 +486,136 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
     'Referer': `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
   }
 
-  // ── Step 1: Load summary page to get chk/obj and __VIEWSTATE ──
+  // ── Step 1: Load summary page to extract reportId and sessionId ──
   const summaryUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
-  console.log(`[fetchDetails] Loading summary page for ${courseCode}...`)
+  console.log(`[fetchDetails] Loading summary page for reportId and sessionId extraction...`)
   
-  const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
-  const html = await summaryRes.text()
-  const $ = cheerio.load(html)
-
-  // Extract chk and obj from the VIEW button for this specific course
-  let obj = courseCode
-  const btn = $(`input[obj="${courseCode}"], input[obj*="${courseCode}"]`).first()
-  if (!chk) {
-    chk = btn.attr('chk') || ''
-    obj = btn.attr('obj') || courseCode
-  }
-  console.log(`[fetchDetails] chk=${chk ? chk.substring(0, 15) + '...' : 'EMPTY'} obj=${obj}`)
-
-  if (!chk) {
-    console.error(`[fetchDetails] No chk found for ${courseCode}. View buttons found:`, 
-      $('input[chk]').map((_, el) => $(el).attr('obj')).get())
+  let html = ''
+  try {
+    const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
+    html = await summaryRes.text()
+  } catch (e) {
+    console.error('[fetchDetails] Failed to load summary page:', e)
     return []
   }
 
-  // Extract ASP.NET form fields for postback
+  const $ = cheerio.load(html)
+
+  // Extract chk and obj from the VIEW button if not provided
+  let obj = courseCode
+  if (!chk) {
+    const btn = $(`input[obj="${courseCode}"], input[obj*="${courseCode}"]`).first()
+    chk = btn.attr('chk') || ''
+    obj = btn.attr('obj') || courseCode
+  }
+  console.log(`[fetchDetails] Resolved courseCode=${courseCode}, chk=${chk ? chk.substring(0, 15) + '...' : 'EMPTY'} obj=${obj}`)
+
+  // Extract reportId and sessionId
+  let reportId = ''
+  let sessionId = ''
+  
+  const getReportMatch = html.match(/getReport\(['"]([^'"]+)['"]\s*,\s*['"]?(\d+)['"]?\)/)
+  if (getReportMatch) {
+    reportId = getReportMatch[1]
+    sessionId = getReportMatch[2]
+  }
+  
+  if (!sessionId) {
+    const sessionMatch = html.match(/CurrentSession\s*\((\d+)\)/)
+    if (sessionMatch) sessionId = sessionMatch[1]
+  }
+  
+  if (!reportId) {
+    const uidPatterns = [
+      /getReport\(['"]([^'"]+)['"]/,
+      /var\s+UID\s*=\s*['"]([^'"]+)['"]/,
+      /var\s+reportId\s*=\s*['"]([^'"]+)['"]/,
+    ]
+    for (const pattern of uidPatterns) {
+      const match = html.match(pattern)
+      if (match) {
+        reportId = match[1]
+        break
+      }
+    }
+  }
+
+  console.log(`[fetchDetails] Extracted reportId=${reportId}, sessionId=${sessionId}`)
+
+  // Extract ASP.NET form fields for fallback postback
   const viewState = $('#__VIEWSTATE').val() as string || ''
   const eventValidation = $('#__EVENTVALIDATION').val() as string || ''
   const viewStateGen = $('#__VIEWSTATEGENERATOR').val() as string || ''
 
-  // ── Step 2: Find the AJAX URL from getdata() in page scripts ──
+  // ── Step 2: Try GetFullReport (Standard CULKO AJAX WebMethod) ──
+  if (reportId && sessionId && chk) {
+    try {
+      const fullReportUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx/GetFullReport`
+      console.log(`[fetchDetails] Sending request to GetFullReport: ${fullReportUrl}`)
+      const res = await fetch(fullReportUrl, {
+        method: 'POST',
+        headers: {
+          ...baseHeaders,
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          course: chk,
+          UID: reportId,
+          fromDate: '',
+          toDate: '',
+          type: 'All',
+          Session: sessionId
+        })
+      })
+      
+      if (res.ok) {
+        const text = await res.text()
+        console.log(`[fetchDetails] GetFullReport response status: ${res.status}, length: ${text.length}`)
+        const parsed = JSON.parse(text)
+        if (parsed.d) {
+          const data = JSON.parse(parsed.d)
+          if (Array.isArray(data) && data.length > 0) {
+            console.log(`[fetchDetails] Successfully parsed ${data.length} detailed records from GetFullReport`)
+            return data.map((r: any) => {
+              const keys = Object.keys(r)
+              const findK = (patterns: string[]) => {
+                return keys.find(k => {
+                  const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
+                  return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
+                })
+              }
+              
+              const dateVal = r[findK(['attdate', 'date'])] || ''
+              const typeVal = r[findK(['subjecttype', 'type', 'classtype'])] || ''
+              const timeVal = r[findK(['classtime', 'time'])] || ''
+              const statusVal = r[findK(['attendance', 'status', 'attstatus'])] || ''
+              const sectionVal = r[findK(['section'])] || ''
+              const groupVal = r[findK(['group'])] || ''
+              const markedByVal = r[findK(['facultyname', 'markedby', 'faculty'])] || ''
+              
+              return {
+                date: dateVal,
+                type: typeVal,
+                time: timeVal,
+                status: statusVal,
+                section: sectionVal,
+                group: groupVal,
+                markedBy: markedByVal
+              }
+            })
+          }
+        }
+      } else {
+        console.error(`[fetchDetails] GetFullReport endpoint returned status ${res.status}`)
+      }
+    } catch (e) {
+      console.error(`[fetchDetails] GetFullReport execution error:`, e)
+    }
+  }
+
+  // ── Step 3: Fallback Approaches if GetFullReport failed/not found ──
+  console.log(`[fetchDetails] Falling back to standard endpoints...`)
   let ajaxUrl: string | null = null
   let ajaxMethod: string | null = null
   
@@ -520,21 +623,16 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
     const sc = $(s).html() || ''
     if (!sc.includes('getdata')) return
     
-    // Extract URL from $.ajax({ url: '...' }) or similar patterns
     const urlMatch = sc.match(/url\s*:\s*['"]([^'"]+)['"]/i)
     if (urlMatch) ajaxUrl = urlMatch[1]
     
-    // Try to understand what data format it sends
     if (sc.includes('JSON.stringify') || sc.includes("contentType.*json")) {
       ajaxMethod = 'json'
     } else if (sc.includes('data:') && sc.includes('chk')) {
       ajaxMethod = 'form'
     }
-    
-    console.log(`[fetchDetails] Found getdata() script — URL: ${ajaxUrl}, Method: ${ajaxMethod || 'unknown'}`)
   })
 
-  // ── Step 3: Try all possible approaches ──
   const endpoints = [
     ajaxUrl,
     'frmStudentCourseWiseAttendanceSummary.aspx/GetData',
@@ -546,7 +644,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
   for (const ep of endpoints) {
     const fullUrl = ep.startsWith('http') ? ep : `${BASE_URL}/${ep.replace(/^\//, '')}`
     
-    // Approach A: JSON WebMethod POST (ASP.NET AJAX pattern)
+    // Approach A: JSON WebMethod POST
     try {
       const res = await fetch(fullUrl, {
         method: 'POST',
@@ -560,17 +658,14 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       
       if (res.ok) {
         const text = await res.text()
-        console.log(`[fetchDetails] JSON POST to ${ep}: ${text.length} chars`)
+        console.log(`[fetchDetails] JSON POST fallback to ${ep}: ${text.length} chars`)
         
-        // Try JSON response (WebMethod returns { d: "..." })
         try {
           const parsed = JSON.parse(text)
-          // If d contains HTML string
           if (typeof parsed.d === 'string' && parsed.d.includes('<')) {
             const history = parseAttendanceHistory(parsed.d)
             if (history.length > 0) return history
           }
-          // If d contains JSON string
           if (typeof parsed.d === 'string') {
             try {
               const data = JSON.parse(parsed.d)
@@ -587,7 +682,6 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
               }
             } catch {}
           }
-          // If response is directly an array
           if (Array.isArray(parsed) && parsed.length > 0) {
             return parsed.map((r: any) => ({
               date: r.Date || r.date || '',
@@ -599,9 +693,8 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
               markedBy: r.MarkedBy || r.Faculty || ''
             }))
           }
-        } catch { /* not JSON */ }
+        } catch {}
         
-        // Try as raw HTML
         if (text.includes('<table') || text.includes('<tr')) {
           const history = parseAttendanceHistory(text)
           if (history.length > 0) return history
@@ -611,7 +704,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       console.log(`[fetchDetails] JSON POST failed for ${ep}`)
     }
 
-    // Approach B: Form POST 
+    // Approach B: Form POST
     try {
       const formData = new URLSearchParams()
       formData.append('chk', chk || '')
@@ -632,16 +725,18 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       
       if (res.ok) {
         const text = await res.text()
-        console.log(`[fetchDetails] Form POST to ${ep}: ${text.length} chars`)
-        const history = parseAttendanceHistory(text)
-        if (history.length > 0) return history
+        console.log(`[fetchDetails] Form POST fallback to ${ep}: ${text.length} chars`)
+        if (text.includes('<table') || text.includes('<tr')) {
+          const history = parseAttendanceHistory(text)
+          if (history.length > 0) return history
+        }
       }
     } catch (e) {
       console.log(`[fetchDetails] Form POST failed for ${ep}`)
     }
   }
 
-  console.error(`[fetchDetails] All approaches failed for ${courseCode}`)
+  console.error('[fetchDetails] All detail fetching approaches failed. Returning empty history.')
   return []
 }
 
@@ -965,52 +1060,62 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
     
     // Convert to our format
     return attendanceJson.map((record: any) => {
-      const getVal = (possibleNames: string[]) => {
-        for (const name of possibleNames) {
-          const key = Object.keys(record).find(k => k.toLowerCase().replace(/[^a-z]/g, '') === name.toLowerCase().replace(/[^a-z]/g, ''))
-          if (key && record[key] !== null && record[key] !== undefined && String(record[key]).trim() !== '') return String(record[key])
+      const keys = Object.keys(record)
+      
+      // Specific precise key finder to prevent pattern collision
+      const getVal = (possibleKeys: string[]) => {
+        for (const pk of possibleKeys) {
+          const normPK = pk.toLowerCase().replace(/[^a-z0-9]/g, '')
+          // First pass: try exact normalized key match
+          const exactKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === normPK)
+          if (exactKey && record[exactKey] !== null && record[exactKey] !== undefined) {
+            return String(record[exactKey]).trim()
+          }
+        }
+        for (const pk of possibleKeys) {
+          const normPK = pk.toLowerCase().replace(/[^a-z0-9]/g, '')
+          // Second pass: try partial/includes match
+          const partialKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '').includes(normPK))
+          if (partialKey && record[partialKey] !== null && record[partialKey] !== undefined) {
+            return String(record[partialKey]).trim()
+          }
         }
         return null
       }
+
+      let code = getVal(['coursecode', 'code']) || ''
+      let title = getVal(['title', 'coursename', 'subject', 'subjectname']) || 'Unknown'
       
-      // AGGRESSIVE KEY MAPPING
-      const keys = Object.keys(record)
-      const findKey = (patterns: string[]) => {
-        return keys.find(k => {
-          const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
-          return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
-        })
-      }
+      // Raw totals
+      let total = getVal(['totaldelv', 'totaldelivered', 'delivered', 'totalclasses']) || '0'
+      let attended = getVal(['totalattd', 'totalattended', 'attended', 'totalpresent']) || '0'
+      let percentage = getVal(['totalpercentage', 'percentage']) || '0%'
 
-      let title = record[findKey(['coursename', 'title', 'subject'])] || 'Unknown'
-      let attended = record[findKey(['totalattd', 'totalattended', 'attended'])] || '0'
-      let total = record[findKey(['totaldelv', 'totaldelivered', 'delivered'])] || '0'
-      let percentage = record[findKey(['totalpercentage', 'percentage'])] || '0%'
-      let code = record[findKey(['coursecode', 'code'])] || ''
-
-      // ELIGIBLE METRICS (Must find that 74 vs 75 difference)
-      let eligDelv = record[findKey(['eligibledelivered', 'elimdelv', 'serveddelivered'])] || total
-      let eligAttd = record[findKey(['eligibleattended', 'elimattd', 'servedattended'])] || attended
-      let eligPerc = record[findKey(['eligiblepercentage', 'elimperc', 'eligiblepercentage'])] || percentage
+      // Eligible metrics (must be precise to prevent total delivered fallback)
+      let eligDelv = getVal(['eligibledelivered', 'eligibledelv', 'eligdelv', 'serveddelivered']) || total
+      let eligAttd = getVal(['eligibleattended', 'eligibleattd', 'eligattd', 'servedattended']) || attended
+      let eligPerc = getVal(['eligiblepercentage', 'eligibleperc', 'eligperc', 'servedpercentage']) || percentage
 
       // Leave Stats
-      let idl = record[findKey(['idl'])] || '0'
-      let adl = record[findKey(['adl'])] || '0'
-      let vdl = record[findKey(['vdl'])] || '0'
-      let ml = record[findKey(['medicalleave', 'ml'])] || '0'
+      let idl = getVal(['idl', 'dutyleaveidl', 'dutyleaven']) || '0'
+      let adl = getVal(['adl', 'dutyleaveadl']) || '0'
+      let vdl = getVal(['vdl', 'dutyleaveother', 'dutyleavevdl']) || '0'
+      let ml = getVal(['medicalleave', 'ml']) || '0'
 
-      // PATTERN DISCOVERY FOR CODE
+      // EncryptCode for details (chk)
+      let chk = getVal(['encryptcode', 'chk']) || ''
+
+      // PATTERN DISCOVERY FOR CODE IF EMPTY
       if (!code || code === '') {
         const foundCode = keys.find(k => /^[A-Z0-9]+-[A-Z0-9]+$/.test(String(record[k])))
         if (foundCode) code = String(record[foundCode]).replace(/\s+/g, '')
       }
 
-      // NOTE: NO heuristic value discovery — incorrect records come from that.
-      // Simply trust the explicit key mapping above.
-
       return {
         name: title,
         code: code,
+        chk: chk,
+        obj: code,
         attended,
         total,
         percentage: eligPerc, // Prioritize the one used for criteria

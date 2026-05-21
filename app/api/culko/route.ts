@@ -25,8 +25,8 @@ export async function GET(req: Request) {
       const supabase = await createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-      await supabase.from('portal_records').delete().eq('user_id', user.id).eq('type', 'attendance')
-      return NextResponse.json({ success: true, message: 'Attendance cache cleared' })
+      await supabase.from('portal_records').delete().eq('user_id', user.id)
+      return NextResponse.json({ success: true, message: 'All portal caches cleared' })
     } catch (e) {
       return NextResponse.json({ error: 'Failed to clear cache' }, { status: 500 })
     }
