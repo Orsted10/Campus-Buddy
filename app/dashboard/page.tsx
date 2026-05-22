@@ -273,7 +273,7 @@ export default function DashboardPage() {
                         <p className="text-[10px] font-black text-primary/80 uppercase">NOTHING ACTIVE • NEXT UP</p>
                         <h3 className="font-black text-foreground text-xl tracking-tight leading-tight mt-1">{classStatus.next.subject}</h3>
                         <p className="text-sm text-primary font-bold mt-1.5 flex items-center gap-2">
-                           <Clock className="w-4 h-4" /> Starts at {classStatus.next.time.split(' - ')[0]}
+                           <Clock className="w-4 h-4" /> Starts at {(classStatus.next.time || '').split(' - ')[0]}
                         </p>
                      </div>
                    ) : (
@@ -348,7 +348,7 @@ export default function DashboardPage() {
                              onClick={() => router.push('/dashboard/attendance')}
                              className="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3 group transition-all hover:bg-amber-500/20"
                            >
-                              <span className="text-xs font-black text-foreground">{a.subject_name.split(' ')[0]}</span>
+                              <span className="text-xs font-black text-foreground">{(a?.subject_name || 'Unknown').split(' ')[0]}</span>
                               <span className="text-xs font-black text-amber-500 px-1.5 py-0.5 rounded-lg bg-black/20 group-hover:bg-black/40">{a.percentage}%</span>
                            </button>
                         ))}

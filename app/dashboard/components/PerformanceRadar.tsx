@@ -16,9 +16,9 @@ export function PerformanceRadar({ attendance }: { attendance: any[] }) {
 
   // Process data for radar chart
   const data = attendance.map(subject => ({
-    subject: subject.subject_name.split(' ')[0], // Take only the first word/code
-    fullSubject: subject.subject_name,
-    percentage: parseFloat(subject.percentage) || 0,
+    subject: (subject?.subject_name || 'Unknown').split(' ')[0], // Take only the first word/code
+    fullSubject: subject?.subject_name || 'Unknown',
+    percentage: parseFloat(subject?.percentage) || 0,
     fullMark: 100,
   })).slice(0, 6) // Radar charts look best with 5-6 points max
 
