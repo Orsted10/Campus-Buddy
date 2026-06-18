@@ -1,0 +1,50 @@
+﻿#div_help img {
+    width: 100%;
+}
+
+#div_help a {
+    display: inline-block;
+    background: #fff;
+    border-radius: 50%;
+    padding: 3px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+#div_help_popup {
+    padding-top: 30px;
+    top: 0px;
+}
+
+#div_help {
+    position: fixed;
+    right: 5px;
+    top: 45%;
+    width: 50px;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 50%;
+    padding: 3px;
+    z-index: 2;
+}
+
+@media (max-width: 767px) {
+    #div_help {
+        right: 5px;
+        top: auto;
+        bottom: 0px;
+    }
+
+    #div_help_popup {
+        padding-top: 30px;
+        top: 0px;
+    }
+
+        #div_help_popup .closebtn {
+            right: 15px;
+            top: 0;
+        }
+
+    .help_logo {
+        text-align: center;
+    }
+}

@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<!-- saved from url=(0097)https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw== -->
+<html lang="en" crxlauncher="" data-qb-installed="true"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="theme-color" content="#ce3333"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="dns-prefetch" href="https://student.culko.in/"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/bootstrap-icons.min.css"><link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin=""><link href="./Chandigarh University Management System _ Unnao Campus_files/css2" rel="stylesheet"><title>
+	Chandigarh University Management System |  Unnao Campus
+</title><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/bootstrap.min.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/font-awesome.min.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/style.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/material-btn.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/responsive.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/style.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/style-new.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/sidenav.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/scrollbar.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/toastr8.min.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/sweet-alert.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/jquery-ui.css"><link href="./Chandigarh University Management System _ Unnao Campus_files/apprise.min.css" rel="stylesheet"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/help-css.css"><link rel="stylesheet" href="./Chandigarh University Management System _ Unnao Campus_files/live-video.css">
+
+
+    <script type="text/javascript" async="" src="./Chandigarh University Management System _ Unnao Campus_files/analytics.js.download"></script><script type="text/javascript" async="" src="./Chandigarh University Management System _ Unnao Campus_files/js"></script><script src="./Chandigarh University Management System _ Unnao Campus_files/apprise-1.5.min.js.download"></script>
+    <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/jquery-2.0.3.min.js.download"></script>
+    <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/sweet-alert.min.js.download"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="./Chandigarh University Management System _ Unnao Campus_files/bootstrap.bundle.min.js.download" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!--- Analytics CUCHD --->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async="" src="./Chandigarh University Management System _ Unnao Campus_files/js(1)"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-108822757-1');
+    </script>
+
+
+
+    <style>
+        body, html {
+            height: 100%;
+            width: 100%;
+        }
+
+        #div_exam img {
+            width: 100%;
+        }
+
+        #div_exam {
+            width: 146px;
+            position: absolute;
+            left: 0;
+            top: 10px;
+        }
+
+        .header-right {
+            position: relative;
+        }
+
+        #menu-loading {
+            /*position: absolute;
+            top: 9px;
+            left: 50%;*/
+            display: none;
+            width: 20px;
+            height: 20px;
+        }
+        .loading{ top: 16px; left: 50%; }
+        #short_links .col-sm-3 {
+            width: 20%;
+        }
+
+        .logo {
+            position: relative;
+        }
+        .logo i {
+            position: absolute;
+            top: 50%;
+            right: -30px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            font-size: 36px;
+        }
+        #footer {
+            position: relative;
+        }
+        #a_bugreport {
+            /*position: absolute;
+            right: 13px;
+            bottom: 28px;*/
+            color: red;
+            font-size: 13px;
+        }
+        div[id*="divUniEmail"] {
+            position: absolute;
+            top: 102px;
+            background: #fff;
+            padding: 10px;
+            height: auto;
+            z-index: 99;
+            border-radius: 10px;
+            border: 1px solid #cecece;
+            z-index: 999999;
+            right: 10px;
+            transition: all 0.4s ease-in-out 0s;
+            -webkit-transition: all 0.4s ease-in-out 0s;
+            display: none;
+            width:calc(100% - 20px);
+        }
+        div[id*="div_OE"] {
+            /*position: relative;
+            z-index:999;*/
+        }
+        #short_links {
+            overflow: visible !important;
+        }
+        @media only screen and (max-width: 767px) {
+            #short_links .col-sm-3 {
+                width: 50%;
+            }
+            #short_links .col-sm-3:last-child {
+                padding-right: 7px;
+            }
+            div[id*="divUniEmail"]{
+                width:310px;
+            }
+        }
+        /* 22-08-2023 */
+        #divChangePassword input[type="submit"], 
+        #divChangePassword input[type="button"],
+        #divChangeWifiPassword input[type="submit"], 
+        #divChangeWifiPassword input[type="button"]{
+            padding: 0px !important;
+        }
+        input[type=submit], input[type=button] {
+            padding: 7px 15px !important;
+        }
+
+        /*header {
+            background: #fff;
+            box-shadow: none;
+            border-bottom: 1px solid #dadbdd;
+        }*/
+
+        .page-search {
+            padding: 13px 30px;
+    }
+        .header-left {
+            /*width: 260px;
+                border-right: 1px solid #dadbdd;
+            padding: 7px 0;*/
+        }
+
+        .user-profile-link h6 {
+            color: #405189;
+        }
+
+        .header-right {
+            padding: 0;
+        }
+        .user-profile-link > span {
+            height: 38px;
+            width: 38px;
+        }
+
+
+        .user-dropdown {
+            width: 190px;
+            background: #fff;
+            box-shadow: none;
+            top: 74px;
+            padding: 0;
+            box-shadow: 0 5px 10px rgba(30,32,37,.12);
+        }
+        .user-dropdown ul li a {
+            padding: 10px 10px;
+            font-size: 14px;
+        }
+        .user-dropdown ul li a:hover{
+            background: #f1f1f1;
+            color: #333;
+        }
+
+        .user-profile-link small.uid{
+            display: block;
+            margin-top: 2px;
+        }
+
+        .setting-dropdown {
+            width: 210px;
+            background: #fff;
+            box-shadow: none;
+            top: 52px;
+            right: -11px;
+            padding: 0;
+            box-shadow: 0 5px 10px rgba(30,32,37,.12);
+        }
+
+        .setting-dropdown ul li{
+            margin: 0 !important;
+        }
+        .setting-dropdown ul li a {
+            padding: 10px 10px;
+            font-size: 14px;
+        }
+        .setting-dropdown ul li a:hover{
+            background: #f1f1f1;
+            color: #333;
+        }
+
+        .info-icon{
+            width: auto;
+        }
+        .home-links ul li,
+        .all-notifications ul>li{
+            margin-left: 25px;
+        }
+
+
+        /*.main-wrapper {
+            background: #f3f3f9;
+            padding: 72px 0 0 260px;
+        }
+        .inner-wrapper {
+            padding: 30px 15px;
+        }*/
+        .page-search-input input[type="text"] {
+            height: 48px;
+            width: 100%;
+            border-radius: 30px;
+            background-color: rgba(228, 228, 228, 0.5);
+            padding: 0 25px;
+            color: #000;
+            transition: all 0.4s ease-in-out 0s;
+            -webkit-transition: all 0.4s ease-in-out 0s;
+            border: 1px solid #fff;
+        }
+
+        /*.uims-sidebar {
+            width: 260px;
+            background: #fff;
+            box-shadow: none;
+            padding-top: 75px;
+            border-right: 1px solid #dadbdd;
+        }*/
+        .uims-sidebar li {
+            border-bottom: 0;
+        }
+        .uims-sidebar li a {
+            color: #fff;
+            font-size: 14px;
+            line-height: 17px;
+            padding:15px;
+            position: relative;
+            font-weight: normal;
+            border-radius:30px;
+        }
+        .uims-sidebar li a span.arrow {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .uims-sidebar ul .sub-menu li{
+            background-color: transparent;
+            border-color: #f5f5f5;
+            border: 0;
+        }
+        .uims-sidebar ul .sub-menu li a{
+            position: relative;
+            color: #fff;
+        }
+        .uims-sidebar ul .sub-menu li a::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 7px;
+            height: 2px;
+            background: #fff;
+        }
+        .uims-sidebar ul ul {
+            padding: 0;
+            /*border-bottom: 1px solid #fff;*/
+        }
+        .uims-sidebar ul ul li a {
+            display: block;
+            padding: 12px 16px 12px 35px;
+            line-height: 16px;
+            font-size: 14px;
+        }
+        .menu-content li[aria-expanded="true"] a {
+            background-color: #B80101;
+            color: #fff !important;
+        }
+        li[aria-expanded="true"] a .arrow::before {
+            transform: rotate(90deg);
+        }
+        .uims-sidebar li a:hover {
+            background-color:#B80101;
+        }
+        .uims-sidebar ul ul ul {
+            padding: 0;
+        }
+
+        .user-profile-link {
+            background: #f1f1f1;
+            padding: 18px 20px;
+        }
+
+        .shortLinks {
+            display: flex;
+            justify-content: space-between;
+            margin: 0 -10px;
+        }
+        /*.shortLinks__item:first-child{
+            padding-left: 0;
+        }
+        .shortLinks__item:last-child{
+            padding-right: 0;
+        }*/
+        .shortLinks__item {
+            width: 100%;
+            padding: 0 10px;
+        }
+        .shortLinks__item a {
+            width: 100%;
+            background: #fff;
+            padding: 20px;
+            position: relative;
+        }
+        .shortLinks__item a span {
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+            background: #e5f3fe;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .shortLinks__item a h6 {
+            font-size: 16px;
+            color: #354781;
+            font-weight: 600;
+        }
+        .shortLinks__item a small {
+            font-size: 12px;
+            border-bottom: 2px solid #ddd;
+            color: #333;
+            display: inline-block;
+            text-transform: uppercase;
+            margin-top: 15px;
+        }
+
+        #loader img{
+            border-radius: 50%;
+            width: 35px
+        }
+        footer {
+            /*padding: 20px 0;
+            background: #f3f3f9;
+            margin-top: 0;
+            border-top: 1px solid #ddd;*/
+        }
+
+        .uims-sidebar.swipe {
+            left: -275px;
+        }
+
+        .box-shadow-common {
+            box-shadow: rgba(100,98,92,.06) 0 0 15px 4px;
+            border: 0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        body {
+            background: #F7F7F5 !important;
+        }
+
+        /*table#rAttachments {
+            background: #f1f1f1 !important;
+        }*/
+        table#rAttachments td{
+            padding: 0!important;
+        }
+        #divChangePassword,
+        #divChangeWifiPassword{
+            background-color: rgba(30, 30, 30, 50%) !important;
+        }
+
+        #divChangePassword .modal-content,
+        #divChangeWifiPassword .modal-content {
+            border-radius: 10px;
+            box-shadow: rgba(100,98,92,.06) 0 0 15px 4px;
+        }
+
+        #divChangePassword input[type=text], 
+        #divChangePassword select, 
+        #divChangePassword input[type=password], 
+        #divChangePassword textarea,
+        #divChangeWifiPassword input[type=text], 
+        #divChangeWifiPassword select, 
+        #divChangeWifiPassword input[type=password], 
+        #divChangeWifiPassword textarea {
+            height: 43px;
+            border-radius: 6px;
+            padding: 0 14px;
+        }
+
+        #divChangePassword input[type=submit], 
+        #divChangePassword input[type=button],
+        #divChangeWifiPassword input[type=submit], 
+        #divChangeWifiPassword input[type=button] {
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            height: 43px;
+            border-radius: 6px;
+            font-weight: 600;
+            line-height: 43px;
+        }
+        #divChangePassword .modal-header,
+        #divChangeWifiPassword .modal-header {
+            background: #fff;
+            border: 0;
+            padding:10px;
+        }
+        #divChangePassword .modal-header h4,
+        #divChangeWifiPassword .modal-header h4 {
+            color: #333;
+            font-weight: 600;
+        }
+        #divChangePassword .modal-header .close,
+        #divChangeWifiPassword .modal-header .close {
+            color: #999;
+            right: 5px;
+            position: relative;
+            top: 4px;
+        }
+
+        #divChangePassword .modal-body,
+        #divChangeWifiPassword .modal-body {
+            padding: 10px 20px 15px;
+        }
+
+        #divChangePassword .modal-dialog,
+        #divChangeWifiPassword .modal-dialog {
+            max-width: 400px;
+            margin: 40px auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+        .form_header {
+            background: #B80101;
+            padding: 12px;
+            border-bottom: 0;
+            text-align: center;
+            margin: 0;
+            line-height: 18px;
+            font-size: 18px;
+            color: #fff;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        } 
+        table{
+            background: #fff !important;
+                border-color: #ddd;
+        }
+        table th {
+            padding: 0;
+            background-color: #eeeeee !important;
+            font-weight: 500 !important;
+            padding: 3px 10px !important;
+            font-size: 14px !important;
+        }
+        table th:hover{ background-color: #eeeeee !important; }
+        table td {
+            padding: 3px 10px;
+        }
+
+        .NavigationSearchPC {
+	        background: #fff;
+	        left: 0;
+	        right: 0;
+	        top: 0;
+            width:100%;
+	        padding-top: 52px;
+        }
+        .divUniEmail{ color:#232323; }
+        .modal { z-index:1060; }
+        .modal.fade .modal-dialog{ transition: transform .35s ease-out; }
+        .modal-backdrop.in{ opacity:.5; }
+        .modal.fade.in .modal-dialog{ transform: translate(0,0); }
+        .modal.fade.in { opacity: 1; }
+        .fade{ transition: opacity .35s linear; }
+        .nav-tabMessage li a{ padding:10px 15px; border-radius:5px 5px 0 0; }
+        .nav-tabMessage li{ display:flex; }
+        /*.modal.show .modal-dialog{ border:10px solid green; }*/
+        @media only screen and (min-width: 1920px){
+            .inner-wrapper{
+                max-width: 1920px;
+                margin: auto;
+            }
+        }
+        @media only screen and (max-width: 1365px){
+            .page-search {
+                width: 37%;
+            }
+            /*.main-wrapper {
+                padding-left: 0;
+            }*/
+            .uims-sidebar {
+                /*left: -265px;*/
+            }
+            .uims-sidebar.swipe {
+                left: 0;
+                z-index: 9999;
+            }
+            .modal-backdrop{
+                    background-color: rgb(30 30 30 / 37%) !important;
+            }
+        }
+        @media only screen and (max-width: 1199px){
+            .page-search {
+                padding: 13px 0;
+                width: 30%;
+            }
+            .home-links ul li, .all-notifications ul>li {
+                margin-left: 20px;
+            }
+            .shortLinks {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .shortLinks__item {
+                width: 33%;
+                padding: 0 10px;
+            }
+        }
+        @media only screen and (max-width: 991px){
+            .info-icon svg,
+            .home-links svg{
+                width: 16px;
+                height: 16px;
+            }
+            .home-links ul li, .all-notifications ul>li {
+                margin-left: 15px;
+            }
+            .home-links > ul > li > a{
+                font-size: 0
+            }
+            .page-search-input input[type="text"]{
+                padding-right: 40px
+            }
+            /*#txtUserSearch001_PC {
+                background-position: 92% center;
+            }*/
+            .user-profile-link {
+                background: transparent;
+            }
+            .page-search {
+                width: 36%;
+            }
+        }
+        @media only screen and (max-width: 767px){
+            .page-search {
+                position: absolute;
+                display: none;
+                width: 100% !important;
+                top: 45px;
+                background: #fff;
+                padding: 8px 13px;
+            }
+            .page-search.open{
+                display: block
+            } 
+            .all-notifications, .home-links {
+                position: relative;
+                top: 0;
+                right: 0;
+            }
+            .header-right{
+                width: auto;
+            }
+            header::before{
+                display: none !important;
+            }
+
+            .shortLinks__item {
+                width: 50%;
+                padding: 0 10px;
+            }
+            /*.row {
+                margin-right: -15px !important;
+                margin-left: -15px !important;
+            }*/
+            .all-notifications{
+                width: auto;
+            }
+
+            .mob-search {
+                display: inline-block !important;
+            }
+            .mob-search svg{
+                width: 16px;
+                height: 16px;
+            }
+        }
+
+        @media only screen and (max-width: 575px){
+            .user-n-mob {
+                display: block;
+            }
+            .user-profile-link h6{
+                display: none
+            }
+            .user-n-mob h5{
+                font-size: 14px;
+                font-weight: 500;
+                color: #405189;
+            }
+            .user-n-mob h5 small{
+                display: block;
+                margin-top: 2px;
+            }
+        }
+
+
+        @media only screen and (max-width: 479px){
+            .shortLinks__item a span {
+                position: relative;
+                margin-top: 15px;
+                display: block;
+                left: 0;
+                bottom: 0;
+            }
+            .shortLinks__item a span svg {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+            .shortLinks__item{
+                margin-bottom: 20px;
+            }
+            .shortLinks__item a{
+                height: 100%;
+                margin-bottom: 0;
+            }
+
+            /*.header-left {
+                width: 116px;
+                text-align: right;
+            }*/
+            .logo {
+                width: 70px;
+            }
+            .user-profile-link {
+                padding: 7px 10px;
+                margin-left: 0;
+            }
+            .info-icon svg, .home-links svg {
+                width: 14px;
+                height: 14px;
+            }
+            .mob-search svg{
+                width: 14px;
+                height: 14px;
+            }
+            .home-links ul li, .all-notifications ul>li {
+                margin-left: 10px;
+            }
+            .home-links ul li:first-child, .all-notifications ul>li:first-child{
+                margin-left: 0 !important;
+            }
+            .user-profile-link > span {
+                margin: 0;
+            }
+            .all-notifications, .home-links {
+                margin-top: 5px;
+            }
+            .main-wrapper {
+                padding-top: 72px;
+            }
+            .inner-wrapper {
+                padding: 0 15px;
+            }
+            .all-notifications {
+                margin-right: 15px;
+            }
+            .user-dropdown{
+                top: 51px;
+            }
+            .setting-dropdown {
+                top: 34px;
+            }
+        }
+
+
+        /* 22-08-2023 */
+    </style>
+    
+<style type="text/css">:root img[width="728"][height="90"], :root [href="https://adstub.net/cina777/"], :root [href="https://adstub.net/arab777/"], :root [href="https://adstub.net/ratu89/"], :root [href="https://adstub.net/judi89/"], :root [href^="//mage98rquewz.com/"], :root [href^="//x4pollyxxpush.com/"], :root span[id^="ezoic-pub-ad-placeholder-"], :root ins.adsbygoogle[data-ad-slot], :root ins.adsbygoogle[data-ad-client], :root img[src^="https://s-img.adskeeper.com/"], :root guj-ad, :root gpt-ad, :root div[ow-ad-unit-wrapper], :root div[id^="zergnet-widget"], :root div[id^="vuukle-ad-"], :root div[id^="taboola-stream-"], :root div[id^="sticky_ad_"], :root div[id^="st"][style^="z-index: 999999999;"], :root div[id^="rc-widget-"], :root div[id^="mrec-leaderboard-"], :root div[id^="gpt_ad_"], :root div[id^="ezoic-pub-ad-"], :root div[id^="dfp-ad-"], :root div[id^="crt-"][style], :root div[id^="apn_native_ad_slot_"], :root div[id^="adspot-"], :root div[id^="adrotate_widgets-"], :root ps-connatix-module, :root div[id^="ad_position_"], :root div[id^="ad-div-"], :root div[id*="ScriptRoot"], :root div[id*="MarketGid"], :root [href="https://adstub.net/rusia777/"], :root div[data-id-advertdfpconf], :root div[data-dfp-id], :root hl-adsense, :root div[data-contentexchange-widget], :root div[data-alias="300x250 Ad 2"], :root div[data-adzone], :root div[data-adunit-path], :root div[data-adname], :root div[data-ad-placeholder], :root a[href^="https://osfultrbriolenai.info/"], :root div[class^="Adstyled__AdWrapper-"], :root a[href^="https://go.xlviiirdr.com"], :root div[class$="-adlabel"], :root display-ads, :root a[href^="https://go.grinsbest.com/"], :root citrus-ad-wrapper, :root a[href^="https://s.zlinkd.com/"], :root bottomadblock, :root amp-fx-flying-carpet, :root amp-embed[type="taboola"], :root amp-connatix-player, :root div[id^="google_dfp_"], :root ad-slot, :root a[href^="https://www.purevpn.com/"][href*="&utm_source=aff-"], :root a[href^="https://www.onlineusershielder.com/"], :root a[href^="https://financeads.net/tc.php?"], :root a[href^="https://www.mrskin.com/tour"], :root a[href^="https://www.infowarsstore.com/"] > img, :root a[href^="https://ak.psaltauw.net/"], :root broadstreet-zone-container, :root a[href^="https://www.highperformancecpmgate.com/"], :root amp-ad, :root a[href^="https://www.highcpmrevenuenetwork.com/"], :root a[href^="https://www.get-express-vpn.com/offer/"], :root a[href^="https://lnkxt.bannerator.com/"], :root a[href^="https://www.geekbuying.com/dynamic-ads/"], :root [href^="https://groorsoa.net/"], :root a[href^="https://www.financeads.net/tc.php?"], :root a[href^="https://www.effectiveratecpm.com/"], :root [href^="https://www.herbanomic.com/"] > img, :root a[href^="https://www.dql2clk.com/"], :root a[href^="https://explore-site.com/"], :root a[href^="https://www.brazzersnetwork.com/landing/"], :root [data-template-type="nativead"], :root a[href^="https://www.adultempire.com/"][href*="?partner_id="], :root a[href^="https://www.nutaku.net/signup/landing/"], :root a[href^="https://www.dating-finder.com/signup/?ai_d="], :root a[href^="https://wolf-327b.com/"], :root a[href^="https://voluum.prom-xcams.com/"], :root a[href^="https://twinrdsyte.com/"], :root a[href^="https://twinrdsrv.com/"], :root a[href^="https://trk.nfl-online-streams.club/"], :root a[href^="https://tracking.avapartner.com/"], :root a[href^="https://track.wg-aff.com"], :root a[href^="https://track.ultravpn.com/"], :root a[href^="https://track.afcpatrk.com/"], :root a[href^="https://track.adform.net/"], :root a[href^="https://torguard.net/aff.php"] > img, :root [data-identity="adhesive-ad"], :root a[href^="https://tc.tradetracker.net/"] > img, :root a[href^="https://tatrck.com/"], :root [href^="https://zstacklife.com/"] img, :root a[href^="https://click.candyoffers.com/"], :root a[href^="https://t.aslnk.link/"], :root a[onmousedown^="this.href='https://paid.outbrain.com/network/redir?"], :root a[href^="https://t.ajump1.com/"], :root a[href^="https://t.adating.link/"], :root a[href^="https://go.trackitalltheway.com/"], :root [href^="https://track.fiverr.com/visit/"] > img, :root a[href^="https://syndication.exoclick.com/"], :root a[href^="https://syndication.dynsrvtbg.com/"], :root div[data-alias="300x250 Ad 1"], :root a[href^="https://syndicate.contentsserved.com/"], :root a[href^="https://svb-analytics.trackerrr.com/"], :root a[onmousedown^="this.href='https://paid.outbrain.com/network/redir?"] + .ob_source, :root a[href^="http://www.iyalc.com/"], :root a[href^="https://claring-loccelkin.com/"], :root a[href^="https://stardomcoit.com/"], :root a[href^="https://track.aftrk5.com/"], :root a[href^="https://slkmis.com/"], :root a[href^="https://myclick-2.com/"], :root a[href^="https://sexynearme.com/"], :root a[href^="https://s.zlinkt.com/"], :root [data-ad-manager-id], :root a[href^="https://s.zlinkr.com/"], :root [href="https://adstub.net/gaza88/"], :root a[href^="https://ad.doubleclick.net/"], :root a[href^="https://static.fleshlight.com/images/banners/"], :root a[href^="https://s.zlink7.com/"], :root a[href^="https://s.ma3ion.com/"], :root a[href^="https://www.privateinternetaccess.com/"] > img, :root a[href^="https://s.gentlefieldpattern.com/"], :root a[href^="https://s.eunow4u.com/"], :root a[href^="https://random-affiliate.atimaze.com/"], :root #kt_player > div[style$="display: block;"][style*="inset: 0px;"], :root [href$="/sexdating.php"], :root a[href^="https://quotationfirearmrevision.com/"], :root a[href^="https://pubads.g.doubleclick.net/"], :root a[href^="https://prf.hn/click/"][href*="/camref:"] > img, :root a[href^="https://serve.awmdelivery.com/"], :root a[href^="https://www.dating-finder.com/?ai_d="], :root a[href^="https://prf.hn/click/"][href*="/adref:"] > img, :root [href^="https://ap.octopuspop.com/click/"] > img, :root app-ad, :root a[href^="https://postback1win.com/"], :root a[href^="https://a.adtng.com/"], :root a[href^="https://playnano.online/offerwalls/?ref="], :root a[href^="https://mmwebhandler.aff-online.com/"], :root a[href^="https://www.bet365.com/"][href*="affiliate="], :root a[href^="https://pb-track.com/"], :root a[href^="https://pb-front.com/"], :root a[href^="https://paid.outbrain.com/network/redir?"], :root a[href^="https://streamate.com/landing/click/"], :root a[href^="https://upsups.click/"], :root a[href^="https://ndt5.net/"], :root a[href^="https://natour.naughtyamerica.com/track/"], :root a[href^="https://mediaserver.entainpartners.com/renderBanner.do?"], :root [data-ad-name], :root a[href^="https://loboclick.com/"], :root a[href^="https://lead1.pl/"], :root a[href^="https://landing.brazzersnetwork.com/"], :root a[href^="https://juicyads.in/"], :root a[href^="https://snowdayonline.xyz/"], :root a[href^="https://join.dreamsexworld.com/"], :root a[href^="https://join.bannedsextapes.com/track/"], :root a[href^="https://jaxofuna.com/"], :root a[href^="https://italarizege.xyz/"], :root a[href^="https://s.happyleafmotion.com/"], :root a[href^="https://identicaldrench.com/"], :root ad-shield-ads, :root a[href^="https://hot-growngames.life/"], :root a[href^="https://helmethomicidal.com/"], :root display-ad-component, :root a[href^="https://golinks.work/"], :root a[href^="https://s.zlinkn.com/"], :root a[href^="https://go.xxxvjmp.com/"], :root a[href^="https://go.xxxjmp.com"], :root a[href^="https://zirdough.net/"], :root [class^="tile-picker__CitrusBannerContainer-sc-"], :root a[href^="https://go.xxxiijmp.com"], :root a[href^="https://go.xtbaffiliates.com/"], :root [data-role="tile-ads-module"], :root a[href^="https://go.xlviirdr.com"], :root a[href^="https://go.xlivrdr.com"], :root a[href^="https://ismlks.com/"], :root [href^="https://www.mypillow.com/"] > img, :root a[href^="https://go.xlirdr.com"], :root [data-css-class="dfp-inarticle"], :root a[href^="https://go.tmrjmp.com"], :root a[href^="https://go.markets.com/visit/?bta="], :root a[href^="https://billing.purevpn.com/aff.php"] > img, :root a[href^="https://go.hpyrdr.com/"], :root a[href^="https://lijavaxa.com/"], :root a[href^="https://go.goaserv.com/"], :root a[href^="https://go.etoro.com/"] > img, :root a[href^="https://go.dmzjmp.com"], :root a[href^="https://www.bang.com/?aff="], :root #mgb-container > #mgb, :root a[href^="https://go.admjmp.com"], :root a[href^="https://get.surfshark.net/aff_c?"][href*="&aff_id="] > img, :root a[href^="https://datewhisper.life/"], :root a[href^="https://click.linksynergy.com/fs-bin/"] > img, :root a[href^="https://get-link.xyz/"], :root a[href^="https://www.mrskin.com/account/"], :root a[href^="https://www.adskeeper.com"], :root a[data-redirect^="https://paid.outbrain.com/network/redir?"], :root [href^="https://clicks.affstrack.com/"] > img, :root a[href^="https://engine.phn.doublepimp.com/"], :root a[href^="https://dl-protect.net/"], :root a[href*=".foxqck.com/"], :root a[href^="https://ctosrd.com/"], :root a[href^="https://clixtrac.com/"], :root a[href^="https://go.bushheel.com/"], :root a[href^="https://ctjdwm.com/"], :root div[data-ad-wrapper], :root .gnt_em_vp_c[data-g-s="vp_dk"], :root [href="//sexcams.plus/"], :root a[href^="https://camfapr.com/landing/click/"], :root a[href^="https://prf.hn/click/"][href*="/creativeref:"] > img, :root a[href*="&maxads="], :root a[href^="http://www.adultempire.com/unlimited/promo?"][href*="&partner_id="], :root a[href^="https://1betandgonow.com/"], :root a[href^="https://chaturbate.com/in/?"], :root a[href^="https://t.ajrkm1.com/"], :root a[href^="https://bongacams10.com/track?"], :root a[href*=".g2afse.com/"], :root a[href^="https://bodelen.com/"], :root a[href^="//hoodingluster.com/"], :root a[href^="https://black77854.com/"], :root a[href^="https://getmatchedlocally.com/"], :root app-advertisement, :root a[href^="https://rixofa.com/"], :root a[href^="https://best-experience-cool.com/"], :root [data-taboola-options], :root a[href^="https://believessway.com/"], :root a[href^="https://Click.ggpickaff.com/"], :root a[href^="https://banners.livepartners.com/"], :root a[href^="http://revolvemockerycopper.com/"], :root a[href^="https://awptjmp.com/"], :root a[href^="https://join.sexworld3d.com/track/"], :root a[href^="https://aweptjmp.com/"], :root a[href^="https://ausoafab.net/"], :root a[href^="https://clicks.pipaffiliates.com/"], :root a[href^="https://aj1070.online/"], :root a[href^="https://a.bestcontentoperation.top/"], :root a[href^="https://adultfriendfinder.com/go/"], :root a[href^="https://ads.planetwin365affiliate.com/"], :root a[href^="https://ads.leovegas.com/"], :root a[href^="https://go.xlvirdr.com"], :root img[src^="https://images.purevpnaffiliates.com"], :root a[href^="https://porntubemate.com/"], :root a[href^="https://click.dtiserv2.com/"], :root a[href^="https://clickadilla.com/"], :root a[href^="https://a.medfoodhome.com/"], :root a[href^="https://cam4com.go2cloud.org/"], :root .nya-slot[style], :root a[href^="https://a.bestcontentweb.top/"], :root atf-ad-slot, :root a[href^="https://a2.adform.net/"], :root a[href^="https://a.candyai.love/"], :root .banner-img > .pbl, :root [data-m-ad-id], :root a[href^="https://a-ads.com/"], :root a[href^="https://1winpb.com/"], :root div[id^="optidigital-adslot"], :root [href^="https://wsup.ai/"], :root a[href^="https://123-stream.org/"], :root a[href^="https://in.rabbtrk.com/"], :root a[href^="http://www.h4trck.com/"], :root [href^="https://a.acebet.com/api/click?"], :root a[href^="http://www.friendlyduck.com/AF_"], :root a[href^="http://partners.etoro.com/"], :root [href="https://chaturbate.jjgirls.com/"] > img, :root a[href^="http://cam4com.go2cloud.org/aff_c?"], :root a[href^="https://ads.betfair.com/redirect.aspx?"], :root amp-ad-custom, :root a[href^="http://trk.globwo.online/"], :root a[onclick^="window.location.replace('https://random-affiliate.atimaze.com/"], :root a[href^="https://bongacams2.com/track?"], :root a-ad, :root a[href^="https://offhandpump.com/"], :root a[href^="http://stickingrepute.com/"], :root #slashboxes > .deals-rail, :root div[aria-label="Ads"], :root [href^="http://mypillow.com/"] > img, :root a[href^="http://bongacams.com/track?"], :root a[href^="//startgaming.net/tienda/" i], :root a[href^="https://a.medfoodsafety.com/"], :root a[href^="//go.eabids.com/"], :root a[href^=" https://www.friendlyduck.com/AF_"], :root [data-cl-spot-id], :root a[href*="/jump/next.php?r="], :root a[href^="https://go.nordvpn.net/aff"] > img, :root .\[\&_\.gdprAdTransparencyCogWheelButton\]\:\!pjra-z-\[5\], :root [href^="http://clicks.totemcash.com/"], :root a[href^="https://ad.zanox.com/ppc/"] > img, :root [data-d-ad-id], :root a[href*=".engine.adglare.net/"], :root div[id^="lazyad-"], :root a[href^="http://com-1.pro/"], :root [href^="https://www.profitablegatecpm.com/"], :root a[href*=".cfm?domain="][href*="&fp="], :root a[href^="https://ab.advertiserurl.com/aff/"], :root a[data-oburl^="https://paid.outbrain.com/network/redir?"], :root [id^="section-ad-banner"], :root [id^="ad_slider"], :root a[href^="https://www.goldenfrog.com/vyprvpn?offer_id="][href*="&aff_id="], :root a[href^="https://wmctjd.com/"], :root a[href*="//jjgirls.com/sex/Chaturbate"], :root [id^="ad-wrap-"], :root [href^="https://zone.gotrackier.com/"], :root a[href^="http://sarcasmadvisor.com/"], :root [href^="https://www.restoro.com/"], :root a[href^="https://track.totalav.com/"], :root a[href^="https://ctrdwm.com/"], :root [href^="https://www.targetingpartner.com/"], :root a[href^="https://join.virtuallust3d.com/"], :root .section-subheader > .section-hotel-prices-header, :root [href^="https://www.hostg.xyz/"] > img, :root a[href^="https://bngpt.com/"], :root a[href^="https://www.sheetmusicplus.com/"][href*="?aff_id="], :root a[href^="http://adultfriendfinder.com/go/"], :root a[href^="https://fastestvpn.com/lifetime-special-deal?a_aid="], :root a[href^="https://tour.mrskin.com/"], :root a[href^="https://s.zlink3.com/"], :root a[href^="http://sneakyadministration.com/"], :root [href^="https://www.brighteonstore.com/products/"] img, :root div[id^="ad-position-"], :root a[href^="https://www.toprevenuegate.com/"], :root a[href^="https://bc.game/"], :root a[href^="http://join.brokestraightboys.com/track/"], :root div[id^="div-ads-"], :root [href^="https://rapidgator.net/article/premium/ref/"], :root [href^="https://join.girlsoutwest.com/"], :root a[href^="https://activate-game.com/"], :root .scroll-fixable.rail-right > .deals-rail, :root [data-wpas-zoneid], :root a[href^="https://track.aftrk3.com/"], :root [href^="https://join3.bannedsextapes.com"], :root div[id^="adngin-"], :root [data-rc-widget], :root span[data-ez-ph-id], :root [href^="https://track.aftrk1.com/"], :root [href^="https://join.playboyplus.com/track/"], :root a[href^="https://go.xxxijmp.com"], :root [href^="https://istlnkcl.com/"], :root a[href^="https://trk.softonixs.xyz/"], :root div[data-adunit], :root app-large-ad, :root [href^="https://turtlebids.irauctions.com/"] img, :root a[href^="https://iqbroker.com/"][href*="?aff="], :root [href^="https://rpwmct.com/"], :root [href^="https://wct.link/click?"], :root a[href^="https://t.acam.link/"], :root a[href^="https://go.strpjmp.com/"], :root [href^="https://url.totaladblock.com/"], :root a[href^="https://go.rmishe.com/"], :root [href^="https://ilovemyfreedoms.com/landing-"], :root [href="https://adstub.net/indo666/"], :root [href^="https://glersakr.com/"], :root a[href^="https://tm-offers.gamingadult.com/"], :root [href^="https://charmingdatings.life/"], :root [data-id^="div-gpt-ad"], :root a[href^="https://tracker.loropartners.com/"], :root [href^="https://awbbjmp.com/"], :root a[href^="https://www.friendlyduck.com/AF_"], :root [href^="https://ad1.adfarm1.adition.com/"], :root a[href^="https://t.ajrkm3.com/"], :root in-page-message[doskip], :root [href^="https://aads.com/campaigns/"], :root a[href^="https://fc.lc/ref/"], :root a[href^="https://go.bbrdbr.com"], :root a[href^="http://tc.tradetracker.net/"] > img, :root a[href^="https://bngprm.com/"], :root [href^="https://shiftnetwork.infusionsoft.com/go/"] > img, :root [href^="http://www.mypillow.com/"] > img, :root .ob_container .item-container-obpd, :root [id^="div-gpt-ad"], :root [href="https://jdrucker.com/gold"] > img, :root a[href^="https://join.virtualtaboo.com/track/"], :root [id^="ad_sky"], :root [name^="google_ads_iframe"], :root aside[id^="adrotate_widgets-"], :root a[href^="https://www.liquidfire.mobi/"], :root DFP-AD, :root .grid > .container > #aside-promotion, :root [data-type="ad-vertical"], :root [href^="https://go.xlrdr.com"], :root a[href^="https://s.cant3am.com/"], :root [data-testid^="taboola-"], :root [data-testid^="section-AdRowBillboard"], :root a[href^="https://track.1234sd123.com/"], :root zeus-ad, :root [data-testid="prism-ad-wrapper"], :root [href^="https://ad.admitad.com/"], :root [href^="https://mypillow.com/"] > img, :root [data-testid="ad_testID"], :root a[href^="https://stellarcashflow.net/trck/"], :root [data-mobile-ad-id], :root [data-dynamic-ads], :root a[href^="https://gamingadlt.com/?offer="], :root [data-desktop-ad-id], :root a[href^="https://go.rmhfrtnd.com"], :root a[href^="https://pb-imc.com/"], :root a[href^="https://www8.smartadserver.com/"], :root topadblock, :root a[href^="//s.zlinkd.com/"], :root [href^="https://mypatriotsupply.com/"] > img, :root [data-testid="adBanner-wrapper"], :root [href^="https://mylead.global/stl/"] > img, :root a[href*=".adsrv.eacdn.com/"], :root [href^="https://antiagingbed.com/discount/"] > img, :root #modal[doskip][prclck], :root #teaser1[style^="width:autopx;"], :root [href^="https://www.cloudways.com/en/?id"], :root [data-asg-ins], :root [data-block-type="ad"], :root [data-ad-width], :root a[href^="https://clickins.slixa.com/"], :root [onclick*="content.ad/"], :root a[href^="https://go.cmtaffiliates.com/"], :root [href^="https://optimizedelite.com/"] > img, :root div[data-ad-region], :root AMP-AD, :root [data-ad-cls], :root a[href^="https://www.adxsrve.com/"], :root a[href^="https://click.Ggpickaff.com/"], :root [data-ez-name], :root a[href^="https://go.mnaspm.com/"], :root a[href^="https://service.bv-aff-trx.com/"], :root a[href^="https://6-partner.com/"], :root [class^="s2nPlayer"], :root a[href^="https://traffdaq.com/"], :root [data-testid="commercial-label-taboola"], :root [class^="div-gpt-ad"], :root [href^="https://affiliate.fastcomet.com/"] > img, :root [class^="adDisplay-module"], :root a[href^="https://adclick.g.doubleclick.net/"], :root [data-freestar-ad][id], :root AD-SLOT, :root a[href^="https://combodef.com/"], :root a[href^="https://click.hoolig.app/"], :root a[href^="https://www.googleadservices.com/pagead/aclk?"] > img, :root [data-ad-module], :root a[href^="https://a.bestcontentfood.top/"], :root #kt_player > a[target="_blank"], :root a[href^="https://go.skinstrip.net"][href*="?campaignId="], :root #teaser2[style^="width:autopx;"], :root [data-revive-zoneid], :root a[href^="https://losingoldfry.com/"], :root div[id^="div-gpt-"], :root a[href^="https://gml-grp.com/"], :root .ob_dual_right > .ob_ads_header ~ .odb_div, :root div[data-ad-targeting], :root a[style="width:100%;height:100%;z-index:10000000000000000;position:absolute;top:0;left:0;"], :root [href^="https://www.avantlink.com/click.php"] img, :root #teaser3[style^="width:autopx;"], :root a[href^="https://go.hpyjmp.com"], :root iframe[scrolling="no"][sandbox*="allow-popups allow-modals"][style^="width: 100%; height: 100%; border: none;"], :root [href^="https://mystore.com/"] > img, :root [class^="amp-ad-"], :root a[href^="https://wittered-mainging.com/"], :root #teaser3[style="width: 100%;text-align: center;display: scroll;position:fixed;bottom: 0;margin: 0 auto;z-index: 103;"] { display: none !important; }</style><style></style></head>
+<body class="body-gradient loaded" style="">
+    <form method="post" action="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw%3d%3d" onsubmit="javascript:return WebForm_OnSubmit();" id="form1">
+<div class="aspNetHidden">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="">
+<input type="hidden" name="__EVENTARGUMENT" id="__EVENTARGUMENT" value="">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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">
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+var theForm = document.forms['form1'];
+if (!theForm) {
+    theForm = document.form1;
+}
+function __doPostBack(eventTarget, eventArgument) {
+    if (!theForm.onsubmit || (theForm.onsubmit() != false)) {
+        theForm.__EVENTTARGET.value = eventTarget;
+        theForm.__EVENTARGUMENT.value = eventArgument;
+        theForm.submit();
+    }
+}
+//]]>
+</script>
+
+
+<script src="./Chandigarh University Management System _ Unnao Campus_files/WebResource.axd" type="text/javascript"></script>
+
+
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource.axd" type="text/javascript"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(1).axd" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+if (typeof(Sys) === 'undefined') throw new Error('ASP.NET Ajax client-side framework failed to load.');
+//]]>
+</script>
+
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(2).axd" type="text/javascript"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(3).axd" type="text/javascript"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(4).axd" type="text/javascript"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(5).axd" type="text/javascript"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(6).axd" type="text/javascript"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/ScriptResource(7).axd" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+function WebForm_OnSubmit() {
+if (typeof(ValidatorOnSubmit) == "function" && ValidatorOnSubmit() == false) return false;
+return true;
+}
+//]]>
+</script>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="2B53A81D">
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="0EgAMnQMXStnNEYBRfIm/2Oyp/0PPA8GTlD8rclQMXfQdJkqq59Qge9fTGQUzHT9JM+mSfmMfcyhvgc9KKrUIMJgCjYHf0E0wFsQdnaQmEm+IEmwDo6Wy3egN8EHXwf2rWnbLWKOLaX/S87fyqChh7sP+AbEn0UaN1MZMuNxA6PFStkMAiB0LhdRGVVCqKtGkUszb16cFmXhsI/POKJezVnjSxc5GG2p6iFRXM1OlUUTNn6qwVu5IIQk8YrLbszr4PCNOCTCzgciIK5VGEo+St5yB7EvHySwos5qH3+Nq6SGJMuGrbK9TFf13AGnexUy5h0NVunDUBVQwIxBaEifeNwTlQBVWaepYJl1BP5eiJ18/656hz+cRZYra7DeR5W7D1VKqQkRSiPSY78RTAX7856JBPKdF8CiUY0LMIHpGFgyz98Qeo/ERkgs0VtocmJrlJCMl+LRcrOVOH2nV7Z7YdjZ4fkBsaKv++6+LcPUj2jWFkm9ZEgI19VMVvWpkxKp6llQ/xrGqI2imOfCMNKEnY9HrATIoAzntIua18AdVeq822HYSa4TzybyyoTs6qlc">
+</div>
+        <input type="hidden" name="ctl00$hfInfoMessage" id="hfInfoMessage">
+        <input type="hidden" name="ctl00$hfUserTheme" id="hfUserTheme">
+        <input type="hidden" name="ctl00$hfWindowScroll" id="hfWindowScroll">
+
+        <input type="hidden" name="ctl00$hfMessagePageNumber" id="hfMessagePageNumber">
+        <input type="hidden" name="ctl00$hfIsNewMessage" id="hfIsNewMessage">
+        <input type="hidden" name="ctl00$hfAlertPageNumber" id="hfAlertPageNumber">
+        <input type="hidden" name="ctl00$hfIsNewAlert" id="hfIsNewAlert">
+        <input type="hidden" name="ctl00$hfAlertsCount" id="hfAlertsCount">
+        <input type="hidden" name="ctl00$hfMessagesCount" id="hfMessagesCount">
+        <input type="hidden" name="ctl00$hfIsMobile" id="hfIsMobile" value="">
+
+         
+        <input type="hidden" name="ctl00$hfbytes" id="hfbytes">
+        <input type="hidden" name="ctl00$hfname" id="hfname">
+        
+        <script type="text/javascript">
+//<![CDATA[
+Sys.WebForms.PageRequestManager._initialize('ctl00$ScriptManager1', 'form1', [], [], [], 90, 'ctl00');
+//]]>
+</script>
+
+        <div id="loader-wrapper">
+            <div id="loader">
+                <img src="./Chandigarh University Management System _ Unnao Campus_files/loader.gif" alt="Loading">
+                <p>Loading...</p>
+            </div>
+        </div>
+        <div class="main-wrapper" id="mainWrap">
+            <header id="header" class="position-fixed header d-flex">
+                
+                <div class="topbar d-flex position-absolute" id="myElement">
+                    <div class="header-left bg-transparent">
+                        <button class="navbar-toggler position-absolute collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#uims_sidebar" aria-controls="uims_sidebar" aria-expanded="false" aria-label="Toggle navigation" onclick="slideLeft()">
+                            
+                            <img id="Image1" class="img-fluid" alt="logo" src="./Chandigarh University Management System _ Unnao Campus_files/icon-hamburger.svg">
+                        </button>
+                        <a class="navbar-brand"><img class="img-fluid" src="./Chandigarh University Management System _ Unnao Campus_files/logo-main-black.png" width="100"></a>
+                    </div>
+                    <div class="ms-auto d-flex outer-area">
+                        <div class="search-bar d-flex">
+                            <div class="search-form d-flex align-items-center">
+                                <span id="s-total-search" class="total-results position-absolute"></span>
+                                <input type="text" name="query" class="search-result" placeholder="Search here" autocomplete="off" id="txtUserSearch001_PC">
+                                <img src="./Chandigarh University Management System _ Unnao Campus_files/loader.gif" class="loading position-absolute" id="menu-loading">
+                                <div class="NavigationSearchPC position-absolute">
+                                </div>
+                            </div>
+                        </div>
+                        <nav class="header-nav ms-auto">
+                            
+                            <ul class="d-flex align-items-center">
+                                <li class="nav-item d-block d-lg-none" id="searchBox">
+                                    <a class="nav-link nav-icon d-flex justify-content-center align-items-center search-icon search-bar-toggle" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#">
+                                        <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-search.svg" alt="Search">
+                                    </a>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link nav-icon d-flex nav-settings justify-content-center align-items-center" id="div_NotiCount" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-notifications.svg" alt="Notifications">
+                                        <span class="other-notify badge badge-number badge-red align-items-center justify-content-center" id="spanNoti_Count">0</span>
+                                    </a>          
+                                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications" id="noti_content">
+                                        <li class="dropdown-header d-flex">
+                                            You have 0 new notifications
+                                            <a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#"><span class="badge d-flex rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                                        </li>
+                                        
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li class="dropdown-footer">
+                                            <a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#">Show all notifications</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a href="https://student.culko.in/StudentHome.aspx" id="aHome" class="nav-link nav-icon d-flex align-items-center justify-content-center" data-bs-toggle="dropdown">
+                                        <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-messages.svg" alt="Messages">
+                                        <span class="badge badge-number d-flex align-items-center justify-content-center">0</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow messages">
+                                        <li class="dropdown-header">
+                                            You have 0 new messages
+                                            <a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#"><span class="badge rounded-pill bg-primary p-2 ms-2">View all</span></a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>                                        
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li class="dropdown-footer">
+                                            <a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#">Show all messages</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link nav-icon nav-library d-flex align-items-center justify-content-center" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#" id="div_LibCount">
+                                        <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-books.svg" alt="Messages">
+                                        <span class="badge badge-number badge-light d-flex align-items-center justify-content-center" id="spanLib_Count">0</span>
+                                    </a>
+                                    
+                                </li>
+                                
+                                <li class="nav-item dropdown pe-3 userInfo">
+                                    <a class="nav-link nav-profile d-flex align-items-center pe-0" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <div class="d-none d-md-block dropdown-toggle position-relative ps-2">
+                                            <div class="u-name d-flex">
+                                                <span>Hello,</span>Ankan
+                                            </div>
+                                            <small class="uid">25LBCS3067</small>
+                                        </div>
+                                        <img src="data:image;base64,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" id="imgFullProfilePic" alt="Profile" class="rounded-circle">
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
+                                        <li class="dropdown-header d-flex flex-column">
+                                            <h6>Ankan Bhattacharjee</h6>
+                                        </li>
+                                        <li class="user-n-mob">
+                                            <h5></h5>
+                                        </li>
+                                        
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li id="liProfile">
+                                            <a class="dropdown-item d-flex align-items-center" href="https://student.culko.in/frmStudentProfile.aspx">
+                                                <i class="bi bi-person"></i>
+                                                <span>My Profile</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a id="LinkButton2" class="dropdown-item d-flex align-items-center" href="javascript:__doPostBack(&#39;ctl00$LinkButton2&#39;,&#39;&#39;)">
+                                                <i class="bi bi-gear"></i>
+                                                <span>Account Settings</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a id="LinkButton3" class="dropdown-item d-flex align-items-center" href="javascript:__doPostBack(&#39;ctl00$LinkButton3&#39;,&#39;&#39;)" style="text-decoration: none;">
+                                                <i class="bi bi-lock"></i>
+                                                <span>Change Password</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li id="liWifiPassword" class="message-item d-flex">
+                                            <a id="lbtnChangeWifiPassword" class="dropdown-item d-flex align-items-center" href="javascript:__doPostBack(&#39;ctl00$lbtnChangeWifiPassword&#39;,&#39;&#39;)" style="text-decoration: none;">
+                                                <i class="bi bi-wifi"></i>
+                                                <span>Change Internet Password</span>
+                                            </a>
+                                        </li>
+							            
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item d-flex align-items-center" onclick="Logout()">
+                                                <i class="bi bi-box-arrow-right"></i>
+                                                <span>Sign Out</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </header>
+            <div id="uims_sidebar" class="uims-sidebar d-lg-block sidebar leftSidebar leftSidebar-collapse position-fixed collapse">
+	            <div class="mobile-header align-items-center d-flex d-lg-none justify-content-between">
+		            <a class="navbar-brand"><img class="img-fluid" src="./Chandigarh University Management System _ Unnao Campus_files/logo-main.png" width="165"></a>
+		            <button class="navbar-toggler d-lg-none navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#uims_sidebar" aria-controls="uims_sidebar" aria-expanded="false" aria-label="Toggle navigation" onclick="slideLeft()">
+			            <span class="navbar-toggler-icon"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-close.svg"></span>
+		            </button>
+	            </div>
+                <div class="header-left">
+                    <button class="navbar-toggler position-absolute d-none d-lg-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#uims_sidebar" aria-controls="uims_sidebar" aria-expanded="false" aria-label="Toggle navigation" onclick="slideLeft()">
+                        
+                        <img id="img_logo" class="img-fluid" alt="logo" src="./Chandigarh University Management System _ Unnao Campus_files/login-logo-main.png">
+                    </button>
+                    <button class="navbar-toggler position-absolute d-none d-sm-none d-lg-block collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#uims_sidebar" aria-controls="uims_sidebar" aria-expanded="false" aria-label="Toggle navigation" onclick="slideLeft()">
+                        <span class="navbar-toggler-icon"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-hamburger-white.svg" class="img-fluid"></span>
+                    </button>
+                    <a class="navbar-brand d-none d-lg-block" href="https://student.culko.in/StudentHome.aspx"><img class="img-fluid" src="./Chandigarh University Management System _ Unnao Campus_files/logo-main.png" width="165"></a>
+                </div>
+	            <div class="scroll-wrapper scroll-bar" style="position: relative;"><div class="scroll-bar scroll-content scroll-scrolly_visible" style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 789px;">
+		            <ul id="menu-content" class="nav flex-column menu-content collapse out">
+			            
+					            <li data-toggle="collapse" data-target="#3563" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Academics<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="3563" class="sub-menu collapse"><li><a class="a-uims-nav" href="javascript:void(0);">Department of Life Long(DLL)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==">My Attendance</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentWinningCampAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==">My Attendance ACP/Winning Camp</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmMyCourse.aspx">My Courses and Lecture Plan</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmMyTimeTable.aspx">My Time Table</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmWinningCampMyTimetable.aspx">My Time Table ACP/Winning Camp</a></li><li><a class="a-uims-nav" href="javascript:void(0);">Project</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmResourceLibrary.aspx">Resource Library</a></li><li data-toggle="collapse" data-target="#4138" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Social Internship<span class="arrow"></span></a></li><ul id="4138" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentDailyDiary.aspx">Daily Diary</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentSocialInternshipEntry.aspx">Model Selection &amp; Activity Upload</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentSocialInternshipEntryPart2.aspx">Model Selection Part 2 &amp; Activity Upload</a></li></ul></ul>
+				            
+					            <li data-toggle="collapse" data-target="#2403" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Accounts<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="2403" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmAccountsStudentReceiptList.aspx">Accounts Reciept</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmAccountStudentDetails.aspx">Accounts Statement/ Fee Payment</a></li></ul>
+				            
+					            <li data-toggle="collapse" data-target="#3566" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Administration<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="3566" class="sub-menu collapse"><li data-toggle="collapse" data-target="#4214" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Centre for Global Education (CGE)<span class="arrow"></span></a></li><ul id="4214" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmCentreForGlobalEducationCGE_ISTP.aspx">International Short-Term Program (ISTP)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmCentreForGlobalEducationCGE_ITP.aspx">International Transfer Program (ITP)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmCentreForGlobalEducationCGE_SEP.aspx">Semester Exchange Program (SEP)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmCentreForGlobalEducationCGE_USA.aspx">USA</a></li></ul><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentComplaintAgainstHarassment.aspx">Complaint Against Harassment</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentAdmissionDocumentsUpload.aspx">Document Upload</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmInternationalStudentBasicInformation.aspx">International Student Application Form </a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmICTSServices.aspx">ITP (International Transfer Program) Services</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmInternationalProgramEnrolment.aspx">OIR Enrollment Form</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOIRServices.aspx">OIR Services</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmUploadInternationalStudentMedicalInsurance.aspx">University Medical Insurance</a></li></ul>
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmLoanLetterApplication.aspx" class="a-uims-nav">
+							            Apply for Loan Documents</a>
+						            
+					            </li>
+					            
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmAppCounsellingTherapyClinicRegistration.aspx" class="a-uims-nav">
+							            Counseling Therapy Clinic Registration</a>
+						            
+					            </li>
+					            
+				            
+					            <li data-toggle="collapse" data-target="#3713" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            DCPD<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="3713" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmCareerOptionOther.aspx?Type=QGVcrLuOjfitECW4+veVzA==">Career Options by DCPD</a></li><li data-toggle="collapse" data-target="#3714" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Evening CUCAT<span class="arrow"></span></a></li><ul id="3714" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmMockTestNew.aspx">Mock Test</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStuQuestionSolution.aspx">View Question Solution</a></li></ul></ul>
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmDLLMOOCCoordinatorList.aspx" class="a-uims-nav">
+							            DLL MOOC Coordinator List</a>
+						            
+					            </li>
+					            
+				            
+					            <li data-toggle="collapse" data-target="#2342" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            E Library<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="2342" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=PA8f2gBZPN2G5vACgUpS8q8aPNbtEWoFpGvx9fSSTn5SBSUkvaW1F4+WDbeuEVgrByLqYAw71dFjOnpINJQkb1nS/VwF0vUGdaNa/ZxXLbPWzD1EDuitwgCqnL4LzayY">EBSCO eBook Academic Collection</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=PA8f2gBZPN2G5vACgUpS8q8aPNbtEWoFpGvx9fSSTn5SBSUkvaW1F4+WDbeuEVgrByLqYAw71dFjOnpINJQkb1nS/VwF0vUGdaNa/ZxXLbMj6WG9aUk6g/X7ApvmbBzR">EBSCO Management Collection</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=PA8f2gBZPN2G5vACgUpS8q8aPNbtEWoFpGvx9fSSTn5SBSUkvaW1F4+WDbeuEVgrByLqYAw71dFjOnpINJQkb1nS/VwF0vUGdaNa/ZxXLbMa+4YBf7yAR+H/jNSXzgUV">EBSCOhost  E-Journal Access(Art and Architecture)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=QV5dHL7jXjFoMfhJzyRSB8mHytDcqoV5f4Wom3J0nlRXzfF6WI0M1CH0kkL/8BpGYTEyZlvrVdogWC2fw3Akc8lFubnuUo4BnEATg248VJXkQapuALK1TryDjmoT7t3eOXYb07XbuxPD2oE+obUlNg==">IEEE</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=QV5dHL7jXjFoMfhJzyRSB8mHytDcqoV5f4Wom3J0nlRXzfF6WI0M1CH0kkL/8BpGQpb7uMfdWl8yF4aRUmP6Zsn6AQJaRnEB7/gtSzVR1p585pFZUqCcLP0Md1FrzDxE">J-Gate (Science &amp; Technology)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=QV5dHL7jXjFoMfhJzyRSB8mHytDcqoV5f4Wom3J0nlRXzfF6WI0M1CH0kkL/8BpGQpb7uMfdWl8yF4aRUmP6Zsn6AQJaRnEB7/gtSzVR1p585pFZUqCcLP0Md1FrzDxE">J-Gate (Soc. Science and Humanities)</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=PA8f2gBZPN2G5vACgUpS8q8aPNbtEWoFpGvx9fSSTn5rGd65jzE8cRuauaYj2tJnH0PJZ8oauJ+rb9nxzuaAexyENYqhaXlaXq/+C2p07L/8z27ruNOLpK4peo2XgI8A">Publication Finder and Open Athens</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmOpenAuthentication.aspx?id=nfiADxpckRxbzXbfgdwrIInRiQfwBTLb6/+Drz4Hfuu1f/+GiF1v7htWc6qZ4UfeZ8rCtYt+mAXwUTxgui+nIVYMH/X2+Mz5T0N9xRCq1O7h9QK5KPVsxhQgLnm25vNLWngZ7jKKbHleD9V5LzqaNEdPHmQrgYDKSejwnT8cE+y+fkzv+sKNmr1tKO6Ax8X20DEzMdIuHk6qSwoUsEES/mvO9tbVtnt1MFx0J9xqrshfF359RI86VFsSRY6J30wDg9WSMpPa4j3V28dJRMP5MvBH+hj+t0X5vazU4wBNAqs=">Web of Science</a></li></ul>
+				            
+					            <li data-toggle="collapse" data-target="#3565" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Examination<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="3565" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/FrmStudentFormsDetails.aspx">Examaination Form Details</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentDatesheet.aspx">My Date Sheet</a></li><li data-toggle="collapse" data-target="#4168" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Raise Query<span class="arrow"></span></a></li><ul id="4168" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/StudentQueryMaster.aspx">Student Query Master</a></li></ul><li data-toggle="collapse" data-target="#2190" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Result<span class="arrow"></span></a></li><ul id="2190" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/result.aspx">Result ( Regular )</a></li></ul><li><a class="a-uims-nav" href="https://student.culko.in/frmAMCATStudentResult.aspx?type=6kjkaB6U01jsNZdSPYT2YA==">Student AMCAT Result</a></li><li data-toggle="collapse" data-target="#2600" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Student Marks View<span class="arrow"></span></a></li><ul id="2600" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentReappearMarksView.aspx">Student Marks View Reappear</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentMarksView.aspx">Student Marks View Regular</a></li></ul><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentPracticleDateSheet.aspx">Student Practical Date Sheet</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmAMCATStudentResult.aspx?type=S4w6En2dn/RLwsoo51Osyw==">Student Technical Result</a></li></ul>
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmStudentFeedbackSurvey.aspx" class="a-uims-nav">
+							            Feedback related to the Teaching and Learning Process</a>
+						            
+					            </li>
+					            
+				            
+					            <li data-toggle="collapse" data-target="#4157" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Hostel<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="4157" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmStudenHostelDetails.aspx">Details</a></li></ul>
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmStudentHostelLeave.aspx" class="a-uims-nav">
+							            Hostel Leave</a>
+						            
+					            </li>
+					            
+				            
+					            <li data-toggle="collapse" data-target="#3567" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Library<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="3567" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmLibraryRepository.aspx">CU E-Repository </a></li></ul>
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmStudentProfile.aspx" class="a-uims-nav">
+							            My Profile</a>
+						            
+					            </li>
+					            
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmTakeTest.aspx" class="a-uims-nav">
+							            Online Test</a>
+						            
+					            </li>
+					            
+				            
+					            <li class="">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            PhD</a>
+						            
+					            </li>
+					            
+				            
+					            <li data-toggle="collapse" data-target="#2932" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Student Leave Application<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="2932" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentApplyDutyLeave.aspx">Duty Leave</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentMedicalLeaveApply.aspx">Medical Leave</a></li></ul>
+				            
+					            <li data-toggle="collapse" data-target="#2192" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Student Relation Management System<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="2192" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentEventReview.aspx">Event Review</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmSWCRequest.aspx">Online Student Care Center Requests</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmTalentSearchProgram.aspx">Talent Search Program</a></li></ul>
+				            
+					            <li class="">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            TPP UILAH</a>
+						            
+					            </li>
+					            
+				            
+					            <li data-toggle="collapse" data-target="#4159" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            Transport<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="4159" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmTransportDetails.aspx">Details</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentTransportConsent.aspx">Transport Consent</a></li><li><a class="a-uims-nav" href="https://student.culko.in/frmStudentTransportConsent.aspx">Transport Consent</a></li></ul>
+				            
+					            <li data-toggle="collapse" data-target="#4172" class="collapsed">
+						            <a href="javascript:void(0);" class="a-uims-nav">
+							            UCMC<span class="arrow"></span></a>
+						            
+					            </li>
+					            <ul id="4172" class="sub-menu collapse"><li data-toggle="collapse" data-target="#4178" class="collapsed"><a class="a-uims-nav" href="javascript:void(0);">Competitive Exams Career Options<span class="arrow"></span></a></li><ul id="4178" class="sub-menu collapse"><li><a class="a-uims-nav" href="https://student.culko.in/frmresources.aspx?type=3MjtO9wiGLhI6em0bw+XikP5Cb/RMH/7S57lk08Obqs=">Judicial Services Preparation</a></li></ul></ul>
+				            
+					            <li class="">
+						            <a href="https://student.culko.in/frmStuUniformCollection.aspx" class="a-uims-nav">
+							            Uniform Management</a>
+						            
+					            </li>
+					            
+				            
+		            </ul>
+	            </div><div class="scroll-element scroll-x scroll-scrolly_visible"><div class="scroll-element_outer"><div class="scroll-element_size"></div><div class="scroll-element_track"></div><div class="scroll-bar" style="width: 100px;"></div></div></div><div class="scroll-element scroll-y scroll-scrolly_visible"><div class="scroll-element_outer"><div class="scroll-element_size"></div><div class="scroll-element_track"></div><div class="scroll-bar" style="height: 573px; top: 0px;"></div></div></div></div>
+            </div>
+            <div class="body-overlay"></div>
+            <div class="inner-wrapper">
+                <div id="short_links" class="d-flex content-boxes row g-3">
+                    <div class="col-sm-6 col-xl-3 col-6">
+                        <a href="https://student.culko.in/frmImportantlink.aspx" id="div_top_1" class="bg-red d-flex card-info">
+                            <div class="card-icon rounded-circle red-box d-flex align-items-center justify-content-center">
+                                <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-links.svg" alt="Important Links" class="img-fluid">
+                            </div>
+                            <div class="d-flex flex-column cardBox justify-content-center">
+                                <h4>Important Links</h4>
+                                <span class="moreLink d-flex text-uppercase">Click Here</span>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="col-sm-6 col-xl-3 col-6">
+                        <a href="https://www.culko.in/online-request/" id="div_top_3" class="card-info bg-blue d-flex">
+                            <div class="card-icon rounded-circle blue-box d-flex align-items-center justify-content-center">
+                                <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-facilitation.svg" alt="Facilitation" class="img-fluid" id="Layer_1">
+                            </div>
+                            <div class="d-flex flex-column cardBox justify-content-center">
+                                <h4>Student Facilitation</h4>
+                                <span class="moreLink d-flex text-uppercase">Click to View</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-sm-6 col-xl-3 col-6">
+                        <div id="div_top_5" class="d-flex">
+
+                            
+                            <a id="lbtnLMSSSO" class="d-flex card-info bg-yellow" href="javascript:__doPostBack(&#39;ctl00$lbtnLMSSSO&#39;,&#39;&#39;)">
+                                <div class="card-icon rounded-circle yellow-box d-flex align-items-center justify-content-center">
+                                    <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-study.svg" alt="CU-LMS" class="img-fluid">
+                                </div>
+                                <div class="d-flex flex-column cardBox justify-content-center">
+                                    <h4>CU-LMS</h4>
+                                    <span class="moreLink d-flex text-uppercase d-flex">My LMS</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-6 col-xl-3 col-6 d-none">
+                        <a href="https://student.culko.in/frmSWCRequest.aspx" id="div_top_4" class="d-flex card-info bg-yellow">
+                            <div class="card-icon rounded-circle yellow-box d-flex align-items-center justify-content-center">
+                                <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-antiragging.svg" alt="Anti Ragging" class="img-fluid">
+                            </div>
+                            <div class="d-flex flex-column cardBox justify-content-center">
+                                <h4>Student Center</h4>
+                                <span class="moreLink d-flex text-uppercase d-flex">Get Help</span>
+                            </div>
+                        </a>
+                    </div>
+                   <div class="col-sm-6 col-xl-3 col-6 position-relative">
+                        <div id="div_OE" class="card-info emp-info d-flex card-thumb">
+                            <div class="card-icon rounded-circle email-box d-flex align-items-center justify-content-center">
+                                <img src="./Chandigarh University Management System _ Unnao Campus_files/icon-email-lg.svg" alt="Anti Ragging" class="img-fluid" width="40">
+                            </div>
+                            <div class="d-flex flex-column cardBox justify-content-center">
+                                <h4>My University Email</h4>
+                                <span class="moreLink d-flex text-uppercase d-flex">View Details</span>
+                            </div>
+                        </div>
+                        <div id="divUniEmail" class="divUniEmail" style="display: none;">Dear Ankan Bhattacharjee, <br><span style="display:block; margin-top:5px">Your EmailId: <b>25LBCS3067@culkomail.in</b></span> <span style="display:block; margin-top:10px">Password: <b>K!778522844822og</b></span> <span style="display:block; margin-top:10px">(One Time Password)</span><br> To activate click <a style="display:block; padding:0" href="https://culkomail.in/" target="_blank">https://culkomail.in</a>
+		   <p style="font-size:10px; font-style:italic;margin-top:5px">Note: This is one-time password for your outlook ID. You need to use your changed password every time you have to log in to your account</p></div>
+                    </div>
+                </div>
+                
+                    
+                    
+                    
+                    
+    <style>  
+        #divattendcalc {     
+            position: fixed;
+            right: 5px;
+            top: 45%;
+            width: 50px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+            #divattendcalc input[type="image"] {
+                width: 100%;
+            }
+
+        @media (max-width: 480px) {
+            .Attendance_Calc {
+                height: 400px;
+                overflow-y: scroll;
+                overflow-x: hidden;
+            }
+
+            div[id*="lblAttendancePer"] {
+                line-height: 20px;
+            }
+        }
+    </style>
+    
+    <div class="form_header">My Attendance <span id="ContentPlaceHolder1_ls"></span></div>
+    <div class="col-md-12" style="margin-bottom:20px !important; border-bottom:1px solid #dadada; padding-bottom:15px !important">
+                   <div class="col-md-3"></div>
+                  <div class="col-md-2 text-right"><label style="padding-top:8px">Select Academic Session</label></div>
+                <div class="col-md-3 text-left">
+                        <select name="ctl00$ContentPlaceHolder1$ddlSession" id="ddlSession">
+	<option selected="selected" value="25262">CurrentSession (25262)</option>
+
+</select>
+                </div>
+                  <div class="clearfix"></div>
+              </div>
+
+    
+
+
+<script src="./Chandigarh University Management System _ Unnao Campus_files/highcharts.js.download"></script>  
+<script src="./Chandigarh University Management System _ Unnao Campus_files/exporting.js.download"></script>
+<script src="./Chandigarh University Management System _ Unnao Campus_files/jquery-ui.js.download"></script>
+<link href="./Chandigarh University Management System _ Unnao Campus_files/jquery-ui.css" rel="stylesheet">
+
+<script src="./Chandigarh University Management System _ Unnao Campus_files/student_attendance_summary_1.3.js.download"></script>
+
+<style type="text/css">
+    .highcharts-credits {
+        display: none;
+    }
+
+    .overlay {
+        height: 100%;
+        width: 100%;
+        z-index: 9999;
+        opacity: 0.5;
+        position: absolute;
+        vertical-align: central;
+    }
+
+    SortTable {
+        border: 1px solid #ccc;
+        border-collapse: collapse;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        table-layout: fixed;
+    }
+
+        SortTable caption {
+            font-size: 1.5em;
+            margin: .5em 0 .75em;
+        }
+
+        SortTable tr {
+            background: #f8f8f8;
+            border: 1px solid #ddd;
+            padding: .35em;
+        }
+
+        SortTable th,
+        SortTable td {
+            padding: .625em;
+            text-align: center;
+        }
+
+        SortTable th {
+            font-size: .85em;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+    .ui-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+
+    .ui-icon,
+    .ui-widget-content .ui-icon {
+        background-image: url("images/ui-icons_444444_256x240.png");
+    }
+
+    .ui-widget-header .ui-icon {
+        background-image: url("images/ui-icons_444444_256x240.png");
+    }
+
+    .my-inp {
+    }
+
+        .my-inp label {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .my-inp input {
+            display: inline-block;
+            vertical-align: middle;
+            width: 170px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+
+        .my-inp select {
+            width: 250px;
+            display: inline-block;
+        }
+
+    @media screen and (max-width: 600px) {
+        table {
+            border: 0;
+        }
+
+            table caption {
+                font-size: 1.3em;
+            }
+
+            table thead {
+                border: none;
+                clip: rect(0 0 0 0);
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                padding: 0;
+                position: absolute;
+                width: 1px;
+            }
+
+            table tr {
+                border-bottom: 3px solid #ddd;
+                display: block;
+                margin-bottom: .625em;
+            }
+
+            table td {
+                border-bottom: 1px solid #ddd;
+                display: block;
+                font-size: .8em;
+                text-align: right;
+            }
+
+                table td:before {
+                    content: attr(data-label);
+                    float: left;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+
+                table td:last-child {
+                    border-bottom: 0;
+                }
+    }
+</style>
+
+<div class="overlay" style="display: none;">
+    <img height="100%" width="100%" src="./Chandigarh University Management System _ Unnao Campus_files/three-bar-loader.gif">
+</div>
+
+<br>
+<div class="row">
+    <div class="col-sm-1"></div>
+    <div class="col-sm-3">
+        <b>UID: #<label class="uid">25LBCS3067</label></b>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-3">
+        <b>Semester: <label class="semester">2</label></b>
+    </div>
+    <div class="col-sm-1"></div>
+    <div class="col-sm-3">
+        <b>Name: <label class="name">Ankan Bhattacharjee</label></b>
+    </div>
+
+
+</div>
+<br>
+<div class="row">
+    <div class="col-sm-4 my-inp">
+        <label>Filter By:</label>
+        <select name="ctl00$ContentPlaceHolder1$wucStudentAttendanceSummary1$drpfilter" id="drpfilter" class="form-control">
+	<option value="All">Till Date(All days)</option>
+	<option value="DS">Date Wise</option>
+
+</select>
+    </div>
+    <div id="div_filter" style="display: none">
+        <div class="col-sm-3 my-inp">
+            <label>From Date:</label>
+            <input name="ctl00$ContentPlaceHolder1$wucStudentAttendanceSummary1$txtfromdate" type="text" autocomplete="off" id="txtfromdate" class="form-control hasDatepicker">
+            
+        </div>
+        <div class="col-sm-3 my-inp">
+            <label>To Date:</label>
+            <input name="ctl00$ContentPlaceHolder1$wucStudentAttendanceSummary1$txttodate" type="text" autocomplete="off" id="txttodate" class="form-control hasDatepicker">
+            
+            <span id="ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1" style="color:Red;visibility:hidden;">*Invalid Data</span>
+        </div>
+
+    </div>
+    <div class="col-sm-2">
+        <input type="button" value="Search" onclick="getDataDateWise()">
+        
+    </div>
+    <div class="col-sm-12">
+        <b>Search Criteria:</b><span id="lbtype">Till Date(All days)</span>
+    </div>
+</div>
+
+<br>
+
+<div id="Chart">
+    <div id="container" data-highcharts-chart="0"><div id="highcharts-sjyw7jq-0" class="highcharts-container " style="position: relative; overflow: hidden; width: 1312px; height: 400px; text-align: left; line-height: normal; z-index: 0; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><svg version="1.1" class="highcharts-root" style="font-family:&quot;Lucida Grande&quot;, &quot;Lucida Sans Unicode&quot;, Arial, Helvetica, sans-serif;font-size:12px;" xmlns="http://www.w3.org/2000/svg" width="1312" height="400" viewBox="0 0 1312 400"><desc>Created with Highcharts 6.0.1</desc><defs><clippath id="highcharts-sjyw7jq-1"><rect x="0" y="0" width="1256" height="311" fill="none"></rect></clippath></defs><rect fill="#ffffff" class="highcharts-background" x="0" y="0" width="1312" height="400" rx="0" ry="0"></rect><rect fill="none" class="highcharts-plot-background" x="46" y="10" width="1256" height="311"></rect><g class="highcharts-grid highcharts-xaxis-grid "><path fill="none" class="highcharts-grid-line" d="M 185.5 10 L 185.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 324.5 10 L 324.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 464.5 10 L 464.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 603.5 10 L 603.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 743.5 10 L 743.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 882.5 10 L 882.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 1022.5 10 L 1022.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 1161.5 10 L 1161.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 1301.5 10 L 1301.5 321" opacity="1"></path><path fill="none" class="highcharts-grid-line" d="M 45.5 10 L 45.5 321" opacity="1"></path></g><g class="highcharts-grid highcharts-yaxis-grid "><path fill="none" stroke="#e6e6e6" stroke-width="1" class="highcharts-grid-line" d="M 46 321.5 L 1302 321.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" class="highcharts-grid-line" d="M 46 259.5 L 1302 259.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" class="highcharts-grid-line" d="M 46 197.5 L 1302 197.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" class="highcharts-grid-line" d="M 46 134.5 L 1302 134.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" class="highcharts-grid-line" d="M 46 72.5 L 1302 72.5" opacity="1"></path><path fill="none" stroke="#e6e6e6" stroke-width="1" class="highcharts-grid-line" d="M 46 9.5 L 1302 9.5" opacity="1"></path></g><rect fill="none" class="highcharts-plot-border" x="46" y="10" width="1256" height="311"></rect><g class="highcharts-axis highcharts-xaxis "><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 185.5 321 L 185.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 324.5 321 L 324.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 464.5 321 L 464.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 603.5 321 L 603.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 743.5 321 L 743.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 882.5 321 L 882.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 1022.5 321 L 1022.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 1161.5 321 L 1161.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 1302.5 321 L 1302.5 331" opacity="1"></path><path fill="none" class="highcharts-tick" stroke="#ccd6eb" stroke-width="1" d="M 45.5 321 L 45.5 331" opacity="1"></path><path fill="none" class="highcharts-axis-line" stroke="#ccd6eb" stroke-width="1" d="M 46 321.5 L 1302 321.5"></path></g><g class="highcharts-axis highcharts-yaxis "><path fill="none" class="highcharts-axis-line" d="M 46 10 L 46 321"></path></g><path fill="none" class="highcharts-crosshair highcharts-crosshair-category undefined" stroke="rgba(204,214,235,0.25)" stroke-width="139.55555555555554" style="pointer-events:none;" visibility="hidden" d="M 952.5 10 L 952.5 321"></path><g class="highcharts-series-group"><g class="highcharts-series highcharts-series-0 highcharts-column-series highcharts-color-0 highcharts-tracker " transform="translate(46,10) scale(1 1)" clip-path="url(#highcharts-sjyw7jq-1)"><rect x="45" y="57" width="51" height="255" fill="green" class="highcharts-point highcharts-color-0"></rect><rect x="184" y="29" width="51" height="283" fill="green" class="highcharts-point highcharts-color-0 "></rect><rect x="324" y="32" width="51" height="280" fill="green" class="highcharts-point highcharts-color-0"></rect><rect x="463" y="51" width="51" height="261" fill="green" class="highcharts-point highcharts-color-0 "></rect><rect x="603" y="51" width="51" height="261" fill="green" class="highcharts-point highcharts-color-0 "></rect><rect x="742" y="38" width="51" height="274" fill="green" class="highcharts-point highcharts-color-0 "></rect><rect x="882" y="29" width="51" height="283" fill="green" class="highcharts-point highcharts-color-0 "></rect><rect x="1022" y="48" width="51" height="264" fill="green" class="highcharts-point highcharts-color-0 "></rect><rect x="1161" y="26" width="51" height="286" fill="green" class="highcharts-point highcharts-color-0 "></rect></g><g class="highcharts-markers highcharts-series-0 highcharts-column-series highcharts-color-0 " transform="translate(46,10) scale(1 1)" clip-path="none"></g></g><g class="highcharts-button highcharts-contextbutton" style="cursor:pointer;" stroke-linecap="round" transform="translate(1278,10)"><title>Chart context menu</title><rect fill="#ffffff" class=" highcharts-button-box" x="0.5" y="0.5" width="24" height="22" rx="2" ry="2" stroke="none" stroke-width="1"></rect><path fill="#666666" d="M 6 6.5 L 20 6.5 M 6 11.5 L 20 11.5 M 6 16.5 L 20 16.5" class="highcharts-button-symbol" stroke="#666666" stroke-width="3"></path><text x="0" style="font-weight:normal;color:#333333;fill:#333333;" y="12"></text></g><g class="highcharts-legend" transform="translate(588,355)"><rect fill="none" class="highcharts-legend-box" rx="0" ry="0" x="0" y="0" width="136" height="30" visibility="visible"></rect><g><g><g class="highcharts-legend-item highcharts-column-series highcharts-color-0 highcharts-series-0" transform="translate(8,3)"><text x="21" style="color:#333333;font-size:12px;font-weight:bold;cursor:pointer;fill:#333333;" text-anchor="start" y="15"><tspan>Total Percentage</tspan></text><rect x="2" y="4" width="12" height="12" fill="#7cb5ec" rx="6" ry="6" class="highcharts-point"></rect></g></g></g></g><g class="highcharts-axis-labels highcharts-xaxis-labels "><text x="115.77777777777777" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25CSH-102</tspan></text><text x="255.33333333333331" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25CSH-114</tspan></text><text x="394.88888888888886" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25CSH-119</tspan></text><text x="534.4444444444443" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25CSR-121</tspan></text><text x="674" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25CST-116</tspan></text><text x="813.5555555555554" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25CST-123</tspan></text><text x="953.1111111111111" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25DCP-151</tspan></text><text x="1092.6666666666665" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25MTT-108</tspan></text><text x="1232.2222222222222" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="middle" transform="translate(0,0)" y="340" opacity="1"><tspan>25UCT-103</tspan></text></g><g class="highcharts-axis-labels highcharts-yaxis-labels "><text x="31" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="325" opacity="1"><tspan>0</tspan></text><text x="31" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="263" opacity="1"><tspan>20</tspan></text><text x="31" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="201" opacity="1"><tspan>40</tspan></text><text x="31" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="138" opacity="1"><tspan>60</tspan></text><text x="31" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="76" opacity="1"><tspan>80</tspan></text><text x="31" style="color:#666666;cursor:default;font-size:11px;fill:#666666;" text-anchor="end" transform="translate(0,0)" y="14" opacity="1"><tspan>100</tspan></text></g><text x="1302" class="highcharts-credits" text-anchor="end" style="cursor:pointer;color:#999999;font-size:9px;fill:#999999;" y="395">Highcharts.com</text><g class="highcharts-label highcharts-tooltip highcharts-color-0" style="cursor:default;pointer-events:none;white-space:nowrap;" transform="translate(878,-9999)" opacity="0" visibility="visible"><path fill="none" class="highcharts-label-box highcharts-tooltip-box" d="M 3.5 0.5 L 68.5 0.5 74.5 -5.5 80.5 0.5 146 0.5 C 149.5 0.5 149.5 0.5 149.5 3.5 L 149.5 44.5 C 149.5 47.5 149.5 47.5 146.5 47.5 L 3.5 47.5 C 0.5 47.5 0.5 47.5 0.5 44.5 L 0.5 3.5 C 0.5 0.5 0.5 0.5 3.5 0.5" isShadow="true" stroke="#000000" stroke-opacity="0.049999999999999996" stroke-width="5" transform="translate(1, 1)"></path><path fill="none" class="highcharts-label-box highcharts-tooltip-box" d="M 3.5 0.5 L 68.5 0.5 74.5 -5.5 80.5 0.5 146 0.5 C 149.5 0.5 149.5 0.5 149.5 3.5 L 149.5 44.5 C 149.5 47.5 149.5 47.5 146.5 47.5 L 3.5 47.5 C 0.5 47.5 0.5 47.5 0.5 44.5 L 0.5 3.5 C 0.5 0.5 0.5 0.5 3.5 0.5" isShadow="true" stroke="#000000" stroke-opacity="0.09999999999999999" stroke-width="3" transform="translate(1, 1)"></path><path fill="none" class="highcharts-label-box highcharts-tooltip-box" d="M 3.5 0.5 L 68.5 0.5 74.5 -5.5 80.5 0.5 146 0.5 C 149.5 0.5 149.5 0.5 149.5 3.5 L 149.5 44.5 C 149.5 47.5 149.5 47.5 146.5 47.5 L 3.5 47.5 C 0.5 47.5 0.5 47.5 0.5 44.5 L 0.5 3.5 C 0.5 0.5 0.5 0.5 3.5 0.5" isShadow="true" stroke="#000000" stroke-opacity="0.15" stroke-width="1" transform="translate(1, 1)"></path><path fill="rgba(247,247,247,0.85)" class="highcharts-label-box highcharts-tooltip-box" d="M 3.5 0.5 L 68.5 0.5 74.5 -5.5 80.5 0.5 146 0.5 C 149.5 0.5 149.5 0.5 149.5 3.5 L 149.5 44.5 C 149.5 47.5 149.5 47.5 146.5 47.5 L 3.5 47.5 C 0.5 47.5 0.5 47.5 0.5 44.5 L 0.5 3.5 C 0.5 0.5 0.5 0.5 3.5 0.5" stroke="green" stroke-width="1"></path><text x="8" style="font-size:12px;color:#333333;fill:#333333;" y="20"><tspan style="font-size: 10px">25DCP-151</tspan><tspan style="fill:green" x="8" dy="15">●</tspan><tspan dx="0"> Total Percentage: </tspan><tspan style="font-weight:bold" dx="0">91</tspan></text></g></svg></div></div>
+</div>
+
+<table id="SortTable" class="table table-bordered table-striped" style="text-align: center;">
+    <thead>
+        <tr>
+            <th>Course Code</th>
+            <th>Title</th>
+            
+
+
+            <th>Total Delv.</th>
+            <th>Total Attd.</th>
+            
+            
+           
+             <th>IDL</th>
+             <th>ADL</th>
+            
+            <th>VDL</th>
+            <th>Medical Leave</th>
+             <th>Eligible Delivered</th>
+             <th>Eligible Attended</th>
+             <th>Eligible Percentage</th>
+            
+            <th>View Attendance</th>
+
+        </tr>
+    </thead>
+    <tbody><tr><td data-label="Course Code:">25CSH-102</td><td data-label="Title:">Computer Eco-System</td><td data-label="Total_Delv:">94</td><td data-label="Total_Attd:">74</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">90</td><td data-label="Eligible Attended:">74</td><td data-label="Eligible Percentage:">82.22</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTj2Fr64uT3+qWeRW9X3qOoSE=" obj="25CSH-102" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25CSH-114</td><td data-label="Title:">   	 Data Structures and Algorithms -I</td><td data-label="Total_Delv:">70</td><td data-label="Total_Attd:">62</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">68</td><td data-label="Eligible Attended:">62</td><td data-label="Eligible Percentage:">91.18</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTjwUKIL7BVuNYlVR2YGJZTsk=" obj="25CSH-114" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25CSH-119</td><td data-label="Title:">Programming in Python </td><td data-label="Total_Delv:">54</td><td data-label="Total_Attd:">46</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">51</td><td data-label="Eligible Attended:">46</td><td data-label="Eligible Percentage:">90.2</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTj1FmNJUzRXBK8/3zg10FQLI=" obj="25CSH-119" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25CSR-121</td><td data-label="Title:">Project based Learning-II </td><td data-label="Total_Delv:">58</td><td data-label="Total_Attd:">44</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">52</td><td data-label="Eligible Attended:">44</td><td data-label="Eligible Percentage:">84.62</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTj8WM+/Q2sI7fWbG47Ai/NE8=" obj="25CSR-121" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25CST-116</td><td data-label="Title:">Network Security</td><td data-label="Total_Delv:">33</td><td data-label="Total_Attd:">27</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">32</td><td data-label="Eligible Attended:">27</td><td data-label="Eligible Percentage:">84.38</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTj2FiZT9iEuBoTWi8K7Sh6b8=" obj="25CST-116" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25CST-123</td><td data-label="Title:">English Communication-II</td><td data-label="Total_Delv:">30</td><td data-label="Total_Attd:">24</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">27</td><td data-label="Eligible Attended:">24</td><td data-label="Eligible Percentage:">88.89</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTj/9OlazRFfrCmbOXdHauEVk=" obj="25CST-123" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25DCP-151</td><td data-label="Title:">SOFT SKILLS - I</td><td data-label="Total_Delv:">24</td><td data-label="Total_Attd:">22</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">24</td><td data-label="Eligible Attended:">22</td><td data-label="Eligible Percentage:">91.67</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTjyUY2KJyGHRleb20gw6JKOA=" obj="25DCP-151" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25MTT-108</td><td data-label="Title:">Linear Algebra and Vector Calculus</td><td data-label="Total_Delv:">65</td><td data-label="Total_Attd:">53</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">62</td><td data-label="Eligible Attended:">53</td><td data-label="Eligible Percentage:">85.48</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTjzlOEZYcEhc0rEs147CQgcI=" obj="25MTT-108" value="View" onclick="getdata(this)"></td></tr><tr><td data-label="Course Code:">25UCT-103</td><td data-label="Title:">Universal Human Values</td><td data-label="Total_Delv:">29</td><td data-label="Total_Attd:">26</td><td data-label="Duty Leave N P:">0</td><td data-label="Duty Leave ADL:">0</td><td data-label="Duty Leave Others:">0</td><td data-label="Medical Leave:">0</td><td data-label="Eligible Delivered:">28</td><td data-label="Eligible Attended:">26</td><td data-label="Eligible Percentage:">92.86</td><td><input type="hidden" value="tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA="><input type="button" chk="mhzuK+SCx4KBPrfGqpzTjxD1bDMJOVD2fWNBgsfPTog=" obj="25UCT-103" value="View" onclick="getdata(this)"></td></tr></tbody>
+</table>
+
+
+
+<div class="row Note">
+    <div class="col-sm-12" style="font-weight: 500; color: #FF0000; font-size: 15px;">
+     
+        <b>Types of Duty Leaves</b>
+        <ul>
+            <li>IDL	: Industrial Duty Leave</li>
+            <li>ADL	: Assigned Duty Leave</li>
+            <li>VDL : Voluntary Duty Leave</li>
+                             
+        </ul>
+    </div>
+
+</div>
+
+<center><input type="submit" name="ctl00$ContentPlaceHolder1$wucStudentAttendanceSummary1$download" value="Download as PDF" id="ContentPlaceHolder1_wucStudentAttendanceSummary1_download"></center>
+
+<div id="popupid" class="sidenav" style="transition: all 0.5s ease 0s; width: 0px; z-index: 15;">
+    <div style="display: block; margin: auto; width: 90%;">
+
+        <h2 style="font-size: 18px; text-align: center; color: #d30505; padding: 0px">Attendance Summary
+                <input type="button" value="Print Data" onclick="printData()"><br>
+            * Please note Absent(Duty Leave) or Absent(Medical Leave) are counted as absent. Benefit of these leaves will  applicable as per policy of minimum physical attendance.
+
+
+        </h2>
+
+        <div style="background: #fff; max-height: 500px;" align="center">
+            <div class="closebtn" onclick="Closepopupfunction();">
+                X
+            </div>
+            <div>
+
+
+
+                <div style="max-height: 500px; overflow-x: hidden; overflow-y: auto;" id="div_attend_details">
+                    <div class="row print">
+
+                        <div class="col-sm-3">
+                            <b>UID: #<label class="uid">25LBCS3067</label></b>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <b>Semester: <label class="semester">2</label></b>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <b>Name: <label class="name">Ankan Bhattacharjee</label></b>
+                        </div>
+                        <div class="col-sm-3">
+                            <b>Course Code: <label class="CourseCode"></label></b>
+                        </div>
+                        
+                    </div>
+                    <table id="fullreport" class="print table table-bordered table-hover table-condensed" style="overflow: auto; text-align: center;">
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="givefeedback" class="sidenav" style="transition: all 0.5s ease 0s; width: 0px; z-index: 15;">
+ <div style="display: block; margin: auto; width: 90%;">
+
+        <h2 style="font-size: 18px; text-align: center; color: #d30505; padding: 0px">
+               
+           
+
+
+        </h2>
+
+        <div style="background: #fff; max-height: 500px;" align="center">
+            <div class="closebtn" onclick="Closefeedbackfunction();">
+                X
+            </div>
+            </div>
+
+    
+   
+
+     </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+                
+            </div>
+            <footer id="footer" class="footer d-flex flex-column">
+			    <div class="top-footer d-flex align-items-center justify-content-center flex-column">
+				    <a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#"><img src="./Chandigarh University Management System _ Unnao Campus_files/logo-black.svg" class="img-fluid" alt="Chandigarh University"></a>
+				    <ul class="social-icons d-flex">
+					    <li><a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-fb.svg" class="img-fluid" alt="Facebook"></a></li>
+					    <li><a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-twitter.svg" class="img-fluid" alt="Twitter"></a></li>
+					    <li><a href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-vimeo.svg" class="img-fluid" alt="Vimeo"></a></li>
+					    <li><a href="https://www.youtube.com/@Chandigarhuniversity"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-youtube.svg" class="img-fluid" alt="Youtube" width="30"></a></li>
+				    </ul>
+			    </div>
+                <div class="text-end">
+                    <a href="https://student.culko.in/bugreport.aspx" id="a_bugreport" title="Report a bug">Report a Bug  <i class="fa fa-bug" aria-hidden="true"></i></a>
+                </div>
+			    <div class="bottom-footer d-flex justify-content-between">
+					<div class="footer-txt">© 2025 Chandigarh University, Lucknow - Kanpur Highway-27, Unnao, Uttar Pradesh, India.</div>
+					<div class="footer-txt"><a href="tel:18002701411"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-phone.svg" class="img-fluid" width="15" alt="phone">General Helpline No: 18002701411</a></div>
+					<div class="footer-txt"><a href="mailto:studentcare@culko.in"><img src="./Chandigarh University Management System _ Unnao Campus_files/icon-email.svg" class="img-fluid" width="15" alt="Email ID">studentcare@culko.in</a></div>
+				</div>
+		    </footer>
+            
+        </div>
+
+        
+
+        <div id="div_help_popup" class="modal fade" role="dialog" style="z-index: 99999; background: rgba(255, 255, 255, 0.9); display:none;">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" onclick="OpenNewPopUp(&#39;0&#39;,&#39;div_help_popup&#39;)">×</button>
+                        <h4 class="modal-title text-center">UIMS HELP</h4>
+                    </div>
+                    <div id="help_content" style="height: 450px; overflow-y: scroll;" class="modal-body">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <!-- Modal -->
+
+        
+
+        
+
+        
+
+
+        
+
+        
+
+        
+
+
+
+
+        
+
+        <div id="div_libpopup" class="modal fade" role="dialog" style="z-index: 999999; background: rgba(255, 255, 255, 0.9); display:none;">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title text-center w-100">LIBRARY MESSAGES</h4>
+                        <button type="button" class="close" data-dismiss="modal" onclick="OpenNewPopUp(&#39;0&#39;,&#39;div_libpopup&#39;)">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <ul id="tabs" class="nav nav-tabs nav-tabMessage">
+                            <li class="active"><a data-toggle="tab" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#t1">Pending</a></li>
+                            <li><a data-toggle="tab" href="https://student.culko.in/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==#t2">History</a></li>
+                        </ul>
+                        <div id="div_lib_content">
+                        </div>
+                        <!-- Bootstrap Accordion -->
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true"></div>
+                        <!-- /Bootstrap Accordion -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        
+
+
+
+
+        
+
+        <div id="div_celebrations" class="sidenav" style="transition: all 0.5s ease 0s; width: 0px; z-index: 15;">
+            <div style="display: block; margin: auto; width: 100%;">
+
+                <div style="background: #fff;">
+                    <div class="div_celebrations_Popup">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+
+
+        
+
+        <div id="divForcePopUp" class="divForcePopup modal fade" role="dialog" style="z-index: 99999; background: rgba(255, 255, 255, 0.9);">
+            <div class="modal-dialog" style="width: 98%; max-width:98%;">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" onclick="OpenNewPopUp(&#39;0&#39;,&#39;divForcePopUp&#39;)">×</button>
+                        <h4 class="modal-title text-center w-100">IMPORTANT INFORMATION</h4>
+                    </div>
+                    <div class="modal-body" id="divForcePopUp_content">
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+
+
+
+
+        
+        <div id="UpdateProgress1" style="display: none; left: 823px; top: 479px; position: fixed;" role="status" aria-hidden="true">
+	
+                <div id="loader-wrapper">
+                    <div id="loader">
+                        <img src="./Chandigarh University Management System _ Unnao Campus_files/loader.gif">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            
+</div>
+        
+        
+
+
+        <script src="./Chandigarh University Management System _ Unnao Campus_files/bootstrap.min.js.download"></script>
+
+        <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/materialize.js.download"></script>
+        <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/UIMSHome4.0.js.download"></script>
+        <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/jquery.scrollbar.js.download"></script>
+        <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/toastr8.min.js.download"></script>
+        <script type="text/javascript" src="./Chandigarh University Management System _ Unnao Campus_files/jquery-ui.js.download"></script>
+
+        
+
+
+        
+    <script>
+        $(".mob-search a").click(function(){
+            $(".page-search").toggleClass("open");
+        });
+    </script>
+    <script>
+        const myElement = document.getElementById('myElement');
+        const searchBox = document.getElementById('searchBox');
+        searchBox.addEventListener('click', function () {
+            myElement.classList.toggle('searchOuter');
+        });
+        function slideLeft() {
+            const mainWrap = document.getElementById('mainWrap');
+            mainWrap.classList.toggle('slideLeft');
+            const sidebarMenu = document.getElementById('uims_sidebars');
+            //uims_sidebar.classList.toggle('slideLeft');
+        }
+        function flip() {
+            $('.card-thumb').toggleClass('flipped');
+        }
+    </script>
+    
+<script type="text/javascript">
+//<![CDATA[
+var Page_Validators =  new Array(document.getElementById("ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1"));
+//]]>
+</script>
+
+<script type="text/javascript">
+//<![CDATA[
+var ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1 = document.all ? document.all["ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1"] : document.getElementById("ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1");
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.controltovalidate = "txttodate";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.errormessage = "*Invalid Data";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.validationGroup = "datefilter";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.type = "Date";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.dateorder = "mdy";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.cutoffyear = "2049";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.century = "2000";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.evaluationfunction = "CompareValidatorEvaluateIsValid";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.controltocompare = "txtfromdate";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.controlhookup = "txtfromdate";
+ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1.operator = "GreaterThanEqual";
+//]]>
+</script>
+
+
+<script type="text/javascript">
+//<![CDATA[
+setTimeout(function () {getReport('tRRbSvUPLQE6wbQ3Z2IPTsz+P41CsOMVyho4U2kASvA=','25262');}, 200);
+var Page_ValidationActive = false;
+if (typeof(ValidatorOnLoad) == "function") {
+    ValidatorOnLoad();
+}
+
+function ValidatorOnSubmit() {
+    if (Page_ValidationActive) {
+        return ValidatorCommonOnSubmit();
+    }
+    else {
+        return true;
+    }
+}
+        
+document.getElementById('ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1').dispose = function() {
+    Array.remove(Page_Validators, document.getElementById('ContentPlaceHolder1_wucStudentAttendanceSummary1_cmpVal1'));
+}
+Sys.Application.add_init(function() {
+    $create(Sys.UI._UpdateProgress, {"associatedUpdatePanelId":null,"displayAfter":0,"dynamicLayout":true}, null, null, $get("UpdateProgress1"));
+});
+Sys.Application.add_init(function() {
+    $create(AjaxControlToolkit.AlwaysVisibleControlBehavior, {"HorizontalSide":1,"VerticalSide":1,"id":"AlwaysVisibleControlExtender5"}, null, null, $get("UpdateProgress1"));
+});
+//]]>
+</script>
+</form>
+
+
+<div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div><div style="left: -1000px; overflow: scroll; position: absolute; top: -1000px; border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"><div style="border-width: medium; border-style: none; border-color: currentcolor; border-image: initial; box-sizing: content-box; height: 200px; margin: 0px; padding: 0px; width: 200px;"></div></div><div><div class="sweet-overlay" tabindex="-1"></div><div class="sweet-alert" tabindex="-1"><div class="icon error"><span class="x-mark"><span class="line left"></span><span class="line right"></span></span></div><div class="icon warning"> <span class="body"></span> <span class="dot"></span> </div> <div class="icon info"></div> <div class="icon success"> <span class="line tip"></span> <span class="line long"></span> <div class="placeholder"></div> <div class="fix"></div> </div> <div class="icon custom"></div> <h2>Title</h2><p>Text</p><button class="cancel" tabindex="2">Cancel</button><button class="confirm" tabindex="1">OK</button></div></div></body></html>

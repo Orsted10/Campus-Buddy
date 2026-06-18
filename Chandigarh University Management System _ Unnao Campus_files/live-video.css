@@ -1,0 +1,127 @@
+/* live-video css */
+.video-wrap {
+    position: relative;
+}
+
+.video-content {
+    content: "";
+    position: fixed;
+    bottom: auto;
+    left: 0;
+    z-index: 99999;
+    padding: 8px;
+    padding-bottom: 3px !important;
+    background: #b9b9bb;
+    border-radius: 4px;
+    border-top-right-radius: 0px !important;
+    top: 0;
+    right: 0;
+    margin: auto;
+    max-width: 320px;
+}
+
+.video-wrap .close {
+    background: #b9b9bb;
+    padding: 0 5px 0px 5px;
+}
+
+    .video-wrap .close,
+    .video-wrap .close:focus {
+        position: fixed;
+        z-index: 999999;
+        font-size: 21px;
+        color: #fff;
+        text-shadow: none;
+        left: 275px;
+        bottom: auto;
+        opacity: 1;
+        box-shadow: none;
+        outline: none;
+        right: 0;
+        margin: auto;
+        top: 159px;
+    }
+
+.toolbar {
+    position: relative;
+}
+
+    .toolbar .btn {
+        content: "";
+        position: fixed;
+        font-weight: 700;
+        padding: 1px 6px;
+        background-color: #b9b9bb;
+        text-decoration: none;
+        color: #333;
+        border: 0px solid white;
+        transition: all .2s;
+        outline: none;
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+        width: 58px;
+        font-size: 12px;
+        border-radius: 0;
+        z-index: 999999;
+        top: 159px;
+        bottom: auto;
+        left: 195px;
+        right: 0;
+        margin: auto;
+        border-top-left-radius: 4px !important;
+    }
+
+    .toolbar .btn_live {
+        padding-right: 0px;
+    }
+
+span.live-icon {
+    display: inline-block;
+    top: calc(50% - 5px);
+    background-color: red;
+    width: 8px;
+    height: 8px;
+    margin-left: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    z-index: 1;
+    margin-bottom: 1px;
+}
+
+    span.live-icon:before {
+        content: '';
+        display: block;
+        position: absolute;
+        background-color: rgba(255, 0, 0, 0.6);
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        -webkit-animation: live 2s ease-in-out -1s infinite;
+        animation: live 2s ease-in-out -1s infinite;
+        z-index: -1;
+    }
+
+@-webkit-keyframes live {
+    0% {
+        -webkit-transform: scale(1, 1);
+        transform: scale(1, 1);
+    }
+
+    100% {
+        -webkit-transform: scale(3.5, 3.5);
+        transform: scale(3.5, 3.5);
+        background-color: rgba(255, 0, 0, 0);
+    }
+}
+
+@keyframes live {
+    0% {
+        -webkit-transform: scale(1, 1);
+        transform: scale(1, 1);
+    }
+
+    100% {
+        -webkit-transform: scale(3.5, 3.5);
+        transform: scale(3.5, 3.5);
+        background-color: rgba(255, 0, 0, 0);
+    }
+}
