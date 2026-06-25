@@ -8,6 +8,7 @@ import { AlertCircle, CheckCircle2, AlertTriangle, GraduationCap, RefreshCw, Cal
 import { motion, AnimatePresence } from 'framer-motion'
 import { getApiUrl } from '@/lib/api-config'
 import { Badge } from '@/components/ui/badge'
+import toast from 'react-hot-toast'
 
 function AttendanceRing({ 
   percentage, attended, total, idl = "0", adl = "0", vdl = "0", ml = "0", onViewDetails, recentDots
@@ -282,9 +283,22 @@ export default function AttendancePage() {
       const chkParam = subject.chk ? `&chk=${encodeURIComponent(subject.chk)}` : ''
       const res = await fetch(getApiUrl(`/api/culko?endpoint=attendance-details&courseCode=${subject.code}${chkParam}`))
       const data = await res.json()
-      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
-        setHistory(data.data)
-        setRecentDotsCache(prev => ({ ...prev, [subject.code]: data.data.slice(0, 6) }))
+      
+      // Check if backend sent debug logs instead of a straight array
+      let historyData = data.data
+      let debugLogs = null
+      
+      if (data.success && !Array.isArray(data.data) && data.data?.debug) {
+        historyData = data.data.data
+        debugLogs = data.data.debug
+        console.warn('Backend sent debug logs:', debugLogs)
+      }
+
+      if (data.success && Array.isArray(historyData) && historyData.length > 0) {
+        setHistory(historyData)
+        setRecentDotsCache(prev => ({ ...prev, [subject.code]: historyData.slice(0, 6) }))
+      } else if (debugLogs && debugLogs.length > 0) {
+        toast.error('Scraper failed. Check console for logs.')
       } else if (!data.success) {
         toast.error(`Backend error: ${data.error || 'Unknown error'}`)
         console.error('Attendance Details Error:', data)

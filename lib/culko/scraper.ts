@@ -479,6 +479,12 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
 }
 
 async function fetchAttendanceDetails(cookies: Record<string, string>, courseCode: string, chk?: string) {
+  const debugLogs: string[] = []
+  const log = (msg: string) => {
+    debugLogs.push(msg)
+    console.log(msg)
+  }
+
   const cookieStr = Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; ')
   const baseHeaders: Record<string, string> = {
     'Cookie': cookieStr,
@@ -486,17 +492,19 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
     'Referer': `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
   }
 
-  // ── Step 1: Load summary page to extract reportId and sessionId ──
+  log(`[fetchDetails] Starting with courseCode=${courseCode}, initial chk=${chk}`)
+
   const summaryUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
-  console.log(`[fetchDetails] Loading summary page for reportId and sessionId extraction...`)
+  log(`[fetchDetails] Loading summary page for reportId and sessionId extraction...`)
   
   let html = ''
   try {
     const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
     html = await summaryRes.text()
+    log(`[fetchDetails] Loaded summary page: ${html.length} chars`)
   } catch (e) {
-    console.error('[fetchDetails] Failed to load summary page:', e)
-    return []
+    log(`[fetchDetails] Failed to load summary page: ${e}`)
+    return { data: [], debug: debugLogs }
   }
 
   const $ = cheerio.load(html)
@@ -523,7 +531,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
     chk = btn.attr('chk') || ''
     obj = btn.attr('obj') || courseCode
   }
-  console.log(`[fetchDetails] Resolved courseCode=${courseCode}, chk=${chk ? chk.substring(0, 15) + '...' : 'EMPTY'} obj=${obj}`)
+  log(`[fetchDetails] Resolved courseCode=${courseCode}, chk=${chk ? chk.substring(0, 15) + '...' : 'EMPTY'} obj=${obj}`)
 
   // Extract reportId and sessionId
   let reportId = ''
@@ -555,7 +563,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
     }
   }
 
-  console.log(`[fetchDetails] Extracted reportId=${reportId}, sessionId=${sessionId}`)
+  log(`[fetchDetails] Extracted reportId=${reportId}, sessionId=${sessionId}`)
 
   // Extract ASP.NET form fields for fallback postback
   const viewState = $('#__VIEWSTATE').val() as string || ''
@@ -566,7 +574,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
   if (reportId && sessionId && chk) {
     try {
       const fullReportUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx/GetFullReport`
-      console.log(`[fetchDetails] Sending request to GetFullReport: ${fullReportUrl}`)
+      log(`[fetchDetails] Sending request to GetFullReport: ${fullReportUrl}`)
       const res = await fetch(fullReportUrl, {
         method: 'POST',
         headers: {
@@ -586,13 +594,13 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       
       if (res.ok) {
         const text = await res.text()
-        console.log(`[fetchDetails] GetFullReport response status: ${res.status}, length: ${text.length}`)
+        log(`[fetchDetails] GetFullReport response status: ${res.status}, length: ${text.length}`)
         const parsed = JSON.parse(text)
         if (parsed.d) {
           const data = JSON.parse(parsed.d)
           if (Array.isArray(data) && data.length > 0) {
-            console.log(`[fetchDetails] Successfully parsed ${data.length} detailed records from GetFullReport`)
-            return data.map((r: any) => {
+            log(`[fetchDetails] Successfully parsed ${data.length} detailed records from GetFullReport`)
+            const history = data.map((r: any) => {
               const keys = Object.keys(r)
               const findK = (patterns: string[]) => {
                 return keys.find(k => {
@@ -600,14 +608,21 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
                   return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
                 })
               }
+              const dateKey = findK(['attdate', 'date'])
+              const typeKey = findK(['attendancetype', 'subjecttype', 'type', 'classtype'])
+              const timeKey = findK(['timing', 'classtime', 'time'])
+              const statusKey = findK(['attendancecode', 'attendance', 'status', 'attstatus'])
+              const sectionKey = findK(['section'])
+              const groupKey = findK(['studentgroup', 'group'])
+              const markedByKey = findK(['name', 'facultyname', 'markedby', 'faculty'])
               
-              const dateVal = r[findK(['attdate', 'date'])] || ''
-              const typeVal = r[findK(['attendancetype', 'subjecttype', 'type', 'classtype'])] || ''
-              const timeVal = r[findK(['timing', 'classtime', 'time'])] || ''
-              const statusVal = r[findK(['attendancecode', 'attendance', 'status', 'attstatus'])] || ''
-              const sectionVal = r[findK(['section'])] || ''
-              const groupVal = r[findK(['studentgroup', 'group'])] || ''
-              const markedByVal = r[findK(['name', 'facultyname', 'markedby', 'faculty'])] || ''
+              const dateVal = dateKey ? r[dateKey] : ''
+              const typeVal = typeKey ? r[typeKey] : ''
+              const timeVal = timeKey ? r[timeKey] : ''
+              const statusVal = statusKey ? r[statusKey] : ''
+              const sectionVal = sectionKey ? r[sectionKey] : ''
+              const groupVal = groupKey ? r[groupKey] : ''
+              const markedByVal = markedByKey ? r[markedByKey] : ''
               
               return {
                 date: dateVal,
@@ -619,18 +634,19 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
                 markedBy: markedByVal
               }
             })
+            return { data: history, debug: debugLogs }
           }
         }
       } else {
-        console.error(`[fetchDetails] GetFullReport endpoint returned status ${res.status}`)
+        log(`[fetchDetails] GetFullReport endpoint returned status ${res.status}`)
       }
     } catch (e) {
-      console.error(`[fetchDetails] GetFullReport execution error:`, e)
+      log(`[fetchDetails] GetFullReport execution error: ${e}`)
     }
   }
 
   // ── Step 3: Fallback Approaches if GetFullReport failed/not found ──
-  console.log(`[fetchDetails] Falling back to standard endpoints...`)
+  log(`[fetchDetails] Falling back to standard endpoints...`)
   let ajaxUrl: string | null = null
   let ajaxMethod: string | null = null
   
@@ -673,19 +689,19 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       
       if (res.ok) {
         const text = await res.text()
-        console.log(`[fetchDetails] JSON POST fallback to ${ep}: ${text.length} chars`)
+        log(`[fetchDetails] JSON POST fallback to ${ep}: ${text.length} chars`)
         
         try {
           const parsed = JSON.parse(text)
           if (typeof parsed.d === 'string' && parsed.d.includes('<')) {
             const history = parseAttendanceHistory(parsed.d)
-            if (history.length > 0) return history
+            if (history.length > 0) return { data: history, debug: debugLogs }
           }
           if (typeof parsed.d === 'string') {
             try {
               const data = JSON.parse(parsed.d)
               if (Array.isArray(data) && data.length > 0) {
-                return data.map((r: any) => ({
+                const history = data.map((r: any) => ({
                   date: r.Date || r.date || r.AttDate || '',
                   type: r.Type || r.ClassType || r.SubjectType || '',
                   time: r.Time || r.ClassTime || '',
@@ -694,11 +710,12 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
                   group: r.Group || '',
                   markedBy: r.MarkedBy || r.Faculty || r.FacultyName || ''
                 }))
+                return { data: history, debug: debugLogs }
               }
             } catch {}
           }
           if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map((r: any) => ({
+            const history = parsed.map((r: any) => ({
               date: r.Date || r.date || '',
               type: r.Type || r.ClassType || '',
               time: r.Time || r.ClassTime || '',
@@ -707,16 +724,17 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
               group: r.Group || '',
               markedBy: r.MarkedBy || r.Faculty || ''
             }))
+            return { data: history, debug: debugLogs }
           }
         } catch {}
         
         if (text.includes('<table') || text.includes('<tr')) {
           const history = parseAttendanceHistory(text)
-          if (history.length > 0) return history
+          if (history.length > 0) return { data: history, debug: debugLogs }
         }
       }
     } catch (e) {
-      console.log(`[fetchDetails] JSON POST failed for ${ep}`)
+      log(`[fetchDetails] JSON POST failed for ${ep}: ${e}`)
     }
 
     // Approach B: Form POST
@@ -740,19 +758,19 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       
       if (res.ok) {
         const text = await res.text()
-        console.log(`[fetchDetails] Form POST fallback to ${ep}: ${text.length} chars`)
+        log(`[fetchDetails] Form POST fallback to ${ep}: ${text.length} chars`)
         if (text.includes('<table') || text.includes('<tr')) {
           const history = parseAttendanceHistory(text)
-          if (history.length > 0) return history
+          if (history.length > 0) return { data: history, debug: debugLogs }
         }
       }
     } catch (e) {
-      console.log(`[fetchDetails] Form POST failed for ${ep}`)
+      log(`[fetchDetails] Form POST failed for ${ep}: ${e}`)
     }
   }
 
-  console.error('[fetchDetails] All detail fetching approaches failed. Returning empty history.')
-  return []
+  log(`[fetchDetails] All detail extraction methods failed.`)
+  return { data: [], debug: debugLogs }
 }
 
 function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
