@@ -598,47 +598,77 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
       if (res.ok) {
         const text = await res.text()
         log(`[fetchDetails] GetFullReport response status: ${res.status}, length: ${text.length}`)
-        const parsed = JSON.parse(text)
-        if (parsed.d) {
-          const data = typeof parsed.d === 'string' ? JSON.parse(parsed.d) : parsed.d
-          if (Array.isArray(data) && data.length > 0) {
-            log(`[fetchDetails] Successfully parsed ${data.length} detailed records from GetFullReport`)
-            const history = data.map((r: any) => {
-              const keys = Object.keys(r)
-              const findK = (patterns: string[]) => {
-                return keys.find(k => {
-                  const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
-                  return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
-                })
+        try {
+          const parsed = JSON.parse(text)
+          log(`[fetchDetails] parsed keys: ${Object.keys(parsed).join(',')}`)
+          
+          let data = null
+          if (parsed.d !== undefined) {
+            log(`[fetchDetails] parsed.d type: ${typeof parsed.d}`)
+            if (typeof parsed.d === 'string') {
+              try {
+                data = JSON.parse(parsed.d)
+                log(`[fetchDetails] Successfully parsed parsed.d string into type: ${typeof data}`)
+              } catch (e) {
+                log(`[fetchDetails] parsed.d is a string but NOT valid JSON. Starts with: ${parsed.d.substring(0, 100)}`)
               }
-              const dateKey = findK(['attdate', 'date'])
-              const typeKey = findK(['attendancetype', 'subjecttype', 'type', 'classtype'])
-              const timeKey = findK(['timing', 'classtime', 'time'])
-              const statusKey = findK(['attendancecode', 'attendance', 'status', 'attstatus'])
-              const sectionKey = findK(['section'])
-              const groupKey = findK(['studentgroup', 'group'])
-              const markedByKey = findK(['name', 'facultyname', 'markedby', 'faculty'])
-              
-              const dateVal = dateKey ? r[dateKey] : ''
-              const typeVal = typeKey ? r[typeKey] : ''
-              const timeVal = timeKey ? r[timeKey] : ''
-              const statusVal = statusKey ? r[statusKey] : ''
-              const sectionVal = sectionKey ? r[sectionKey] : ''
-              const groupVal = groupKey ? r[groupKey] : ''
-              const markedByVal = markedByKey ? r[markedByKey] : ''
-              
-              return {
-                date: dateVal,
-                type: typeVal,
-                time: timeVal,
-                status: statusVal,
-                section: sectionVal,
-                group: groupVal,
-                markedBy: markedByVal
-              }
-            })
-            return { data: history, debug: debugLogs }
+            } else {
+              data = parsed.d
+            }
+          } else {
+            // maybe parsed is the array itself?
+            data = parsed
           }
+          
+          if (data) {
+            log(`[fetchDetails] data type: ${typeof data}, isArray: ${Array.isArray(data)}`)
+            
+            // If data is an object but not an array, maybe the array is inside a property?
+            if (!Array.isArray(data) && typeof data === 'object') {
+               log(`[fetchDetails] data keys: ${Object.keys(data).join(',')}`)
+               // Check if any value is an array
+               for (const key of Object.keys(data)) {
+                 if (Array.isArray(data[key])) {
+                   log(`[fetchDetails] Found array inside data.${key} with length ${data[key].length}`)
+                   data = data[key]
+                   break
+                 }
+               }
+            }
+
+            if (Array.isArray(data) && data.length > 0) {
+              log(`[fetchDetails] Successfully found ${data.length} records!`)
+              const history = data.map((r: any) => {
+                const keys = Object.keys(r)
+                const findK = (patterns: string[]) => {
+                  return keys.find(k => {
+                    const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
+                    return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
+                  })
+                }
+                const dateKey = findK(['attdate', 'date'])
+                const typeKey = findK(['attendancetype', 'subjecttype', 'type', 'classtype'])
+                const timeKey = findK(['timing', 'classtime', 'time'])
+                const statusKey = findK(['attendancecode', 'attendance', 'status', 'attstatus'])
+                const sectionKey = findK(['section'])
+                const groupKey = findK(['studentgroup', 'group'])
+                const markedByKey = findK(['name', 'facultyname', 'markedby', 'faculty'])
+                
+                return {
+                  date: dateKey ? r[dateKey] : '',
+                  type: typeKey ? r[typeKey] : '',
+                  time: timeKey ? r[timeKey] : '',
+                  status: statusKey ? r[statusKey] : '',
+                  section: sectionKey ? r[sectionKey] : '',
+                  group: groupKey ? r[groupKey] : '',
+                  markedBy: markedByKey ? r[markedByKey] : ''
+                }
+              })
+              return { data: history, debug: debugLogs }
+            } // end if isArray
+          } // end if data
+        } catch (e) {
+          log(`[fetchDetails] JSON parse error: ${e}`)
         }
       } else {
         log(`[fetchDetails] GetFullReport endpoint returned status ${res.status}`)
