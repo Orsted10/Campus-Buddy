@@ -14,36 +14,84 @@ const features = [
     title: 'Live Portal Sync',
     description: 'Directly mirrors your CULKO portal. Attendance, marks, and timetable sync in real-time securely.',
     className: "md:col-span-2 md:row-span-2",
+    visual: (
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-40 group-hover:opacity-100 transition-all duration-700 translate-y-8 group-hover:translate-y-0">
+        <div className="w-[70%] h-[70%] border border-primary/20 rounded-xl bg-background/80 backdrop-blur-md p-4 flex flex-col gap-3 relative overflow-hidden shadow-2xl">
+          <div className="flex items-center gap-2 border-b border-border/50 pb-3">
+            <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+          </div>
+          <div className="flex flex-col gap-3 mt-2">
+            <div className="flex items-center gap-2"><span className="text-primary font-mono text-xs">~</span><div className="h-2 w-1/2 bg-foreground/60 rounded-full" /></div>
+            <div className="flex items-center gap-2"><span className="text-primary font-mono text-xs">~</span><div className="h-2 w-3/4 bg-muted/40 rounded-full animate-pulse" /></div>
+            <div className="flex items-center gap-2"><span className="text-primary font-mono text-xs">~</span><div className="h-2 w-1/3 bg-muted/40 rounded-full animate-pulse delay-150" /></div>
+          </div>
+          <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-background to-transparent" />
+        </div>
+      </div>
+    )
   },
   {
     icon: MessageSquare,
     title: 'Context-Aware AI',
     description: 'Ask "What is my attendance?" and the AI responds with YOUR actual data immediately.',
     className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute -right-8 -bottom-8 w-48 h-48 opacity-20 group-hover:opacity-50 transition-all duration-700 blur-[30px] group-hover:blur-[20px]">
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-primary via-purple-500 to-indigo-500 animate-spin-slow" />
+      </div>
+    )
   },
   {
     icon: Shield,
     title: 'Bank-Grade Privacy',
     description: 'Row-level security via Supabase. Your credentials never leave your session.',
     className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute inset-0 flex items-center justify-center opacity-5 group-hover:opacity-20 transition-all duration-700 scale-[2] group-hover:scale-[1.5] pointer-events-none">
+        <Shield className="w-48 h-48 text-foreground" strokeWidth={0.5} />
+      </div>
+    )
   },
   {
     icon: BookOpen,
     title: 'Academic Dashboard',
     description: 'Color-coded performance metrics and deep academic insights.',
     className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute bottom-6 right-6 flex items-end gap-1.5 opacity-20 group-hover:opacity-80 transition-all duration-500 pointer-events-none">
+        <div className="w-3 h-6 bg-primary/40 rounded-t-sm group-hover:h-8 transition-all duration-300" />
+        <div className="w-3 h-10 bg-primary/60 rounded-t-sm group-hover:h-12 transition-all duration-300 delay-75" />
+        <div className="w-3 h-5 bg-primary/40 rounded-t-sm group-hover:h-6 transition-all duration-300 delay-100" />
+        <div className="w-3 h-14 bg-primary/80 rounded-t-sm group-hover:h-20 transition-all duration-300 delay-150" />
+        <div className="w-3 h-8 bg-primary/60 rounded-t-sm group-hover:h-10 transition-all duration-300 delay-200" />
+      </div>
+    )
   },
   {
     icon: Building,
     title: 'Campus Life',
     description: 'Mess menus, hostel passes, and facility booking natively integrated.',
     className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute -top-4 -right-4 opacity-5 group-hover:opacity-20 transition-all duration-700 scale-150 -rotate-12 group-hover:rotate-0 pointer-events-none">
+        <Building className="w-32 h-32 text-foreground" strokeWidth={0.5} />
+      </div>
+    )
   },
   {
     icon: MapPin,
     title: 'Intelligent Maps',
     description: 'Turn-by-turn navigation for your specific campus.',
     className: "md:col-span-1 md:row-span-1",
+    visual: (
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+        <div className="w-32 h-32 rounded-full border border-primary/20 absolute opacity-0 group-hover:animate-ping" style={{ animationDuration: '3s' }} />
+        <div className="w-16 h-16 rounded-full border border-primary/30 absolute opacity-0 group-hover:animate-ping" style={{ animationDuration: '3s', animationDelay: '0.5s' }} />
+        <div className="w-2 h-2 rounded-full bg-primary/50 absolute scale-0 group-hover:scale-100 transition-transform duration-500" />
+      </div>
+    )
   },
 ]
 
@@ -260,6 +308,9 @@ export default function LandingPage() {
                   className={`glass-strong rounded-[2rem] p-8 md:p-10 flex flex-col justify-between group overflow-hidden relative ${feature.className}`}
                 >
                   <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[60px] transform translate-x-1/2 -translate-y-1/2 group-hover:bg-primary/10 transition-colors duration-500" />
+                  
+                  {/* Abstract Visual Injection */}
+                  {feature.visual}
                   
                   <div className="relative z-10">
                     <div className="w-12 h-12 rounded-2xl bg-background border border-border flex items-center justify-center mb-6 shadow-premium-sm group-hover:scale-105 transition-transform duration-500">
