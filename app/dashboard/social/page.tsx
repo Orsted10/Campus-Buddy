@@ -231,10 +231,10 @@ export default function SocialHubPage() {
           {/* User Status Area */}
           <div className="h-16 border-t border-black/5 dark:border-white/5 flex items-center px-3 bg-black/5 dark:bg-white/5 gap-3">
             <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-              {user?.user_metadata?.full_name?.charAt(0) || 'U'}
+              {user?.full_name?.charAt(0) || 'U'}
             </div>
             <div className="flex-1 overflow-hidden">
-              <div className="text-xs font-black truncate">{user?.user_metadata?.full_name || 'User'}</div>
+              <div className="text-xs font-black truncate">{user?.full_name || 'User'}</div>
               <div className="text-[10px] text-emerald-500 font-bold">Online</div>
             </div>
             <div className="flex gap-1 text-muted-foreground">

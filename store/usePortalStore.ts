@@ -37,6 +37,7 @@ export const usePortalStore = create<PortalState>()(
       lastSync: null,
       isSyncing: false,
       culkoCookies: null,
+      forceSyncAll: async () => { return false },
 
       setPortalData: (data) => set((state) => ({ ...state, ...data })),
       

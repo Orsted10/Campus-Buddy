@@ -19,7 +19,7 @@ export default function MarksPage() {
   const [subjects, setSubjects] = useState<any[]>(cachedMarks || [])
   const [loading, setLoading] = useState(cachedMarks ? (cachedMarks.length === 0) : true)
   const [metadata, setMetadata] = useState({
-    isCached: !!lastSync && (portalStatus === 'no_session' || portalStatus === 'logout'),
+    isCached: !!lastSync && (portalStatus === 'no_session'),
     lastSync: lastSync || null
   })
 
@@ -55,7 +55,7 @@ export default function MarksPage() {
   }
 
   // Only show Sync Required if we have NO data AND portal is disconnected
-  const isDisconnected = portalStatus === 'no_session' || portalStatus === 'logout'
+  const isDisconnected = portalStatus === 'no_session'
   if (subjects.length === 0 && isDisconnected) {
     return (
       <div className="p-6 max-w-4xl mx-auto flex flex-col items-center justify-center h-[60vh] text-center space-y-4">

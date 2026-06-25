@@ -204,6 +204,7 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
       result = await chatWithGemini(messages, systemPrompt)
     }
 
+    let currentChatId = chatId
     if (!result.success) {
       return NextResponse.json({
         success: true,
@@ -213,7 +214,6 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
     }
 
     // 5. Persistence
-    let currentChatId = chatId
     if (!currentChatId) {
       const { data: newChat, error: chatError } = await supabase
         .from('ai_chats')

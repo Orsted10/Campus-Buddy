@@ -318,7 +318,10 @@ export async function fetchCULKOData(
     
     if (!culkoCookies) {
       console.warn(`[fetchCULKOData] No session for ${endpoint}. Trying DB fallback...`)
-      const cached = await getPortalData(endpoint)
+      if (endpoint === 'attendance-details') {
+        return { success: false, error: 'No active portal session. Please login to portal sync first.' }
+      }
+      const cached = await getPortalData(endpoint as any)
       if (cached.success) {
         return {
           success: true,
@@ -799,7 +802,7 @@ function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
     if (cells.length < 4) return
     
     // Strategy 1: Use data-label attributes (mobile responsive)
-    const hasDataLabels = cells.filter((__, c) => $(c).attr('data-label')).length > 0
+    const hasDataLabels = cells.filter((__: any, c: any) => !!$(c).attr('data-label')).length > 0
     
     if (hasDataLabels) {
       const getLabel = (needle: string) => {
@@ -1204,7 +1207,7 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
       let headerMap: Record<string, number> = {}
       let headerRowFound = false
       
-      $table.find('tr').each((_, tr) => {
+      $table.find('tr').each((_: any, tr: any) => {
         if (headerRowFound) return
         
         // Collect all cells (th or td) in this row
@@ -1219,7 +1222,7 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
         
         // Build the header map
         const headerTexts: string[] = []
-        cells.each((i, c) => {
+        cells.each((i: number, c: any) => {
           const raw = $(c).text().trim()
           headerTexts.push(`${i}:"${raw}"`)
           const n = norm(raw)
@@ -1252,7 +1255,7 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
       
       // Step 3: Parse data rows
       let firstRowLogged = false
-      $table.find('tr').each((_, row) => {
+      $table.find('tr').each((_: any, row: any) => {
         const cells = $(row).find('td')
         if (cells.length < 8) return
         
@@ -1266,7 +1269,7 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
         // Debug: dump first data row
         if (!firstRowLogged) {
           const vals: string[] = []
-          cells.each((ci, c) => vals.push(`${ci}:"${$(c).text().trim()}"`))
+          cells.each((ci: number, c: any) => { vals.push(`${ci}:"${$(c).text().trim()}"`) })
           console.log(`[parseAttendanceHTML] DATA ROW (${cells.length} cells): ${vals.join(' | ')}`)
           firstRowLogged = true
         }

@@ -8,7 +8,7 @@ import { AlertCircle, CheckCircle2, AlertTriangle, GraduationCap, RefreshCw, Cal
 import { motion, AnimatePresence } from 'framer-motion'
 import { getApiUrl } from '@/lib/api-config'
 import { Badge } from '@/components/ui/badge'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 function AttendanceRing({ 
   percentage, attended, total, idl = "0", adl = "0", vdl = "0", ml = "0", onViewDetails, recentDots
@@ -320,7 +320,7 @@ export default function AttendancePage() {
   })
   const overallPercentage = totalEligDelv > 0 ? (totalEligAttd / totalEligDelv) * 100 : 0
 
-  const isDisconnected = portalStatus === 'no_session' || portalStatus === 'logout'
+  const isDisconnected = portalStatus === 'no_session'
 
   if ((portalStatus === 'error' && attendance.length === 0) || (isDisconnected && attendance.length === 0)) {
     return (
