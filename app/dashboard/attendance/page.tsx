@@ -285,9 +285,13 @@ export default function AttendancePage() {
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         setHistory(data.data)
         setRecentDotsCache(prev => ({ ...prev, [subject.code]: data.data.slice(0, 6) }))
+      } else if (!data.success) {
+        toast.error(`Backend error: ${data.error || 'Unknown error'}`)
+        console.error('Attendance Details Error:', data)
       }
     } catch (err) {
       console.error('Connection error loading history', err)
+      toast.error(`Connection error: ${err}`)
     } finally {
       setIsHistoryLoading(false)
     }
