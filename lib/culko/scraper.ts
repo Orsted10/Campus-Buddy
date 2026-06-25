@@ -626,12 +626,21 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
             // If data is an object but not an array, maybe the array is inside a property?
             if (!Array.isArray(data) && typeof data === 'object') {
                log(`[fetchDetails] data keys: ${Object.keys(data).join(',')}`)
-               // Check if any value is an array
-               for (const key of Object.keys(data)) {
-                 if (Array.isArray(data[key])) {
-                   log(`[fetchDetails] Found array inside data.${key} with length ${data[key].length}`)
-                   data = data[key]
-                   break
+               
+               if ('Result' in data && data.Result) {
+                 log(`[fetchDetails] Found .NET Task Result property!`)
+                 data = typeof data.Result === 'string' ? JSON.parse(data.Result) : data.Result
+                 log(`[fetchDetails] Parsed Result type: ${typeof data}, isArray: ${Array.isArray(data)}`)
+               }
+               
+               // If it's still not an array, check its properties
+               if (!Array.isArray(data) && typeof data === 'object' && data !== null) {
+                 for (const key of Object.keys(data)) {
+                   if (Array.isArray(data[key])) {
+                     log(`[fetchDetails] Found array inside data.${key} with length ${data[key].length}`)
+                     data = data[key]
+                     break
+                   }
                  }
                }
             }
