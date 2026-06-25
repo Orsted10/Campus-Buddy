@@ -663,8 +663,17 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
                 const groupKey = findK(['studentgroup', 'group'])
                 const markedByKey = findK(['name', 'facultyname', 'markedby', 'faculty'])
                 
+                let parsedDate = dateKey ? r[dateKey] : ''
+                if (typeof parsedDate === 'string' && parsedDate.includes('/Date(')) {
+                  const match = parsedDate.match(/\/Date\((\d+)\)\//)
+                  if (match && match[1]) {
+                    const d = new Date(parseInt(match[1]))
+                    parsedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                  }
+                }
+                
                 return {
-                  date: dateKey ? r[dateKey] : '',
+                  date: parsedDate,
                   type: typeKey ? r[typeKey] : '',
                   time: timeKey ? r[timeKey] : '',
                   status: statusKey ? r[statusKey] : '',
