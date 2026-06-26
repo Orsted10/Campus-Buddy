@@ -21,7 +21,7 @@ const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
 function extractCookies(response: Response): Record<string, string> {
   const setCookieHeaders = response.headers.getSetCookie();
   const jar: Record<string, string> = {}
-  
+
   if (setCookieHeaders && setCookieHeaders.length > 0) {
     setCookieHeaders.forEach(cookieString => {
       const parts = cookieString.split(';')[0].trim().split('=');
@@ -37,7 +37,7 @@ function extractCookies(response: Response): Record<string, string> {
   // Fallback for older environments
   const setCookie = response.headers.get('set-cookie')
   if (!setCookie) return {}
-  
+
   // Robust split for Set-Cookie header
   const cookies = setCookie.split(/,(?=[^;]*=)/);
   cookies.forEach(c => {
@@ -133,7 +133,7 @@ export async function initCULKOLogin(uid: string) {
 
 export async function captureBasePortalData(cookieJar: Record<string, string>) {
   console.log('[captureBasePortalData] Starting PARALLEL first-sync sequence...')
-  
+
   const endpoints: ('profile' | 'attendance' | 'marks' | 'hostel')[] = ['profile', 'attendance', 'marks', 'hostel']
 
   // Fetch ALL endpoints simultaneously instead of one-by-one (3x faster)
@@ -187,16 +187,16 @@ export async function completeCULKOLogin(password: string, captcha: string, sess
 
     let finalJar = mergeCookies(jar, extractCookies(response))
     let finalHtml = ''
-    
+
     // REDIRECT SEATING: If it redirects (302), we MUST follow it to "activate" the session
     if (response.status === 302 || response.status === 303 || response.status === 200) {
       const redirectUrl = response.headers.get('location')
-      const targetUrl = redirectUrl 
+      const targetUrl = redirectUrl
         ? (redirectUrl.startsWith('http') ? redirectUrl : `${BASE_URL}/${redirectUrl}`)
         : url
-        
+
       console.log('[completeCULKOLogin] Verifying session at:', targetUrl)
-      
+
       const seatRes = await fetch(targetUrl, {
         headers: {
           'Cookie': serializeCookies(finalJar),
@@ -223,7 +223,7 @@ export async function completeCULKOLogin(password: string, captcha: string, sess
 
     // STEP 2: NOW check for success
     const isDashboard = finalHtml.includes('StudentHome.aspx') || finalHtml.includes('Logout') ||
-                        finalHtml.includes('frmStudentCourseWise') || finalHtml.includes('Welcome Student')
+      finalHtml.includes('frmStudentCourseWise') || finalHtml.includes('Welcome Student')
     const isLoginPage = finalHtml.includes('id="txtUserId"') || finalHtml.includes('btnLogin')
 
     const saveSession = async () => {
@@ -242,7 +242,7 @@ export async function completeCULKOLogin(password: string, captcha: string, sess
       await saveSession()
       return { success: true, cookies: finalJar }
     }
-    
+
     // Strict fallback: Page is not an error and not a login page — likely success
     if (!isLoginPage && !hasInvalidCaptcha && !hasInvalidPassword && finalHtml.length > 1000) {
       console.log('[completeCULKOLogin] ✅ Fallback: not on login page — assuming success')
@@ -308,14 +308,14 @@ export interface AttendanceHistoryRecord {
 }
 
 export async function fetchCULKOData(
-  endpoint: 'attendance' | 'marks' | 'timetable' | 'profile' | 'announcements' | 'hostel' | 'attendance-details', 
+  endpoint: 'attendance' | 'marks' | 'timetable' | 'profile' | 'announcements' | 'hostel' | 'attendance-details',
   customCookie?: string,
   extraParams?: { courseCode?: string; chk?: string }
 ) {
   try {
     const cookieStore = await cookies()
     const culkoCookies = customCookie || cookieStore.get('culko_session')?.value
-    
+
     if (!culkoCookies) {
       console.warn(`[fetchCULKOData] No session for ${endpoint}. Trying DB fallback...`)
       if (endpoint === 'attendance-details') {
@@ -335,10 +335,10 @@ export async function fetchCULKOData(
         error: 'No active portal session. Please login to portal sync first.'
       }
     }
-    
+
     // Parse cookies
     const sessionCookies = JSON.parse(culkoCookies)
-    
+
     // Make request to CULKO
     let response: any
     if (endpoint === 'attendance-details' && extraParams?.courseCode) {
@@ -346,7 +346,7 @@ export async function fetchCULKOData(
     } else {
       response = await fetchCULKOResource(endpoint, sessionCookies)
     }
-    
+
     // MUST await - fire-and-forget is killed by serverless before it resolves
     try {
       if (endpoint !== 'announcements') {
@@ -355,7 +355,7 @@ export async function fetchCULKOData(
     } catch (syncErr) {
       console.error(`[fetchCULKOData] Sync error for ${endpoint}:`, syncErr)
     }
-    
+
     return {
       success: true,
       data: response,
@@ -364,7 +364,7 @@ export async function fetchCULKOData(
     }
   } catch (error) {
     console.error(`Error fetching ${endpoint}:`, error)
-    
+
     // On error, try DB fallback
     const cached = await getPortalData(endpoint as any)
     if (cached.success) {
@@ -393,9 +393,9 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
     result: '/result.aspx',
     hostel: '/frmStudenHostelDetails.aspx'
   }
-  
+
   const url = BASE_URL + endpointMap[endpoint]
-  
+
   const response = await fetch(url, {
     headers: {
       'Cookie': Object.entries(cookies)
@@ -405,13 +405,13 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
       'Referer': `${BASE_URL}/StudentHome.aspx`
     }
   })
-  
+
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${response.statusText}`)
   }
-  
+
   const html = await response.text()
-  
+
   if (html.includes('id="txtUserId"') || html.includes('Login.aspx') || html.includes('Session Expired')) {
     console.error(`[fetchCULKOResource] Session for ${endpoint} has expired or is invalid.`)
     console.log('[fetchCULKOResource] HTML Length:', html.length)
@@ -422,7 +422,7 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
     })
     throw new Error('Unauthorized or Session Expired')
   }
-  
+
   // Parse HTML based on endpoint - DIRECT HTML SCRAPING
   switch (endpoint) {
     case 'attendance':
@@ -432,7 +432,7 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
         console.log(`[fetchCULKOResource] ✅ HTML parsed ${htmlData.length} attendance records — USING HTML PATH`)
         return htmlData
       }
-      
+
       // Only fall back to AJAX if HTML parsing completely failed
       console.log('[fetchCULKOResource] ⚠️ HTML parsing returned 0 records — FALLING BACK TO AJAX')
       const ajaxData = await fetchAttendanceViaAjax(url, cookies)
@@ -452,18 +452,18 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
       try {
         const resUrl = BASE_URL + '/result.aspx'
         const resResponse = await fetch(resUrl, {
-           headers: {
-             'Cookie': Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; '),
-             'User-Agent': 'Mozilla/5.0'
-           }
+          headers: {
+            'Cookie': Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; '),
+            'User-Agent': 'Mozilla/5.0'
+          }
         })
         if (resResponse.ok) {
           const resHtml = await resResponse.text()
           // Re-validate session for result page
           if (!resHtml.includes('id="txtUserId"') && !resHtml.includes('Login.aspx')) {
-             const stats = parseResult(resHtml)
-             profile.cgpa = stats.cgpa
-             profile.sgpa = stats.sgpa
+            const stats = parseResult(resHtml)
+            profile.cgpa = stats.cgpa
+            profile.sgpa = stats.sgpa
           }
         }
       } catch (e) {
@@ -499,7 +499,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
 
   const summaryUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
   log(`[fetchDetails] Loading summary page for reportId and sessionId extraction...`)
-  
+
   let html = ''
   try {
     const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
@@ -517,7 +517,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
   if (!chk) {
     // 1. Try finding by courseCode as obj
     let btn = $(`input[obj="${courseCode}"], input[obj*="${courseCode}"]`).first()
-    
+
     // 2. If not found (courseCode is actually the name), find the table row containing the name
     if (btn.length === 0) {
       $('tr').each((_, row) => {
@@ -530,7 +530,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
         }
       })
     }
-    
+
     chk = btn.attr('chk') || ''
     obj = btn.attr('obj') || courseCode
   }
@@ -539,18 +539,18 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
   // Extract reportId and sessionId
   let reportId = ''
   let sessionId = ''
-  
+
   const getReportMatch = html.match(/getReport\(['"]([^'"]+)['"]\s*,\s*['"]?(\d+)['"]?\)/)
   if (getReportMatch) {
     reportId = getReportMatch[1]
     sessionId = getReportMatch[2]
   }
-  
+
   if (!sessionId) {
     const sessionMatch = html.match(/CurrentSession\s*\((\d+)\)/)
     if (sessionMatch) sessionId = sessionMatch[1]
   }
-  
+
   if (!reportId) {
     const uidPatterns = [
       /getReport\(['"]([^'"]+)['"]/,
@@ -573,7 +573,63 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
   const eventValidation = $('#__EVENTVALIDATION').val() as string || ''
   const viewStateGen = $('#__VIEWSTATEGENERATOR').val() as string || ''
 
-  // ── Step 2: Try GetFullReport (Standard CULKO AJAX WebMethod) ──
+  // ── Step 2: Try HTML Table Extraction (Most Accurate) ──
+  // The CULKO JSON endpoint (GetFullReport) sometimes returns "Present" for all records due to backend bugs.
+  // The HTML endpoint used by the portal UI is the only 100% accurate source of truth.
+  log(`[fetchDetails] Attempting to extract detailed HTML table...`)
+  
+  let ajaxUrl: string | null = null
+  $('script').each((_, s) => {
+    const sc = $(s).html() || ''
+    if (sc.includes('getdata')) {
+      const urlMatch = sc.match(/url\s*:\s*['"]([^'"]+)['"]/i)
+      if (urlMatch) ajaxUrl = urlMatch[1]
+    }
+  })
+
+  const endpoints = [
+    ajaxUrl,
+    'frmStudentCourseWiseAttendanceSummary.aspx/GetData',
+    'frmStudentCourseWiseAttendanceSummary.aspx/getdata'
+  ].filter(Boolean) as string[]
+
+  for (const ep of endpoints) {
+    const fullUrl = ep.startsWith('http') ? ep : `${BASE_URL}/${ep.replace(/^\//, '')}`
+    try {
+      const formData = new URLSearchParams()
+      formData.append('chk', chk || '')
+      formData.append('obj', obj)
+      if (viewState) formData.append('__VIEWSTATE', viewState)
+      if (eventValidation) formData.append('__EVENTVALIDATION', eventValidation)
+      if (viewStateGen) formData.append('__VIEWSTATEGENERATOR', viewStateGen)
+
+      const res = await fetch(fullUrl, {
+        method: 'POST',
+        headers: {
+          ...baseHeaders,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData.toString() // Fix TypeError: fetch failed
+      })
+
+      if (res.ok) {
+        const text = await res.text()
+        log(`[fetchDetails] HTML Table POST to ${ep}: ${text.length} chars`)
+        if (text.includes('<table') || text.includes('<tr')) {
+          const history = parseAttendanceHistory(text)
+          if (history.length > 0) {
+             log(`[fetchDetails] Successfully extracted ${history.length} records from HTML!`)
+             return { data: history, debug: debugLogs }
+          }
+        }
+      }
+    } catch (e) {
+      log(`[fetchDetails] HTML Table POST failed for ${ep}: ${e}`)
+    }
+  }
+
+  // ── Step 3: Fallback to GetFullReport JSON ──
   if (reportId && sessionId && chk) {
     try {
       const fullReportUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx/GetFullReport`
@@ -586,115 +642,83 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
           'X-Requested-With': 'XMLHttpRequest'
         },
         body: JSON.stringify({
-          course: chk,
-          UID: reportId,
-          fromDate: '0',
-          toDate: '0',
-          type: 'All',
-          Session: sessionId
+          reportId: reportId,
+          sessionId: sessionId,
+          flag: '2'
         })
       })
-      
+
       if (res.ok) {
         const text = await res.text()
         log(`[fetchDetails] GetFullReport response status: ${res.status}, length: ${text.length}`)
         try {
           const parsed = JSON.parse(text)
-          log(`[fetchDetails] parsed keys: ${Object.keys(parsed).join(',')}`)
-          
           let data = null
-          if (parsed.d !== undefined) {
-            log(`[fetchDetails] parsed.d type: ${typeof parsed.d}`)
-            if (typeof parsed.d === 'string') {
-              try {
-                data = JSON.parse(parsed.d)
-                log(`[fetchDetails] Successfully parsed parsed.d string into type: ${typeof data}`)
-              } catch (e) {
-                log(`[fetchDetails] parsed.d is a string but NOT valid JSON. Starts with: ${parsed.d.substring(0, 100)}`)
-              }
-            } else {
-              data = parsed.d
-            }
+          if (parsed.d) {
+            data = typeof parsed.d === 'string' ? JSON.parse(parsed.d) : parsed.d
           } else {
-            // maybe parsed is the array itself?
             data = parsed
-          }
-          
-          if (data) {
-            log(`[fetchDetails] data type: ${typeof data}, isArray: ${Array.isArray(data)}`)
-            
-            // If data is an object but not an array, maybe the array is inside a property?
-            if (!Array.isArray(data) && typeof data === 'object') {
-               log(`[fetchDetails] data keys: ${Object.keys(data).join(',')}`)
-               
-               if ('Result' in data && data.Result) {
-                 log(`[fetchDetails] Found .NET Task Result property!`)
-                 data = typeof data.Result === 'string' ? JSON.parse(data.Result) : data.Result
-                 log(`[fetchDetails] Parsed Result type: ${typeof data}, isArray: ${Array.isArray(data)}`)
-               }
-               
-               // If it's still not an array, check its properties
-               if (!Array.isArray(data) && typeof data === 'object' && data !== null) {
-                 for (const key of Object.keys(data)) {
-                   if (Array.isArray(data[key])) {
-                     log(`[fetchDetails] Found array inside data.${key} with length ${data[key].length}`)
-                     data = data[key]
-                     break
-                   }
-                 }
-               }
-            }
-
-            if (Array.isArray(data) && data.length > 0) {
-              log(`[fetchDetails] Successfully found ${data.length} records!`)
-              const history = data.map((r: any, i: number) => {
-                const keys = Object.keys(r)
-                if (i === 0) log(`[fetchDetails] Record keys: ${keys.join(',')}`)
-                const findK = (patterns: string[], exclude: string[] = []) => {
-                  // 1. Exact match
-                  let match = keys.find(k => {
-                    const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
-                    return patterns.some(p => lowerK === p.replace(/[^a-z0-9]/g, ''))
-                  })
-                  if (match) return match
-
-                  // 2. Substring match
-                  return keys.find(k => {
-                    const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
-                    if (exclude.some(e => lowerK.includes(e))) return false
-                    return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
-                  })
-                }
-                const dateKey = findK(['attdate', 'date'])
-                const typeKey = findK(['attendancetype', 'subjecttype', 'type', 'classtype'])
-                const timeKey = findK(['timing', 'classtime', 'time'])
-                const statusKey = findK(['status', 'attendancecode', 'attstatus', 'ispresent', 'attendance'], ['date', 'time'])
-                const sectionKey = findK(['section'])
-                const groupKey = findK(['studentgroup', 'group'])
-                const markedByKey = findK(['name', 'facultyname', 'markedby', 'faculty'])
-                
-                let parsedDate = dateKey ? r[dateKey] : ''
-                if (typeof parsedDate === 'string' && parsedDate.includes('/Date(')) {
-                  const match = parsedDate.match(/\/Date\((\d+)\)\//)
-                  if (match && match[1]) {
-                    const d = new Date(parseInt(match[1]))
-                    parsedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            if (!Array.isArray(data) && typeof data === 'object' && data !== null) {
+              if ('Result' in data && data.Result) {
+                data = typeof data.Result === 'string' ? JSON.parse(data.Result) : data.Result
+              }
+              if (!Array.isArray(data) && typeof data === 'object' && data !== null) {
+                for (const key of Object.keys(data)) {
+                  if (Array.isArray(data[key])) {
+                    data = data[key]
+                    break
                   }
                 }
-                
-                return {
-                  date: parsedDate,
-                  type: typeKey ? r[typeKey] : '',
-                  time: timeKey ? r[timeKey] : '',
-                  status: statusKey ? r[statusKey] : '',
-                  section: sectionKey ? r[sectionKey] : '',
-                  group: groupKey ? r[groupKey] : '',
-                  markedBy: markedByKey ? r[markedByKey] : ''
+              }
+            }
+          }
+
+          if (Array.isArray(data) && data.length > 0) {
+            log(`[fetchDetails] Successfully found ${data.length} records!`)
+            const history = data.map((r: any, i: number) => {
+              const keys = Object.keys(r)
+              if (i === 0) log(`[fetchDetails] Record keys: ${keys.join(',')}`)
+              const findK = (patterns: string[], exclude: string[] = []) => {
+                let match = keys.find(k => {
+                  const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
+                  return patterns.some(p => lowerK === p.replace(/[^a-z0-9]/g, ''))
+                })
+                if (match) return match
+                return keys.find(k => {
+                  const lowerK = k.toLowerCase().replace(/[^a-z0-9]/g, '')
+                  if (exclude.some(e => lowerK.includes(e))) return false
+                  return patterns.some(p => lowerK.includes(p.replace(/[^a-z0-9]/g, '')))
+                })
+              }
+              const dateKey = findK(['attdate', 'date'])
+              const typeKey = findK(['attendancetype', 'subjecttype', 'type', 'classtype'])
+              const timeKey = findK(['timing', 'classtime', 'time'])
+              const statusKey = findK(['status', 'attendancecode', 'attstatus', 'ispresent', 'attendance'], ['date', 'time'])
+              const sectionKey = findK(['section'])
+              const groupKey = findK(['studentgroup', 'group'])
+              const markedByKey = findK(['name', 'facultyname', 'markedby', 'faculty'])
+              
+              let parsedDate = dateKey ? r[dateKey] : ''
+              if (typeof parsedDate === 'string' && parsedDate.includes('/Date(')) {
+                const match = parsedDate.match(/\/Date\((\d+)\)\//)
+                if (match && match[1]) {
+                  const d = new Date(parseInt(match[1]))
+                  parsedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                 }
-              })
-              return { data: history, debug: debugLogs }
-            } // end if isArray
-          } // end if data
+              }
+              
+              return {
+                date: parsedDate,
+                type: typeKey ? r[typeKey] : '',
+                time: timeKey ? r[timeKey] : '',
+                status: statusKey ? r[statusKey] : '',
+                section: sectionKey ? r[sectionKey] : '',
+                group: groupKey ? r[groupKey] : '',
+                markedBy: markedByKey ? r[markedByKey] : ''
+              }
+            })
+            return { data: history, debug: debugLogs }
+          }
         } catch (e) {
           log(`[fetchDetails] JSON parse error: ${e}`)
         }
@@ -706,130 +730,6 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
     }
   }
 
-  // ── Step 3: Fallback Approaches if GetFullReport failed/not found ──
-  log(`[fetchDetails] Falling back to standard endpoints...`)
-  let ajaxUrl: string | null = null
-  let ajaxMethod: string | null = null
-  
-  $('script').each((_, s) => {
-    const sc = $(s).html() || ''
-    if (!sc.includes('getdata')) return
-    
-    const urlMatch = sc.match(/url\s*:\s*['"]([^'"]+)['"]/i)
-    if (urlMatch) ajaxUrl = urlMatch[1]
-    
-    if (sc.includes('JSON.stringify') || sc.includes("contentType.*json")) {
-      ajaxMethod = 'json'
-    } else if (sc.includes('data:') && sc.includes('chk')) {
-      ajaxMethod = 'form'
-    }
-  })
-
-  const endpoints = [
-    ajaxUrl,
-    'frmStudentCourseWiseAttendanceSummary.aspx/GetData',
-    'frmStudentCourseWiseAttendanceSummary.aspx/GetAttendanceDetails', 
-    'frmStudentCourseWiseAttendanceSummary.aspx/getdata',
-    'frmStudentCourseWiseAttendanceSummary.aspx/GetReport',
-  ].filter(Boolean) as string[]
-
-  for (const ep of endpoints) {
-    const fullUrl = ep.startsWith('http') ? ep : `${BASE_URL}/${ep.replace(/^\//, '')}`
-    
-    // Approach A: JSON WebMethod POST
-    try {
-      const res = await fetch(fullUrl, {
-        method: 'POST',
-        headers: {
-          ...baseHeaders,
-          'Content-Type': 'application/json; charset=UTF-8',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({ chk, obj })
-      })
-      
-      if (res.ok) {
-        const text = await res.text()
-        log(`[fetchDetails] JSON POST fallback to ${ep}: ${text.length} chars`)
-        
-        try {
-          const parsed = JSON.parse(text)
-          if (typeof parsed.d === 'string' && parsed.d.includes('<')) {
-            const history = parseAttendanceHistory(parsed.d)
-            if (history.length > 0) return { data: history, debug: debugLogs }
-          }
-          if (typeof parsed.d === 'string') {
-            try {
-              const data = JSON.parse(parsed.d)
-              if (Array.isArray(data) && data.length > 0) {
-                const history = data.map((r: any) => ({
-                  date: r.Date || r.date || r.AttDate || '',
-                  type: r.Type || r.ClassType || r.SubjectType || '',
-                  time: r.Time || r.ClassTime || '',
-                  status: r.Status || r.AttStatus || r.Attendance || '',
-                  section: r.Section || '',
-                  group: r.Group || '',
-                  markedBy: r.MarkedBy || r.Faculty || r.FacultyName || ''
-                }))
-                return { data: history, debug: debugLogs }
-              }
-            } catch {}
-          }
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const history = parsed.map((r: any) => ({
-              date: r.Date || r.date || '',
-              type: r.Type || r.ClassType || '',
-              time: r.Time || r.ClassTime || '',
-              status: r.Status || r.AttStatus || r.Attendance || '',
-              section: r.Section || '',
-              group: r.Group || '',
-              markedBy: r.MarkedBy || r.Faculty || ''
-            }))
-            return { data: history, debug: debugLogs }
-          }
-        } catch {}
-        
-        if (text.includes('<table') || text.includes('<tr')) {
-          const history = parseAttendanceHistory(text)
-          if (history.length > 0) return { data: history, debug: debugLogs }
-        }
-      }
-    } catch (e) {
-      log(`[fetchDetails] JSON POST failed for ${ep}: ${e}`)
-    }
-
-    // Approach B: Form POST
-    try {
-      const formData = new URLSearchParams()
-      formData.append('chk', chk || '')
-      formData.append('obj', obj)
-      if (viewState) formData.append('__VIEWSTATE', viewState)
-      if (eventValidation) formData.append('__EVENTVALIDATION', eventValidation)
-      if (viewStateGen) formData.append('__VIEWSTATEGENERATOR', viewStateGen)
-      
-      const res = await fetch(fullUrl, {
-        method: 'POST',
-        headers: {
-          ...baseHeaders,
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formData
-      })
-      
-      if (res.ok) {
-        const text = await res.text()
-        log(`[fetchDetails] Form POST fallback to ${ep}: ${text.length} chars`)
-        if (text.includes('<table') || text.includes('<tr')) {
-          const history = parseAttendanceHistory(text)
-          if (history.length > 0) return { data: history, debug: debugLogs }
-        }
-      }
-    } catch (e) {
-      log(`[fetchDetails] Form POST failed for ${ep}: ${e}`)
-    }
-  }
-
   log(`[fetchDetails] All detail extraction methods failed.`)
   return { data: [], debug: debugLogs }
 }
@@ -837,31 +737,31 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
 function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
   const $ = cheerio.load(html)
   const history: AttendanceHistoryRecord[] = []
-  
+
   // Target the #fullreport table specifically (from portal inspect element)
   let targetTable = $('table#fullreport')
-  
+
   // Fallback: find any table with attendance-like content
   if (targetTable.length === 0) {
     targetTable = $('table').filter((_, el) => {
       const txt = $(el).text().toLowerCase()
-      return (txt.includes('present') || txt.includes('absent')) && 
-             (txt.includes('date') || txt.includes('time'))
+      return (txt.includes('present') || txt.includes('absent')) &&
+        (txt.includes('date') || txt.includes('time'))
     }).first()
   }
-  
+
   if (targetTable.length === 0) {
     // Last resort: scan ALL tables
     targetTable = $('table')
   }
-  
+
   targetTable.find('tr').each((_, row) => {
     const cells = $(row).find('td')
     if (cells.length < 4) return
-    
+
     // Strategy 1: Use data-label attributes (mobile responsive)
     const hasDataLabels = cells.filter((__: any, c: any) => !!$(c).attr('data-label')).length > 0
-    
+
     if (hasDataLabels) {
       const getLabel = (needle: string) => {
         let val = ''
@@ -874,10 +774,10 @@ function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
         })
         return val
       }
-      
+
       const date = getLabel('date')
       const status = getLabel('attendance') || getLabel('status')
-      
+
       if (date && status) {
         history.push({
           date,
@@ -891,7 +791,7 @@ function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
       }
       return // next row
     }
-    
+
     // Strategy 2: Positional parsing (desktop view)
     // Portal columns: SrNo(0), Date(1), Type(2), Time(3), Attendance(4), Section(5), Group(6), Marked By(7)
     // Check for date in cell 1 (skip SrNo)
@@ -899,14 +799,14 @@ function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
     for (let j = 0; j < Math.min(cells.length, 3); j++) {
       const txt = $(cells[j]).text().trim()
       // Match: DD/MM/YYYY or "Saturday, 25 Apr 2026" or "25 Apr 2026"
-      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(txt) || 
-          /\d{1,2}\s+\w{3,9}\s+\d{4}/.test(txt) ||
-          /^\w+day,?\s+\d{1,2}\s+\w+\s+\d{4}$/.test(txt)) {
+      if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(txt) ||
+        /\d{1,2}\s+\w{3,9}\s+\d{4}/.test(txt) ||
+        /^\w+day,?\s+\d{1,2}\s+\w+\s+\d{4}$/.test(txt)) {
         dateIdx = j
         break
       }
     }
-    
+
     if (dateIdx >= 0) {
       const date = $(cells[dateIdx]).text().trim()
       const type = $(cells[dateIdx + 1])?.text().trim() || 'Class'
@@ -915,13 +815,13 @@ function parseAttendanceHistory(html: string): AttendanceHistoryRecord[] {
       const section = $(cells[dateIdx + 4])?.text().trim() || ''
       const group = $(cells[dateIdx + 5])?.text().trim() || ''
       const markedBy = $(cells[dateIdx + 6])?.text().trim() || $(cells[cells.length - 1]).text().trim() || 'System'
-      
+
       if (status && status.length > 2) {
         history.push({ date, type, time, status, section, group, markedBy })
       }
     }
   })
-  
+
   console.log(`[parseAttendanceHistory] Parsed ${history.length} history records`)
   return history
 }
@@ -972,15 +872,15 @@ async function fetchAnnouncementsViaAjax(url: string, cookies: Record<string, st
       const description = $(el).find('.ann-desc, p, .text-muted, .desc').first().text().trim()
       const category = $(el).find('.badge, .label, .cat').first().text().trim() || 'General'
       const onclick = $(el).attr('onclick') || $(el).find('[onclick]').attr('onclick') || ''
-      
+
       // Extract linked document if any
       let link = undefined
       // Try multiple link patterns
-      const linkMatch = onclick.match(/openAnnouncement\(['"]([^'"]+)['"]\)/) || 
-                        onclick.match(/ViewAnnouncement\(['"]([^'"]+)['"]\)/)
-      
+      const linkMatch = onclick.match(/openAnnouncement\(['"]([^'"]+)['"]\)/) ||
+        onclick.match(/ViewAnnouncement\(['"]([^'"]+)['"]\)/)
+
       if (linkMatch) {
-         link = `https://student.culko.in/ViewAnnouncement.aspx?id=${linkMatch[1]}`
+        link = `https://student.culko.in/ViewAnnouncement.aspx?id=${linkMatch[1]}`
       }
 
       if (title && title.length > 2) {
@@ -997,18 +897,18 @@ async function fetchAnnouncementsViaAjax(url: string, cookies: Record<string, st
     // Fallback for flat structure
     if (announcements.length === 0) {
       $('div').each((_, el) => {
-         const text = $(el).text().trim()
-         if (text.includes('-202') || text.includes('-203')) { // Date pattern
-            const parts = text.split('\n').map(p => p.trim()).filter(p => p.length > 0)
-            if (parts.length >= 2) {
-               announcements.push({
-                  title: parts[0],
-                  date: parts[1],
-                  description: parts.slice(2).join(' '),
-                  category: 'General'
-               })
-            }
-         }
+        const text = $(el).text().trim()
+        if (text.includes('-202') || text.includes('-203')) { // Date pattern
+          const parts = text.split('\n').map(p => p.trim()).filter(p => p.length > 0)
+          if (parts.length >= 2) {
+            announcements.push({
+              title: parts[0],
+              date: parts[1],
+              description: parts.slice(2).join(' '),
+              category: 'General'
+            })
+          }
+        }
       })
     }
 
@@ -1024,11 +924,11 @@ function parseResult(html: string): any {
   try {
     const $ = cheerio.load(html)
     const text = $('body').text()
-    
+
     // Look for CGPA patterns in text
     const cgpaMatch = text.match(/CGPA\s*[:\-]?\s*([\d.]+)/i)
     if (cgpaMatch) stats.cgpa = cgpaMatch[1]
-    
+
     const sgpaMatch = text.match(/Current\s*SGPA\s*[:\-]?\s*([\d.]+)/i) || text.match(/SGPA\s*[:\-]?\s*([\d.]+)/i)
     if (sgpaMatch) stats.sgpa = sgpaMatch[1]
 
@@ -1042,7 +942,7 @@ function parseResult(html: string): any {
         }
       })
     }
-  } catch {}
+  } catch { }
   return stats
 }
 
@@ -1056,17 +956,17 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
       'User-Agent': USER_AGENT
     }
   })
-  
+
   if (!pageResponse.ok) {
     throw new Error(`Failed to load attendance page: ${pageResponse.status}`)
   }
-  
+
   const html = await pageResponse.text()
-  
+
   // Try multiple patterns to extract report ID and session
   let reportId = null
   let sessionId = null
-  
+
   // Pattern 1: getReport('...', '...') - with two parameters
   const getReportMatch = html.match(/getReport\(['"]([^'"]+)['"]\s*,\s*['"]?(\d+)['"]?\)/)
   if (getReportMatch) {
@@ -1074,7 +974,7 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
     sessionId = getReportMatch[2]
     console.log('Found via getReport pattern:', { reportId, sessionId })
   }
-  
+
   // Pattern 2: CurrentSession in dropdown/option
   if (!sessionId) {
     const sessionMatch = html.match(/CurrentSession\s*\((\d+)\)/)
@@ -1083,7 +983,7 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
       console.log('Found session via CurrentSession:', sessionId)
     }
   }
-  
+
   // Fallback patterns for report ID
   if (!reportId) {
     const uidPatterns = [
@@ -1091,7 +991,7 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
       /var\s+UID\s*=\s*['"]([^'"]+)['"]/,
       /var\s+reportId\s*=\s*['"]([^'"]+)['"]/,
     ]
-    
+
     for (const pattern of uidPatterns) {
       const match = html.match(pattern)
       if (match) {
@@ -1101,24 +1001,24 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
       }
     }
   }
-  
+
   if (!reportId || !sessionId) {
     console.error('Could not extract report ID or session from page')
     console.error('Report ID found:', reportId)
     console.error('Session ID found:', sessionId)
-    
+
     return []
   }
-  
+
   console.log(`Extracted Report ID: ${reportId}, Session: ${sessionId}`)
-  
+
   // Step 2: Call the GetReport AJAX endpoint
   const ajaxUrl = url.split('?')[0] + '/GetReport'
   const ajaxData = `{UID:'${reportId}',Session:'${sessionId}'}`
-  
+
   console.log('Making AJAX request to:', ajaxUrl)
   console.log('AJAX data:', ajaxData)
-  
+
   const ajaxResponse = await fetch(ajaxUrl, {
     method: 'POST',
     headers: {
@@ -1130,32 +1030,32 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
     },
     body: ajaxData
   })
-  
+
   if (!ajaxResponse.ok) {
     throw new Error(`AJAX request failed: ${ajaxResponse.status}`)
   }
-  
+
   const ajaxText = await ajaxResponse.text()
   console.log('AJAX response length:', ajaxText.length)
-  
+
   try {
     // Parse the JSON response
     const parsed = JSON.parse(ajaxText)
     const attendanceJson = JSON.parse(parsed.d)
-    
+
     console.log(`Parsed ${attendanceJson.length} attendance records from AJAX`)
-    
+
     // DEBUG: Log all keys from first record to see actual field names
     if (attendanceJson.length > 0) {
       const sampleKeys = Object.keys(attendanceJson[0])
       console.log('[AJAX] First record keys:', sampleKeys.join(', '))
       console.log('[AJAX] First record values:', JSON.stringify(attendanceJson[0]))
     }
-    
+
     // Convert to our format
     return attendanceJson.map((record: any) => {
       const keys = Object.keys(record)
-      
+
       // Specific precise key finder to prevent pattern collision
       const getVal = (possibleKeys: string[]) => {
         for (const pk of possibleKeys) {
@@ -1179,7 +1079,7 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
 
       let code = getVal(['coursecode', 'code']) || ''
       let title = getVal(['title', 'coursename', 'subject', 'subjectname']) || 'Unknown'
-      
+
       // Raw totals
       let total = getVal(['totaldelv', 'totaldelivered', 'delivered', 'totalclasses']) || '0'
       let attended = getVal(['totalattd', 'totalattended', 'attended', 'totalpresent']) || '0'
@@ -1225,7 +1125,7 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
   } catch (error) {
     console.error('Error parsing AJAX response:', error)
     console.error('Raw response (first 500 chars):', ajaxText.substring(0, 500))
-    
+
     // AJAX response reading failed, return empty
     return []
   }
@@ -1233,19 +1133,19 @@ async function fetchAttendanceViaAjax(url: string, cookies: Record<string, strin
 
 function parseAttendanceHTML(html: string): AttendanceRecord[] {
   const records: AttendanceRecord[] = []
-  
+
   try {
     const $ = cheerio.load(html)
-    
+
     // Normalize helper: "Eligible_Delivered:" → "eligibledelivered"
     const norm = (s: string) => s.toLowerCase().replace(/[^a-z]/g, '')
-    
+
     // ══════════════════════════════════════════════════════════════
     // STRATEGY: Find the attendance table, read its headers, build
     // a header→column index map, then extract each data row.
     // This works regardless of data-label, th vs td, underscores, etc.
     // ══════════════════════════════════════════════════════════════
-    
+
     // Step 1: Find ALL tables that contain course-code patterns
     const candidateTables: any[] = []
     $('table').each((_, t) => {
@@ -1255,36 +1155,36 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
         candidateTables.push($(t))
       }
     })
-    
+
     console.log(`[parseAttendanceHTML] Found ${candidateTables.length} candidate tables with course codes`)
-    
+
     for (const $table of candidateTables) {
       if (records.length > 0) break
-      
+
       // Step 2: Find the header row — scan ALL rows for one that looks like a header
       let headerMap: Record<string, number> = {}
       let headerRowFound = false
-      
+
       $table.find('tr').each((_: any, tr: any) => {
         if (headerRowFound) return
-        
+
         // Collect all cells (th or td) in this row
         const cells = $(tr).find('th, td')
         if (cells.length < 8) return
-        
+
         // Check if this row contains header-like text
         const rowText = $(tr).text().toLowerCase()
         const isHeaderRow = rowText.includes('eligible') && (rowText.includes('delivered') || rowText.includes('attended'))
-        
+
         if (!isHeaderRow) return
-        
+
         // Build the header map
         const headerTexts: string[] = []
         cells.each((i: number, c: any) => {
           const raw = $(c).text().trim()
           headerTexts.push(`${i}:"${raw}"`)
           const n = norm(raw)
-          
+
           // Map normalized header text → column index
           if (n.includes('eligibledelivered')) headerMap['eligDelv'] = i
           else if (n.includes('eligibleattended')) headerMap['eligAttd'] = i
@@ -1299,31 +1199,31 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
           else if (n === 'vdl' || n.includes('dutyleaveother') || n.includes('dutyleavevdl')) headerMap['vdl'] = i
           else if (n.includes('viewattendance') || n.includes('view')) { /* skip */ }
         })
-        
+
         headerRowFound = true
         console.log('[parseAttendanceHTML] HEADER ROW:', headerTexts.join(' | '))
         console.log('[parseAttendanceHTML] HEADER MAP:', JSON.stringify(headerMap))
       })
-      
+
       // If no header row, use defaults
       if (!headerRowFound) {
         headerMap = { code: 0, title: 1, totalDelv: 2, totalAttd: 3, idl: 4, adl: 5, vdl: 6, ml: 7, eligDelv: 8, eligAttd: 9, eligPerc: 10 }
         console.log('[parseAttendanceHTML] No header row found, using default column map')
       }
-      
+
       // Step 3: Parse data rows
       let firstRowLogged = false
       $table.find('tr').each((_: any, row: any) => {
         const cells = $(row).find('td')
         if (cells.length < 8) return
-        
+
         // Try to find the course code — check headerMap['code'] first, then cell 0
         const codeIdx = headerMap['code'] ?? 0
         const code = cells.eq(codeIdx).text().trim()
-        
+
         // Must look like a course code
         if (!/^\d{2}[A-Z]{2,4}-\d{2,3}$/.test(code) && !/^[A-Z0-9]{3,}-[A-Z0-9]+$/.test(code)) return
-        
+
         // Debug: dump first data row
         if (!firstRowLogged) {
           const vals: string[] = []
@@ -1331,23 +1231,23 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
           console.log(`[parseAttendanceHTML] DATA ROW (${cells.length} cells): ${vals.join(' | ')}`)
           firstRowLogged = true
         }
-        
+
         const get = (key: string, fallbackIdx: number) => {
           const idx = headerMap[key] ?? fallbackIdx
           return cells.eq(idx).text().trim() || '0'
         }
-        
+
         const title = get('title', 1)
         if (!title || title.length < 3) return
-        
+
         const totalDelv = get('totalDelv', 2)
         const totalAttd = get('totalAttd', 3)
         const eligDelv = get('eligDelv', 8)
         const eligAttd = get('eligAttd', 9)
         const eligPerc = get('eligPerc', 10)
-        
+
         const viewBtn = $(row).find('input[chk], [onclick*="getdata"]')
-        
+
         records.push({
           name: title,
           code,
@@ -1365,29 +1265,29 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
           eligiblePercentage: eligPerc
         } as any)
       })
-      
+
       if (records.length > 0) {
         console.log(`[parseAttendanceHTML] ✅ Parsed ${records.length} records from table. First: ${records[0].name} EligDelv=${(records[0] as any).eligibleDelivered} EligAttd=${(records[0] as any).eligibleAttended}`)
       }
     }
-    
+
     // ══════════════════════════════════════════════════════════════
     // PASS 2: DATA-LABEL APPROACH (if no table headers found)
     // ══════════════════════════════════════════════════════════════
     if (records.length === 0) {
       console.log('[parseAttendanceHTML] Table approach failed, trying data-label Pass 2...')
-      
+
       const eligDelvCells = $('td').filter((_, el) => {
         const label = norm($(el).attr('data-label') || '')
         return label.includes('eligibledelivered')
       })
-      
+
       console.log(`[parseAttendanceHTML] Pass 2: Found ${eligDelvCells.length} data-label cells`)
-      
+
       if (eligDelvCells.length > 0) {
         eligDelvCells.each((_, eligCell) => {
           const $row = $(eligCell).closest('tr')
-          
+
           const getByLabel = (...needles: string[]): string => {
             let found = ''
             $row.find('td[data-label]').each((__, td) => {
@@ -1401,13 +1301,13 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
             })
             return found
           }
-          
+
           const code = getByLabel('course code', 'coursecode', 'code')
           const title = getByLabel('title', 'subject name', 'course name')
           if (!title || title.length < 3) return
-          
+
           const viewBtn = $row.find('input[chk], input[onclick*="getdata"], button[chk]')
-          
+
           records.push({
             name: title,
             code: code || viewBtn.attr('obj') || '',
@@ -1430,128 +1330,128 @@ function parseAttendanceHTML(html: string): AttendanceRecord[] {
   } catch (error) {
     console.error('[parseAttendanceHTML] Error:', error)
   }
-  
+
   console.log(`[parseAttendanceHTML] Total: ${records.length} subjects parsed`)
   return records
 }
 
 function parseMarksHTML(html: string): MarkRecord[] {
   const records: MarkRecord[] = []
-  
+
   try {
     const $ = cheerio.load(html)
-    
+
     // PRIMARY STRATEGY: Accordion format (Subject is in h3, marks in nested table)
     // We check this first to prevent the inner tables from triggering the fallback!
     const accordion = $('#accordion, .panel-group')
     if (accordion.length > 0) {
       console.log('Cheerio found Marks Accordion!')
-      
+
       accordion.find('h3, .panel-title').each((i, header) => {
         const subjectName = $(header).text().trim()
-        
+
         let content = $(header).nextAll('.panel-collapse').first()
         if (content.length === 0) {
-            content = $(header).next('div')
+          content = $(header).next('div')
         }
 
         if (content.length > 0) {
           const evaluations: MarkEvaluation[] = []
-          
+
           content.find('table tr').each((j, tr) => {
-             if ($(tr).find('th').length > 0) return
-             const cells = $(tr).find('td')
-             if (cells.length >= 3) {
-                const type = $(cells[0]).text().trim()
-                const max = $(cells[1]).text().trim() // Sometimes marks are listed here
-                const marks = $(cells[2]).text().trim() // Sometimes grades are here
-                
-                evaluations.push({
-                  type: type,
-                  marks: marks,
-                  grade: max
-                })
-             }
+            if ($(tr).find('th').length > 0) return
+            const cells = $(tr).find('td')
+            if (cells.length >= 3) {
+              const type = $(cells[0]).text().trim()
+              const max = $(cells[1]).text().trim() // Sometimes marks are listed here
+              const marks = $(cells[2]).text().trim() // Sometimes grades are here
+
+              evaluations.push({
+                type: type,
+                marks: marks,
+                grade: max
+              })
+            }
           })
-          
+
           if (evaluations.length > 0) {
             records.push({ subject: subjectName, evaluations })
           }
         }
       })
-    } 
-    
+    }
+
     if (records.length === 0) {
       console.log('Using robust table scraper for marks')
       // Advanced flat table parser - group by subject names
       $('table').each((_, table) => {
         let currentSubject = 'General Marks'
         let currentEvals: MarkEvaluation[] = []
-        
+
         $(table).find('tr').each((_, tr) => {
           const ths = $(tr).find('th')
           const tds = $(tr).find('td')
-          
+
           if (ths.length === 1 && tds.length === 0) {
-             // Sometimes a single header row outlines the subject
-             if (currentEvals.length > 0) {
-                records.push({ subject: currentSubject, evaluations: currentEvals })
-                currentEvals = []
-             }
-             currentSubject = ths.text().trim()
+            // Sometimes a single header row outlines the subject
+            if (currentEvals.length > 0) {
+              records.push({ subject: currentSubject, evaluations: currentEvals })
+              currentEvals = []
+            }
+            currentSubject = ths.text().trim()
           } else if (tds.length >= 3) {
-             const val1 = $(tds[0]).text().trim()
-             const val2 = $(tds[1]).text().trim()
-             const val3 = $(tds[2]).text().trim()
-             
-             // Check if it's a valid data row (contains numbers or valid grade words)
-             if (/\d/.test(val2) || /\d/.test(val3) || val2.toLowerCase().includes('grade') || val3.toLowerCase().includes('grade')) {
-               currentEvals.push({ type: val1, grade: val2, marks: val3 })
-             }
+            const val1 = $(tds[0]).text().trim()
+            const val2 = $(tds[1]).text().trim()
+            const val3 = $(tds[2]).text().trim()
+
+            // Check if it's a valid data row (contains numbers or valid grade words)
+            if (/\d/.test(val2) || /\d/.test(val3) || val2.toLowerCase().includes('grade') || val3.toLowerCase().includes('grade')) {
+              currentEvals.push({ type: val1, grade: val2, marks: val3 })
+            }
           }
         })
-        
+
         if (currentEvals.length > 0) {
           records.push({ subject: currentSubject, evaluations: currentEvals })
         }
       })
     }
-    
+
     // Absolute fallback - parse flat text that user described: "MST -1 Theory \n 20 \n Grade: 16"
     if (records.length === 0) {
-       console.log('Using raw text extraction for marks')
-       const text = $('body').text()
-       const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0)
-       
-       let currentSubject = 'Subject Marks'
-       let evals: MarkEvaluation[] = []
-       
-       for (let i = 0; i < lines.length; i++) {
-          const l = lines[i]
-          // Looking for typical exam names
-          if (l.match(/MST|Practical|MSP|Theory|Assign|Quiz/i) && i + 2 < lines.length) {
-             const next1 = lines[i+1]
-             const next2 = lines[i+2]
-             
-             // Pattern: MST -> 20 -> Grade: 16 OR MST -> 20 -> 16
-             if (/^\d+(\.\d+)?$/.test(next1) && (next2.toLowerCase().includes('grade') || /^\d+(\.\d+)?$/.test(next2))) {
-                evals.push({
-                   type: l,
-                   grade: next1,
-                   marks: next2.replace(/grade:?/i, '').trim()
-                })
-                // Skip the parsed lines
-                i += 2
-             }
+      console.log('Using raw text extraction for marks')
+      const text = $('body').text()
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0)
+
+      let currentSubject = 'Subject Marks'
+      let evals: MarkEvaluation[] = []
+
+      for (let i = 0; i < lines.length; i++) {
+        const l = lines[i]
+        // Looking for typical exam names
+        if (l.match(/MST|Practical|MSP|Theory|Assign|Quiz/i) && i + 2 < lines.length) {
+          const next1 = lines[i + 1]
+          const next2 = lines[i + 2]
+
+          // Pattern: MST -> 20 -> Grade: 16 OR MST -> 20 -> 16
+          if (/^\d+(\.\d+)?$/.test(next1) && (next2.toLowerCase().includes('grade') || /^\d+(\.\d+)?$/.test(next2))) {
+            evals.push({
+              type: l,
+              grade: next1,
+              marks: next2.replace(/grade:?/i, '').trim()
+            })
+            // Skip the parsed lines
+            i += 2
           }
-       }
-       if (evals.length > 0) records.push({ subject: currentSubject, evaluations: evals })
+        }
+      }
+      if (evals.length > 0) records.push({ subject: currentSubject, evaluations: evals })
     }
-    
+
   } catch (error) {
     console.error('Error parsing marks with cheerio:', error)
   }
-  
+
   console.log(`Parsed ${records.length} mark subjects (records) with cheerio`)
   return records
 }
@@ -1571,52 +1471,52 @@ function parseTimetable(html: string): any {
         }
       })
     }
-    
+
     if (table.length > 0) {
-       const dayHeaders: string[] = []
-       
-       table.find('tr').each((i, row) => {
-         const cells = $(row).find('th, td')
-         if (cells.length > 1) {
-            const firstCell = $(cells[0]).text().trim()
-            
-            // Is it the header row with Day names?
-            if (i === 0 || firstCell.toLowerCase().includes('timing') || firstCell.toLowerCase().includes('time') || firstCell.toLowerCase() === 'day/time') {
-               // Capture days from headers
-               for(let j=1; j<cells.length; j++) {
-                  let dayText = $(cells[j]).text().trim()
-                  // Expand short day names
-                  if (dayText.toLowerCase().startsWith('mon')) dayText = 'Monday'
-                  else if (dayText.toLowerCase().startsWith('tue')) dayText = 'Tuesday'
-                  else if (dayText.toLowerCase().startsWith('wed')) dayText = 'Wednesday'
-                  else if (dayText.toLowerCase().startsWith('thu')) dayText = 'Thursday'
-                  else if (dayText.toLowerCase().startsWith('fri')) dayText = 'Friday'
-                  else if (dayText.toLowerCase().startsWith('sat')) dayText = 'Saturday'
-                  else if (dayText.toLowerCase().startsWith('sun')) dayText = 'Sunday'
-                  
-                  dayHeaders.push(dayText)
-                  timetable[dayText] = []
-               }
-            } 
-            // Is it a timing row? (starts with a time string or number)
-            else if (firstCell.includes(':') || /\d/.test(firstCell)) {
-               const timing = firstCell
-               
-               // Match subjects across the row columns
-               for(let j=1; j<cells.length; j++) {
-                  const day = dayHeaders[j-1]
-                  if (!day) continue
-                  
-                  const subjectName = $(cells[j]).text().trim()
-                  // Ignore empty slots or breaks
-                  if (subjectName && subjectName !== '&nbsp;' && subjectName !== '-' && !subjectName.toLowerCase().includes('break')) {
-                    if (!timetable[day]) timetable[day] = []
-                    timetable[day].push({ time: timing, subject: subjectName.replace(/\s+/g, ' ') })
-                  }
-               }
+      const dayHeaders: string[] = []
+
+      table.find('tr').each((i, row) => {
+        const cells = $(row).find('th, td')
+        if (cells.length > 1) {
+          const firstCell = $(cells[0]).text().trim()
+
+          // Is it the header row with Day names?
+          if (i === 0 || firstCell.toLowerCase().includes('timing') || firstCell.toLowerCase().includes('time') || firstCell.toLowerCase() === 'day/time') {
+            // Capture days from headers
+            for (let j = 1; j < cells.length; j++) {
+              let dayText = $(cells[j]).text().trim()
+              // Expand short day names
+              if (dayText.toLowerCase().startsWith('mon')) dayText = 'Monday'
+              else if (dayText.toLowerCase().startsWith('tue')) dayText = 'Tuesday'
+              else if (dayText.toLowerCase().startsWith('wed')) dayText = 'Wednesday'
+              else if (dayText.toLowerCase().startsWith('thu')) dayText = 'Thursday'
+              else if (dayText.toLowerCase().startsWith('fri')) dayText = 'Friday'
+              else if (dayText.toLowerCase().startsWith('sat')) dayText = 'Saturday'
+              else if (dayText.toLowerCase().startsWith('sun')) dayText = 'Sunday'
+
+              dayHeaders.push(dayText)
+              timetable[dayText] = []
             }
-         }
-       })
+          }
+          // Is it a timing row? (starts with a time string or number)
+          else if (firstCell.includes(':') || /\d/.test(firstCell)) {
+            const timing = firstCell
+
+            // Match subjects across the row columns
+            for (let j = 1; j < cells.length; j++) {
+              const day = dayHeaders[j - 1]
+              if (!day) continue
+
+              const subjectName = $(cells[j]).text().trim()
+              // Ignore empty slots or breaks
+              if (subjectName && subjectName !== '&nbsp;' && subjectName !== '-' && !subjectName.toLowerCase().includes('break')) {
+                if (!timetable[day]) timetable[day] = []
+                timetable[day].push({ time: timing, subject: subjectName.replace(/\s+/g, ' ') })
+              }
+            }
+          }
+        }
+      })
     }
   } catch (e) {
     console.error('Error parsing timetable:', e)
@@ -1629,19 +1529,19 @@ function formatContacts(raw: string): string {
   // If it's a giant string of digits (stuck together)
   const digits = raw.replace(/\D/g, '')
   if (digits.length > 15) {
-     // Likely 3 numbers (10 digits each, or similar)
-     // Split every 10 digits if possible
-     const matches = digits.match(/.{1,10}/g)
-     return matches ? matches.join(' / ') : raw
+    // Likely 3 numbers (10 digits each, or similar)
+    // Split every 10 digits if possible
+    const matches = digits.match(/.{1,10}/g)
+    return matches ? matches.join(' / ') : raw
   }
   return raw
 }
 
 function parseProfile(html: string): any {
-  const profile: any = { 
+  const profile: any = {
     name: 'Student', uid: 'Unknown', semester: 'Unknown', email: 'Unknown',
-    bloodGroup: 'Unknown', program: 'Unknown', dob: 'Unknown', 
-    admissionYear: 'Unknown', address: 'Unknown', fathersName: 'Unknown', 
+    bloodGroup: 'Unknown', program: 'Unknown', dob: 'Unknown',
+    admissionYear: 'Unknown', address: 'Unknown', fathersName: 'Unknown',
     mothersName: 'Unknown', cgpa: 'N/A', sgpa: 'N/A', mobile: 'Unknown',
     religion: 'Unknown', caste: 'Unknown'
   }
@@ -1650,18 +1550,18 @@ function parseProfile(html: string): any {
 
     // ── EXACT ID MAP (from debug endpoint, CULKO Unnao portal) ──
     const exactIds: Record<string, keyof typeof profile> = {
-      'lbstuUID':                               'uid',
-      'ContentPlaceHolder1_lblName':            'name',
-      'ContentPlaceHolder1_lblFathername':      'fathersName',
-      'ContentPlaceHolder1_lblMothername':      'mothersName',
-      'ContentPlaceHolder1_lblDob':             'dob',
-      'ContentPlaceHolder1_lblAdmissionYear':   'admissionYear',
+      'lbstuUID': 'uid',
+      'ContentPlaceHolder1_lblName': 'name',
+      'ContentPlaceHolder1_lblFathername': 'fathersName',
+      'ContentPlaceHolder1_lblMothername': 'mothersName',
+      'ContentPlaceHolder1_lblDob': 'dob',
+      'ContentPlaceHolder1_lblAdmissionYear': 'admissionYear',
       'ContentPlaceHolder1_lblCurrentSemester': 'semester',
-      'ContentPlaceHolder1_lblBloodGroup':      'bloodGroup',
-      'ContentPlaceHolder1_lblProgramCode':     'program',
-      'ContentPlaceHolder1_lblAddress':         'address',
-      'ContentPlaceHolder1_lblReligion':        'religion',
-      'ContentPlaceHolder1_lblCaste':           'caste',
+      'ContentPlaceHolder1_lblBloodGroup': 'bloodGroup',
+      'ContentPlaceHolder1_lblProgramCode': 'program',
+      'ContentPlaceHolder1_lblAddress': 'address',
+      'ContentPlaceHolder1_lblReligion': 'religion',
+      'ContentPlaceHolder1_lblCaste': 'caste',
     }
 
     Object.entries(exactIds).forEach(([id, field]) => {
@@ -1744,14 +1644,14 @@ export function parseHostelDetails(html: string) {
     room: '',
     reportingStatus: ''
   }
-  
+
   try {
     const $ = cheerio.load(html)
-    
+
     $('td, span, div, th').each((_, el) => {
       const t = $(el).text().trim()
       const nextText = $(el).next().text().trim() || $(el).parent().next().text().trim()
-      
+
       if (t === 'Hostel Status') hostel.status = nextText
       if (t === 'Seater') hostel.seater = nextText
       if (t === 'Hostel Name') hostel.name = nextText
@@ -1760,24 +1660,24 @@ export function parseHostelDetails(html: string) {
     })
 
     if (!hostel.status || !hostel.room) {
-       $('tr').each((_, row) => {
-          const cells = $(row).find('td, th')
-          if (cells.length >= 2) {
-             const label = $(cells[0]).text().trim()
-             const value = $(cells[1]).text().trim()
+      $('tr').each((_, row) => {
+        const cells = $(row).find('td, th')
+        if (cells.length >= 2) {
+          const label = $(cells[0]).text().trim()
+          const value = $(cells[1]).text().trim()
 
-             if (label.includes('Hostel Status')) hostel.status = value
-             if (label.includes('Seater')) hostel.seater = value
-             if (label.includes('Hostel Name')) hostel.name = value
-             if (label.includes('Room No')) hostel.room = value
-             if (label.includes('Reporting Status')) hostel.reportingStatus = value
-          }
-       })
+          if (label.includes('Hostel Status')) hostel.status = value
+          if (label.includes('Seater')) hostel.seater = value
+          if (label.includes('Hostel Name')) hostel.name = value
+          if (label.includes('Room No')) hostel.room = value
+          if (label.includes('Reporting Status')) hostel.reportingStatus = value
+        }
+      })
     }
   } catch (e) {
     console.error('Error parsing Hostel details', e)
   }
-  
+
   return hostel
 }
 
