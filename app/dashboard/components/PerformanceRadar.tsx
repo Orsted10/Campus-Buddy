@@ -3,8 +3,16 @@
 import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Tooltip } from 'recharts'
 import { motion } from 'framer-motion'
 import { TrendingUp, Zap, Target } from 'lucide-react'
+import { useTheme } from 'next-themes'
 
 export function PerformanceRadar({ attendance, marks = [] }: { attendance: any[], marks?: any[] }) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
+  const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'
+  const tickColor = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.5)'
+  const cursorColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'
+
   if (!attendance || attendance.length === 0) {
     return (
       <div className="h-[300px] w-full flex items-center justify-center flex-col gap-2 opacity-50">
@@ -67,7 +75,7 @@ export function PerformanceRadar({ attendance, marks = [] }: { attendance: any[]
       const isLowMarks = data.marks > 0 && data.marks < 40
       
       return (
-        <div className="bg-background/95 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl min-w-[200px]">
+        <div className="bg-background/95 backdrop-blur-xl border border-black/5 dark:border-white/10 p-4 rounded-2xl shadow-2xl min-w-[200px]">
           <p className="text-[10px] font-black text-foreground uppercase tracking-widest mb-4 leading-tight">{data.fullSubject}</p>
           
           <div className="space-y-3">
@@ -87,7 +95,7 @@ export function PerformanceRadar({ attendance, marks = [] }: { attendance: any[]
                 {data.marks > 0 ? (
                    <span className={`text-sm font-black ${isLowMarks ? 'text-amber-500' : 'text-blue-500'}`}>{data.marks.toFixed(1)}%</span>
                 ) : (
-                   <span className="text-[10px] font-bold text-muted-foreground uppercase bg-white/5 px-2 py-0.5 rounded-md">N/A</span>
+                   <span className="text-[10px] font-bold text-muted-foreground uppercase bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-md">N/A</span>
                 )}
              </div>
           </div>
@@ -123,13 +131,13 @@ export function PerformanceRadar({ attendance, marks = [] }: { attendance: any[]
       <div className="w-full h-[300px] -mt-2">
         <ResponsiveContainer width="99%" height="99%" minWidth={1} minHeight={1}>
           <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
-            <PolarGrid stroke="rgba(255,255,255,0.08)" gridType="polygon" />
+            <PolarGrid stroke={gridColor} gridType="polygon" />
             <PolarAngleAxis 
                dataKey="subject" 
-               tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 9, fontWeight: 900, textAnchor: 'middle', letterSpacing: '0.1em' }} 
+               tick={{ fill: tickColor, fontSize: 9, fontWeight: 900, textAnchor: 'middle', letterSpacing: '0.1em' }} 
             />
             <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: cursorColor }} />
             
             {/* Academics Radar */}
             <Radar
