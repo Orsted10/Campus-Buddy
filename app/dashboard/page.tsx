@@ -362,7 +362,10 @@ export default function DashboardPage() {
           {/* PERFORMANCE RADAR */}
           <Card className="card-app overflow-hidden">
              <CardContent className="p-0">
-                <PerformanceRadar attendance={Array.isArray(attendanceData) ? attendanceData : []} />
+                <PerformanceRadar 
+                  attendance={Array.isArray(attendanceData) ? attendanceData : []} 
+                  marks={Array.isArray(marksData) ? marksData : []} 
+                />
              </CardContent>
           </Card>
 
