@@ -688,6 +688,7 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
           ...baseHeaders,
           'Content-Type': 'application/json; charset=UTF-8',
           'X-Requested-With': 'XMLHttpRequest'
+        },
         body: JSON.stringify({
           course: chk,
           UID: reportId,
