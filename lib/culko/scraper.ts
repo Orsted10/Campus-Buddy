@@ -158,15 +158,15 @@ export async function captureBasePortalData(cookieJar: Record<string, string>) {
   }
 
   // Fetch detailed attendance for all subjects
-  if (results.attendance && Array.isArray(results.attendance.data)) {
+  if (results.attendance && Array.isArray(results.attendance)) {
     console.log('[captureBasePortalData] Fetching detailed attendance for all subjects...')
     const allDetails: Record<string, any> = {}
     
     // Process all subjects sequentially to avoid hammering the CULKO portal and triggering 500s
-    for (const subject of results.attendance.data) {
+    for (const subject of results.attendance) {
       try {
-        const detailsData = await fetchCULKOResource('attendance-details', cookieJar, { courseCode: subject.code, chk: subject.chk })
-        if (detailsData.data) {
+        const detailsData = await fetchAttendanceDetails(cookieJar, subject.code, subject.chk)
+        if (detailsData && detailsData.data) {
           allDetails[subject.code] = detailsData.data
         }
       } catch (e) {
@@ -175,7 +175,7 @@ export async function captureBasePortalData(cookieJar: Record<string, string>) {
     }
     
     if (Object.keys(allDetails).length > 0) {
-      await savePortalData('attendance-details' as any, { success: true, data: allDetails })
+      await savePortalData('attendance-details' as any, allDetails)
       results.attendanceDetails = allDetails
       console.log(`[captureBasePortalData] ✅ attendance-details captured and saved for ${Object.keys(allDetails).length} subjects`)
     }
@@ -374,11 +374,11 @@ export async function fetchCULKOData(
       // Fetch base attendance to get course list, then fetch all details
       const baseAttendance = await fetchCULKOResource('attendance', sessionCookies)
       const allDetails: Record<string, any> = {}
-      if (baseAttendance.success && Array.isArray(baseAttendance.data)) {
-        for (const subject of baseAttendance.data) {
+      if (Array.isArray(baseAttendance)) {
+        for (const subject of baseAttendance) {
           try {
             const detailsData = await fetchAttendanceDetails(sessionCookies, subject.code, subject.chk)
-            if (detailsData.data) {
+            if (detailsData) {
               allDetails[subject.code] = detailsData.data
             }
           } catch (e) {
@@ -386,7 +386,7 @@ export async function fetchCULKOData(
           }
         }
       }
-      response = { success: true, data: allDetails }
+      response = allDetails
       try {
         await savePortalData('attendance-details' as any, response)
       } catch (e) {
