@@ -579,13 +579,20 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
   log(`[fetchDetails] Attempting to extract detailed HTML table...`)
   
   let ajaxUrl: string | null = null
+  let getdataScriptContent = ''
   $('script').each((_, s) => {
     const sc = $(s).html() || ''
+    if (sc.includes('function getdata')) {
+      getdataScriptContent = sc
+    }
     if (sc.includes('getdata')) {
       const urlMatch = sc.match(/url\s*:\s*['"]([^'"]+)['"]/i)
       if (urlMatch) ajaxUrl = urlMatch[1]
     }
   })
+  if (getdataScriptContent) {
+    log(`[fetchDetails] Found getdata script: ${getdataScriptContent.substring(0, 500)}...`)
+  }
 
   const endpoints = [
     ajaxUrl,
@@ -681,11 +688,13 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
           ...baseHeaders,
           'Content-Type': 'application/json; charset=UTF-8',
           'X-Requested-With': 'XMLHttpRequest'
-        },
         body: JSON.stringify({
-          reportId: reportId,
-          sessionId: sessionId,
-          flag: '2'
+          course: chk,
+          UID: reportId,
+          fromDate: '0',
+          toDate: '0',
+          type: 'All',
+          Session: sessionId
         })
       })
 
