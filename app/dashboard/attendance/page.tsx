@@ -89,8 +89,9 @@ function AttendanceRing({
         <div className="flex items-center gap-1.5 pt-1 border-t border-border/20">
           <span className="text-[8px] font-bold text-muted-foreground/50 uppercase tracking-wider mr-1">Recent:</span>
           {recentDots.slice(0, 6).map((dot, i) => {
-            const s = dot.status.toLowerCase()
-            const isP = s.includes('present')
+            const s = (dot.status || '').toLowerCase()
+            const isP = s === 'p' || s.includes('present')
+            const isA = s === 'a' || s.includes('absent')
             const isDL = s.includes('dl') || s.includes('duty') || s.includes('medical')
             const color = isP ? 'bg-green-500' : isDL ? 'bg-blue-500' : 'bg-red-500'
             return <div key={i} className={`w-2.5 h-2.5 rounded-full ${color} shadow-sm`} title={dot.status} />
@@ -119,8 +120,14 @@ function HistoryModal({ isOpen, onClose, subjectName, history, isLoading }: {
 }) {
   if (!isOpen) return null
 
-  const presentCount = history.filter(r => r.status?.toLowerCase().includes('present')).length
-  const absentCount = history.filter(r => r.status?.toLowerCase().includes('absent')).length
+  const presentCount = history.filter(r => {
+    const s = (r.status || '').toLowerCase()
+    return s === 'p' || s.includes('present')
+  }).length
+  const absentCount = history.filter(r => {
+    const s = (r.status || '').toLowerCase()
+    return s === 'a' || s.includes('absent')
+  }).length
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-md animate-in fade-in duration-300" onClick={onClose}>
@@ -141,7 +148,7 @@ function HistoryModal({ isOpen, onClose, subjectName, history, isLoading }: {
                  <BookOpen className="w-3.5 h-3.5" />
                  <span className="text-[10px] font-bold tracking-widest uppercase">Class Record</span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-tight">{subjectName}</h2>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-normal pb-1">{subjectName}</h2>
               <div className="flex items-center gap-3 pt-1">
                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20 shadow-sm">
                     <CheckCircle2 className="w-4 h-4" />
