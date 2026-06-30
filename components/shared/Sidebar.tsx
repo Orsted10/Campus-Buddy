@@ -37,6 +37,7 @@ const studentNavItems = [
   { href: '/dashboard/navigation', label: 'Navigation', icon: MapPin },
   { href: '/dashboard/library', label: 'Library', icon: Library },
   { href: '/dashboard/notifications', label: 'Notifications', icon: Bell },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
 const adminNavItems = [

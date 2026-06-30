@@ -212,15 +212,23 @@ export const usePortalStore = create<PortalState>()(
             // Diff Marks
             const oldMarks = get().marks
             if (oldMarks.length > 0 && updates.marks.length > 0) {
-              updates.marks.forEach((newMark: any) => {
-                const oldMark = oldMarks.find((m: any) => m.subject === newMark.subject && m.type === newMark.type)
-                if (!oldMark || parseFloat(newMark.score) !== parseFloat(oldMark.score)) {
-                  newNotifications.push({
-                    id: Math.random().toString(36).substring(7),
-                    type: 'marks',
-                    message: `New/Updated marks for ${newMark.subject} ${newMark.type}: ${newMark.score}`,
-                    read: false,
-                    timestamp: new Date().toISOString()
+              updates.marks.forEach((newSubj: any) => {
+                const oldSubj = oldMarks.find((m: any) => m.subject === newSubj.subject)
+                if (newSubj.evaluations && Array.isArray(newSubj.evaluations)) {
+                  newSubj.evaluations.forEach((newEval: any) => {
+                    const oldEval = oldSubj?.evaluations?.find((e: any) => e.type === newEval.type)
+                    if (!oldEval || parseFloat(newEval.marks) !== parseFloat(oldEval.marks)) {
+                      // Validate that it's a real mark change and not just invalid data
+                      if (!isNaN(parseFloat(newEval.marks))) {
+                        newNotifications.push({
+                          id: Math.random().toString(36).substring(7),
+                          type: 'marks',
+                          message: `New/Updated marks for ${newSubj.subject} ${newEval.type}: ${newEval.marks}`,
+                          read: false,
+                          timestamp: new Date().toISOString()
+                        })
+                      }
+                    }
                   })
                 }
               })

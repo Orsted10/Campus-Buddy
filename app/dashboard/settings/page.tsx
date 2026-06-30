@@ -84,6 +84,23 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState('')
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
   const supabase = createClient()
+  
+  // Email Update & Google State
+  const [newEmail, setNewEmail] = useState('')
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false)
+  const [isGoogleLinked, setIsGoogleLinked] = useState(false)
+
+  // Fetch linked identities on mount
+  useEffect(() => {
+    async function checkIdentities() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const isLinked = user.identities?.some(id => id.provider === 'google') || false
+        setIsGoogleLinked(isLinked)
+      }
+    }
+    checkIdentities()
+  }, [])
 
   const handleUpdatePassword = async () => {
     if (newPassword.length < 6) {
@@ -101,6 +118,25 @@ export default function SettingsPage() {
       toast.error(error.message || 'Failed to update password')
     } finally {
       setIsUpdatingPassword(false)
+    }
+  }
+
+  const handleUpdateEmail = async () => {
+    if (!newEmail.includes('@')) {
+      toast.error('Please enter a valid email address')
+      return
+    }
+
+    setIsUpdatingEmail(true)
+    try {
+      const { error } = await supabase.auth.updateUser({ email: newEmail })
+      if (error) throw error
+      toast.success('Check both old and new email inboxes to confirm the change!')
+      setNewEmail('')
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update email')
+    } finally {
+      setIsUpdatingEmail(false)
     }
   }
 
@@ -295,19 +331,47 @@ export default function SettingsPage() {
                         <p className="text-[10px] text-muted-foreground font-medium">Changing this will update your Campus Buddy login, not your university portal password.</p>
                     </div>
 
+                    <div className="space-y-2 pt-4 border-t border-black/5 dark:border-white/5">
+                        <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Update Email</label>
+                        <div className="flex gap-3">
+                            <Input 
+                                type="email" 
+                                placeholder="new.email@example.com" 
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                className="bg-black/5 dark:bg-white/5 border-white/10 rounded-xl"
+                            />
+                            <Button 
+                                onClick={handleUpdateEmail} 
+                                disabled={isUpdatingEmail || !newEmail}
+                                className="rounded-xl font-black px-6"
+                            >
+                                {isUpdatingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Update'}
+                            </Button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground font-medium">Supabase will send a confirmation link to BOTH your old and new email.</p>
+                    </div>
+
                     <div className="pt-4 border-t border-black/5 dark:border-white/5 space-y-3">
                         <label className="text-xs font-black text-muted-foreground uppercase tracking-widest">Connected Accounts</label>
                         <Button 
                             variant="outline"
                             onClick={async () => {
+                              if (isGoogleLinked) return
                               try {
-                                const { error } = await supabase.auth.linkIdentity({ provider: 'google' })
+                                const { error } = await supabase.auth.linkIdentity({ 
+                                  provider: 'google',
+                                  options: {
+                                    redirectTo: window.location.origin + '/dashboard/settings'
+                                  }
+                                })
                                 if (error) throw error
                                 toast.success('Redirecting to Google to link account...')
                               } catch (e: any) {
                                 toast.error(e.message || 'Failed to link Google account')
                               }
                             }}
+                            disabled={isGoogleLinked}
                             className="w-full justify-start gap-3 rounded-xl border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10"
                         >
                             <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -316,7 +380,7 @@ export default function SettingsPage() {
                               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                             </svg>
-                            Link Google Account
+                            {isGoogleLinked ? 'Google Account Linked' : 'Link Google Account'}
                         </Button>
                     </div>
                 </CardContent>
