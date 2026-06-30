@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Book, Search, Download, ExternalLink, Loader2, BookOpen, Sparkles } from 'lucide-react'
+import { Book, Search, Download, ExternalLink, Loader2, BookOpen, Sparkles, Library } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { usePortalStore } from '@/store/usePortalStore'
