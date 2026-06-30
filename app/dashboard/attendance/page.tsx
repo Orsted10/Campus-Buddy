@@ -318,8 +318,8 @@ export default function AttendancePage() {
           {portalStatus === 'error' ? 'Failed to connect to CULKO.' : 'Connect your portal to view attendance analytics.'}
         </p>
         <div className="flex gap-3">
-          <button onClick={() => syncAll()} className="bg-primary text-background px-6 py-2.5 rounded-xl font-black uppercase text-xs hover:opacity-90 transition-all">
-            {portalStatus === 'error' ? 'Retry' : 'Sync Now'}
+          <button onClick={() => isDisconnected ? router.push('/dashboard/academics') : syncAll()} className="bg-primary text-background px-6 py-2.5 rounded-xl font-black uppercase text-xs hover:opacity-90 transition-all">
+            {portalStatus === 'error' ? 'Retry' : (isDisconnected ? 'Connect' : 'Sync Now')}
           </button>
           <button onClick={() => router.push('/dashboard/academics')} className="bg-muted px-6 py-2.5 rounded-xl font-black uppercase text-xs hover:bg-muted/80 transition-all">
             Credentials

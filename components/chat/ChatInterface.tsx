@@ -86,8 +86,18 @@ export default function ChatInterface() {
     setIsLoading(true)
 
     try {
-      // Remove artificial 3-second timeout that kills the chat request during token refreshes
-      const sessionData = await supabase.auth.getSession()
+      // Use a safe timeout for getSession: if it hangs (e.g. Capacitor auth lock bug),
+      // we fallback to proceeding without it rather than hanging the entire chat infinitely.
+      let sessionData = null
+      try {
+        sessionData = await Promise.race([
+          supabase.auth.getSession(),
+          new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000))
+        ])
+      } catch (e) {
+        console.warn('getSession timed out, proceeding without token. (Cookies will be used on web)')
+      }
+      
       const session = sessionData?.data?.session
       
       const fetchPromise = fetch(getApiUrl('/api/chat'), {
@@ -293,9 +303,11 @@ export default function ChatInterface() {
                 )}>
                   {message.role === 'assistant' ? (
                     <div className="prose prose-sm dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-a:text-primary prose-strong:text-primary prose-table:border-collapse prose-table:w-full prose-th:bg-black/5 dark:prose-th:bg-white/5 prose-th:px-4 prose-th:py-3 prose-td:border prose-td:border-black/5 dark:prose-td:border-white/5 prose-td:px-4 prose-td:py-3 prose-tr:transition-colors hover:prose-tr:bg-black/[0.02] dark:hover:prose-tr:bg-white/[0.02]">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {message.content}
-                      </ReactMarkdown>
+                      <div className="overflow-x-auto max-w-[100%] pb-2">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {message.content}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   ) : (
                     <p className="text-sm leading-relaxed">{message.content}</p>
