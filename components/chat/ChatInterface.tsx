@@ -144,7 +144,7 @@ export default function ChatInterface() {
       "flex flex-col w-full glass-panel overflow-hidden border-white/5 relative transition-all duration-300",
       isFullscreen 
         ? "fixed inset-0 z-[100] h-[100dvh] max-w-none rounded-none shadow-none bg-background md:p-4" 
-        : "h-[calc(100dvh-7rem)] md:h-[calc(100vh-8rem)] max-w-5xl mx-auto rounded-3xl md:rounded-[2.5rem] shadow-2xl"
+        : "h-[calc(100dvh-11rem)] md:h-[calc(100vh-8rem)] max-w-5xl mx-auto rounded-3xl md:rounded-[2.5rem] shadow-2xl"
     )}>
       
       {/* Settings / History Sidebar */}
