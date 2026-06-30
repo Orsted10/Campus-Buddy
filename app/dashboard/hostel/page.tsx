@@ -10,12 +10,6 @@ import { motion } from 'framer-motion'
 export default function HostelPage() {
   const { hostel, portalStatus, isSyncing, syncAll } = usePortalStore()
 
-  useEffect(() => {
-    // Only auto-sync if we have no data
-    if (!hostel) {
-      syncAll()
-    }
-  }, [])
 
   const features = [
     {

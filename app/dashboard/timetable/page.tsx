@@ -122,7 +122,7 @@ export default function TimetablePage() {
       </div>
 
       {/* Day Selector */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide">
+      <div className="flex items-center gap-3 overflow-x-auto py-3 px-2 scrollbar-hide">
         {days.map((day) => {
           const isActive = selectedDay === day
           const isToday = days[currentIST.getUTCDay() - 1] === day

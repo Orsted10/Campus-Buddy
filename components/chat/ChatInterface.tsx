@@ -380,9 +380,6 @@ export default function ChatInterface() {
             </Button>
           </div>
         </form>
-        <p className="text-[10px] text-center text-muted-foreground mt-4 uppercase tracking-widest font-bold opacity-60">
-          Powered by Gemini 1.5 & Neural Mapping
-        </p>
       </div>
     </div>
   )
