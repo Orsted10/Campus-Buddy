@@ -83,7 +83,7 @@ export default function SettingsPage() {
   // Password Update State
   const [newPassword, setNewPassword] = useState('')
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false)
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
   
   // Email Update & Google State
   const [newEmail, setNewEmail] = useState('')
@@ -106,12 +106,13 @@ export default function SettingsPage() {
     async function checkIdentities() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const isLinked = user.identities?.some(id => id.provider === 'google') || false
+        const isLinked = user.app_metadata?.providers?.includes('google') || 
+                         user.identities?.some(id => id.provider === 'google') || false
         setIsGoogleLinked(isLinked)
       }
     }
     checkIdentities()
-  }, [])
+  }, [supabase])
 
   const handleUpdatePassword = async () => {
     if (newPassword.length < 6) {

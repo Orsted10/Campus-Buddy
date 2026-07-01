@@ -426,7 +426,7 @@ export default function ChatInterface() {
 
       {/* Input Area */}
       <div className={cn(
-        "p-4 md:p-6 border-t border-white/5 flex-shrink-0 z-10",
+        "p-4 pb-[max(1rem,env(safe-area-inset-bottom))] md:p-6 border-t border-white/5 flex-shrink-0 z-10",
         isFullscreen ? "bg-background/80 backdrop-blur-xl rounded-b-3xl" : "bg-white/[0.01] backdrop-blur-xl"
       )}>
         <form onSubmit={handleSubmit} className="relative group max-w-4xl mx-auto">

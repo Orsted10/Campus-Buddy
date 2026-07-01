@@ -14,7 +14,9 @@ export default function LoginPage() {
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isResetting, setIsResetting] = useState(false)
-  const { signIn, signInWithGoogle, resetPassword, user } = useAuth()
+  const [isVerifyingRecovery, setIsVerifyingRecovery] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
+  const { signIn, signInWithGoogle, resetPassword, verifyOtp, user } = useAuth()
   const router = useRouter()
 
   // Redirect logic moved to server-side middleware for better stability
@@ -51,12 +53,35 @@ export default function LoginPage() {
       if (error) {
         toast.error(error.message)
       } else {
-        toast.success('Password reset link sent to your email!')
+        toast.success('Recovery code sent to your email!')
+        setIsVerifyingRecovery(true)
       }
     } catch {
       toast.error('Failed to send reset link')
     } finally {
       setIsResetting(false)
+    }
+  }
+
+  const handleVerifyRecovery = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!otpCode || otpCode.length !== 6) {
+      toast.error('Please enter a valid 6-digit code')
+      return
+    }
+    setLoading(true)
+    try {
+      const { error } = await verifyOtp(email, otpCode, 'recovery')
+      if (error) {
+        toast.error(error.message)
+      } else {
+        toast.success('Code verified. Please set your new password.')
+        router.push('/reset-password')
+      }
+    } catch {
+      toast.error('An error occurred during verification')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -72,6 +97,8 @@ export default function LoginPage() {
     }
   }
 
+  const inputStyle = { backgroundColor: 'oklch(0.14 0.018 120)' }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -84,66 +111,116 @@ export default function LoginPage() {
         <div className="w-14 h-14 rounded-2xl bg-primary mx-auto flex items-center justify-center mb-4 glow-olive-sm">
           <LogIn className="w-7 h-7 text-background" />
         </div>
-        <h1 className="text-2xl font-black text-white">Welcome Back</h1>
-        <p className="text-muted-foreground text-sm mt-1">Sign in to your Campus Buddy account</p>
+        <h1 className="text-2xl font-black text-white">{isVerifyingRecovery ? 'Verify Identity' : 'Welcome Back'}</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          {isVerifyingRecovery ? 'Enter the recovery code sent to your email' : 'Sign in to your Campus Buddy account'}
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Email */}
-        <div className="space-y-1.5">
-          <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Email</label>
-          <input
-            type="email"
-            placeholder="25lbcs3067@culkomail.in"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full border border-white/8 text-white placeholder:text-muted-foreground/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all"
-            style={{ backgroundColor: 'oklch(0.14 0.018 120)' }}
-          />
-        </div>
-
-        {/* Password */}
-        <div className="space-y-1.5">
-          <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Password</label>
-            <button 
-              type="button" 
-              onClick={handleForgotPassword}
-              disabled={isResetting}
-              className="text-xs font-bold text-primary hover:text-white transition-colors"
-            >
-              {isResetting ? 'Sending...' : 'Forgot password?'}
-            </button>
+      {isVerifyingRecovery ? (
+        <form onSubmit={handleVerifyRecovery} className="space-y-4">
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5 text-center mb-6">
+              <label className="text-sm font-bold text-muted-foreground">We sent a 6-digit code to</label>
+              <div className="text-white font-black">{email}</div>
+            </div>
+            
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest text-center block mb-2">Recovery Code</label>
+              <input
+                type="text"
+                placeholder="123456"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                required
+                className="w-full border border-white/8 text-white placeholder:text-muted-foreground/50 rounded-xl px-4 py-3 text-2xl tracking-[0.5em] text-center font-black outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all"
+                style={inputStyle}
+              />
+            </div>
           </div>
-          <div className="relative">
+
+          <motion.button
+            type="submit"
+            disabled={loading || otpCode.length !== 6}
+            whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(160,210,80,0.3)' }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full bg-primary text-background font-black uppercase tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>Verify Code <ArrowRight className="w-4 h-4" /></>
+            )}
+          </motion.button>
+          
+          <button
+            type="button"
+            onClick={() => setIsVerifyingRecovery(false)}
+            className="w-full text-center text-sm text-muted-foreground hover:text-white mt-4"
+          >
+            Back to login
+          </button>
+        </form>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Email</label>
             <input
-              type={showPwd ? 'text' : 'password'}
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              placeholder="25lbcs3067@culkomail.in"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full border border-white/8 text-white placeholder:text-muted-foreground/50 rounded-xl px-4 py-3 pr-12 text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all"
-              style={{ backgroundColor: 'oklch(0.14 0.018 120)' }}
+              className="w-full border border-white/8 text-white placeholder:text-muted-foreground/50 rounded-xl px-4 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all"
+              style={inputStyle}
             />
-            <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors">
-              {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
           </div>
-        </div>
 
-        <motion.button
-          type="submit"
-          disabled={loading}
-          whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(160,210,80,0.3)' }}
-          whileTap={{ scale: 0.98 }}
-          className="w-full bg-primary text-background font-black py-3.5 rounded-xl flex items-center justify-center gap-2 glow-olive-sm hover:glow-olive transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
-        >
-          {loading ? 'Signing in...' : (
-            <><span>Sign In</span> <ArrowRight className="w-4 h-4" /></>
-          )}
-        </motion.button>
-      </form>
+          {/* Password */}
+          <div className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Password</label>
+              <button 
+                type="button" 
+                onClick={handleForgotPassword}
+                disabled={isResetting}
+                className="text-xs font-bold text-primary hover:text-white transition-colors"
+              >
+                {isResetting ? 'Sending...' : 'Forgot password?'}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showPwd ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full border border-white/8 text-white placeholder:text-muted-foreground/50 rounded-xl px-4 py-3 pr-12 text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-all"
+                style={inputStyle}
+              />
+              <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white transition-colors">
+                {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <motion.button
+            type="submit"
+            disabled={loading}
+            whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(160,210,80,0.3)' }}
+            whileTap={{ scale: 0.98 }}
+            className="w-full bg-primary text-background font-black uppercase tracking-widest py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-background border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>Sign In <ArrowRight className="w-4 h-4" /></>
+            )}
+          </motion.button>
+        </form>
+      )}
 
       <div className="flex items-center gap-3 my-5">
         <div className="flex-1 h-px bg-white/5" />

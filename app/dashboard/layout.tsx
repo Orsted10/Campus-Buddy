@@ -19,20 +19,21 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const user = useAuthStore((state) => state.user)
   const hasHydrated = useAuthStore((state) => state._hasHydrated)
+  const isLoading = useAuthStore((state: any) => state.isLoading)
   const portalStatus = usePortalStore((state) => state.portalStatus)
   const syncAll = usePortalStore((state) => state.syncAll)
   const lastSync = usePortalStore((state) => state.lastSync)
 
   useEffect(() => {
-    // Only redirect AFTER zustand has hydrated from localStorage
-    if (hasHydrated && !user) {
+    // Only redirect AFTER zustand has hydrated AND auth has finished loading
+    if (hasHydrated && !isLoading && !user) {
       router.push('/login')
     }
-  }, [user, router, hasHydrated])
+  }, [user, router, hasHydrated, isLoading])
 
   // Global Auto-Sync
   useEffect(() => {
-    if (hasHydrated && portalStatus === 'connected') {
+    if (hasHydrated && !isLoading && portalStatus === 'connected') {
       const now = Date.now()
       const last = lastSync ? new Date(lastSync).getTime() : 0
       if (now - last > 60000) { // 1 minute threshold
@@ -41,10 +42,10 @@ export default function DashboardLayout({
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasHydrated, portalStatus])
+  }, [hasHydrated, isLoading, portalStatus])
 
-  // Show a loading screen while zustand is reading from localStorage
-  if (!hasHydrated) {
+  // Show a loading screen while zustand is reading from localStorage or auth is loading
+  if (!hasHydrated || isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background">
         <motion.div
@@ -53,7 +54,9 @@ export default function DashboardLayout({
           className="text-center space-y-4"
         >
           <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
-          <p className="text-muted-foreground text-sm">Loading your session...</p>
+          <p className="text-muted-foreground text-sm">
+            {!hasHydrated ? 'Loading your session...' : 'Authenticating...'}
+          </p>
         </motion.div>
       </div>
     )

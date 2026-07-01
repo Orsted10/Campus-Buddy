@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
       if (error) throw error
 
       toast.success('Password updated successfully!')
-      router.push('/login')
+      router.push('/dashboard')
     } catch (error: any) {
       toast.error(error.message || 'Failed to update password')
     } finally {

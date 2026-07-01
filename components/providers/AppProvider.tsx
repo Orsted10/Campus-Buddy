@@ -5,10 +5,12 @@ import { App } from '@capacitor/app'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { isNativeApp } from '@/lib/api-config'
+import { useAuth } from '@/hooks/useAuth'
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const supabase = createClient()
+  useAuth()
 
   useEffect(() => {
     // Handle Deep Linking for Auth (Session Injection)

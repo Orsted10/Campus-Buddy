@@ -12,10 +12,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
-  const { user, setUser, clearUser } = useAuthStore()
+  const { user, setUser, clearUser, setIsLoading } = useAuthStore()
 
   useEffect(() => {
     const getSession = async () => {
+      setIsLoading(true)
       try {
         const {
           data: { session },
@@ -57,6 +58,7 @@ export function useAuth() {
         clearUser()
       } finally {
         setLoading(false)
+        setIsLoading(false)
       }
     }
 
@@ -190,6 +192,20 @@ export function useAuth() {
     }
   }
 
+  const verifyOtp = async (email: string, token: string, type: 'signup' | 'recovery') => {
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type,
+      })
+      if (error) throw error
+      return { data, error: null }
+    } catch (error: any) {
+      return { data: null, error }
+    }
+  }
+
   const signOut = async () => {
     try {
       console.log('--- SIGNOUT START ---')
@@ -266,6 +282,7 @@ export function useAuth() {
     signUp,
     signInWithGoogle,
     resetPassword,
+    verifyOtp,
     signOut,
   }
 }
