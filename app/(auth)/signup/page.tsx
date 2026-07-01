@@ -45,7 +45,7 @@ export default function SignupPage() {
           toast.error(error.message)
         } else {
           toast.success('Email verified successfully! Welcome to Campus Buddy.')
-          window.location.href = '/dashboard'
+          router.push('/dashboard')
         }
       } catch {
         toast.error('An error occurred during verification')

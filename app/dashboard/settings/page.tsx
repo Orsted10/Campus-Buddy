@@ -215,7 +215,7 @@ export default function SettingsPage() {
       icon: Shield,
       items: [
         { label: 'Portal Auto-Sync', value: 'autoSync', type: 'toggle' },
-        { label: 'Data Refresh Rate', value: 'Every 5 mins', status: 'Optimal' },
+        { label: 'Data Refresh Rate', value: 'Every 1 min', status: 'Optimal' },
         { label: 'Strict Elite Persona (AI)', value: 'aiStrict', type: 'toggle' },
       ]
     },

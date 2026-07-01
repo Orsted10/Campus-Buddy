@@ -27,9 +27,9 @@ export default function DashboardLayout({
   useEffect(() => {
     // Only redirect AFTER zustand has hydrated AND auth has finished loading
     if (hasHydrated && !isLoading && !user) {
-      window.location.href = '/login'
+      router.push('/login')
     }
-  }, [user, hasHydrated, isLoading])
+  }, [user, hasHydrated, isLoading, router])
 
   // Global Auto-Sync
   useEffect(() => {

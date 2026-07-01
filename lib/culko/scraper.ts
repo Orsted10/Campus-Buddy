@@ -351,14 +351,20 @@ export async function fetchCULKOData(
       const baseAttendance = await fetchCULKOResource('attendance', sessionCookies)
       const allDetails: Record<string, any> = {}
       if (Array.isArray(baseAttendance)) {
-        for (const subject of baseAttendance) {
+        const promises = baseAttendance.map(async (subject) => {
           try {
             const detailsData = await fetchAttendanceDetails(sessionCookies, subject.code, subject.chk)
-            if (detailsData) {
-              allDetails[subject.code] = detailsData.data
-            }
+            return { code: subject.code, data: detailsData?.data }
           } catch (e) {
             console.error(`Failed to fetch details for ${subject.code}:`, e)
+            return { code: subject.code, data: null }
+          }
+        })
+        
+        const results = await Promise.all(promises)
+        for (const result of results) {
+          if (result.data) {
+            allDetails[result.code] = result.data
           }
         }
       }
