@@ -159,15 +159,26 @@ export default function LibraryPage() {
                   {/* Book Cover */}
                   <div className="aspect-[2/3] w-full bg-muted relative overflow-hidden">
                     {coverUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img 
-                        src={coverUrl} 
-                        alt={book.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
+                      <>
+                        <img 
+                          src={coverUrl} 
+                          alt={book.title}
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.nextElementSibling;
+                            if (fallback) fallback.classList.remove('hidden');
+                          }}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="hidden w-full h-full flex flex-col items-center justify-center bg-black/5 dark:bg-white/5 p-4 text-center">
+                          <Book className="w-8 h-8 text-muted-foreground/30 mb-2" />
+                          <span className="text-xs text-muted-foreground font-medium line-clamp-3">{book.title}</span>
+                        </div>
+                      </>
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-black/5 dark:bg-white/5">
-                        <Book className="w-10 h-10 text-muted-foreground/30" />
+                      <div className="w-full h-full flex flex-col items-center justify-center bg-black/5 dark:bg-white/5 p-4 text-center">
+                        <Book className="w-8 h-8 text-muted-foreground/30 mb-2" />
+                        <span className="text-xs text-muted-foreground font-medium line-clamp-3">{book.title}</span>
                       </div>
                     )}
                     

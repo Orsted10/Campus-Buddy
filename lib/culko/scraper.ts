@@ -347,13 +347,21 @@ export async function fetchCULKOData(
       response = await fetchAttendanceDetails(sessionCookies, extraParams.courseCode, extraParams.chk)
       // Do NOT overwrite DB with single subject details
     } else if (endpoint === 'attendance-details-all') {
-      // Fetch base attendance to get course list, then fetch all details
-      const baseAttendance = await fetchCULKOResource('attendance', sessionCookies)
+      const summaryUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
+      const baseHeaders = {
+        'Cookie': Object.entries(sessionCookies).map(([k, v]) => `${k}=${v}`).join('; '),
+        'User-Agent': USER_AGENT,
+        'Referer': `${BASE_URL}/StudentHome.aspx`
+      }
+      const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
+      const summaryHtml = await summaryRes.text()
+
+      const baseAttendance = parseAttendanceHTML(summaryHtml)
       const allDetails: Record<string, any> = {}
-      if (Array.isArray(baseAttendance)) {
+      if (Array.isArray(baseAttendance) && baseAttendance.length > 0) {
         const promises = baseAttendance.map(async (subject) => {
           try {
-            const detailsData = await fetchAttendanceDetails(sessionCookies, subject.code, subject.chk)
+            const detailsData = await fetchAttendanceDetails(sessionCookies, subject.code, subject.chk, summaryHtml)
             return { code: subject.code, data: detailsData?.data }
           } catch (e) {
             console.error(`Failed to fetch details for ${subject.code}:`, e)
@@ -512,7 +520,7 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
   }
 }
 
-async function fetchAttendanceDetails(cookies: Record<string, string>, courseCode: string, chk?: string) {
+async function fetchAttendanceDetails(cookies: Record<string, string>, courseCode: string, chk?: string, summaryHtml?: string) {
   const debugLogs: string[] = []
   const log = (msg: string) => {
     debugLogs.push(msg)
@@ -528,17 +536,21 @@ async function fetchAttendanceDetails(cookies: Record<string, string>, courseCod
 
   log(`[fetchDetails] Starting with courseCode=${courseCode}, initial chk=${chk}`)
 
-  const summaryUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
-  log(`[fetchDetails] Loading summary page for reportId and sessionId extraction...`)
-
-  let html = ''
-  try {
-    const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
-    html = await summaryRes.text()
-    log(`[fetchDetails] Loaded summary page: ${html.length} chars`)
-  } catch (e) {
-    log(`[fetchDetails] Failed to load summary page: ${e}`)
-    return { data: [], debug: debugLogs }
+  let html = summaryHtml || ''
+  
+  if (!html) {
+    const summaryUrl = `${BASE_URL}/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==`
+    log(`[fetchDetails] Loading summary page for reportId and sessionId extraction...`)
+    try {
+      const summaryRes = await fetch(summaryUrl, { headers: baseHeaders })
+      html = await summaryRes.text()
+      log(`[fetchDetails] Loaded summary page: ${html.length} chars`)
+    } catch (e) {
+      log(`[fetchDetails] Failed to load summary page: ${e}`)
+      return { data: [], debug: debugLogs }
+    }
+  } else {
+    log(`[fetchDetails] Using pre-fetched summary page HTML: ${html.length} chars`)
   }
 
   const $ = cheerio.load(html)

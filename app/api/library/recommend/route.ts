@@ -17,11 +17,8 @@ Example output: ["science", "mathematics", "physics", "logic"]
 
 Subjects: ${subjects.join(', ')}`
 
-    let result = await chatWithOpenRouter([{ role: 'user', content: systemPrompt }])
-    if (!result.success) {
-      result = await chatWithGroq([{ role: 'user', content: systemPrompt }], true)
-    }
-
+    let result = await chatWithGroq([{ role: 'user', content: systemPrompt }], true)
+    
     if (!result.success) {
        return NextResponse.json({ success: true, queries: subjects.slice(0, 3).map((s: string) => s.split(' ')[0]) })
     }

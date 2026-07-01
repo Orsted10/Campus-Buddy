@@ -213,10 +213,7 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
       }))
     ]
 
-    let result = await chatWithOpenRouter(enrichedMessages)
-    if (!result.success) {
-      result = await chatWithGroq(enrichedMessages, true)
-    }
+    let result = await chatWithGroq(enrichedMessages, true)
 
     let currentChatId = chatId
     if (!result.success) {
