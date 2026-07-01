@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const courseCode = searchParams.get('courseCode')
   const chk = searchParams.get('chk')
   
-  if (!endpoint || !['attendance', 'marks', 'timetable', 'profile', 'announcements', 'hostel', 'attendance-details', 'attendance-details-all', 'delete-cache'].includes(endpoint)) {
+  if (!endpoint || !['attendance', 'marks', 'timetable', 'profile', 'announcements', 'hostel', 'attendance-details', 'attendance-details-all', 'attendance-details-cached', 'delete-cache'].includes(endpoint)) {
     return NextResponse.json(
       { error: 'Invalid endpoint.' },
       { status: 400 }
@@ -33,6 +33,25 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: true, message: 'All portal caches cleared' })
     } catch (e) {
       return NextResponse.json({ error: 'Failed to clear cache' }, { status: 500 })
+    }
+  }
+
+  // Fast DB-only read for attendance details (no scraping, no timeout)
+  if (endpoint === 'attendance-details-cached') {
+    try {
+      const { createClient } = await import('@/lib/supabase/server')
+      const supabase = await createClient()
+      const authHeader = req.headers.get('Authorization')
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : undefined
+      const { data: { user } } = token ? await supabase.auth.getUser(token) : await supabase.auth.getUser()
+      if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+      const cached = await getPortalData('attendance-details', user.id)
+      if (cached.success) {
+        return NextResponse.json({ success: true, data: cached.data, isCached: true })
+      }
+      return NextResponse.json({ success: false, data: {}, isCached: false })
+    } catch (e) {
+      return NextResponse.json({ success: false, data: {} })
     }
   }
   

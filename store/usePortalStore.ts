@@ -247,18 +247,30 @@ export const usePortalStore = create<PortalState>()(
           // Phase 1 done — update store immediately so UI is live
           set(updates)
 
-          // Phase 2: Load detailed attendance records in background (heavier, non-blocking)
-          // This prevents Vercel timeout and lets the dashboard load fast
-          console.log('[usePortalStore] Starting Phase 2: attendance details...')
-          fetch(getApiUrl('/api/culko?endpoint=attendance-details-all'), { headers })
+          // Phase 2: Load attendance details — cache-first, then background scrape
+          // Step 2a: Instantly read from DB cache (fast, no timeout risk)
+          console.log('[usePortalStore] Phase 2a: Reading cached attendance details from DB...')
+          fetch(getApiUrl('/api/culko?endpoint=attendance-details-cached'), { headers })
             .then(res => res.json())
-            .then(details => {
-              if (details.success && details.data) {
-                console.log('[usePortalStore] Phase 2: attendance details loaded.')
-                set({ attendanceDetails: details.data })
+            .then(cached => {
+              if (cached.success && cached.data && Object.keys(cached.data).length > 0) {
+                console.log('[usePortalStore] Phase 2a: Cached details loaded instantly.')
+                set({ attendanceDetails: cached.data })
               }
+              // Step 2b: Always trigger a fresh scrape in the background to keep cache warm for NEXT sync
+              // Fire-and-forget: if it times out, cached data is already shown above
+              console.log('[usePortalStore] Phase 2b: Triggering background scrape to refresh cache...')
+              fetch(getApiUrl('/api/culko?endpoint=attendance-details-all'), { headers })
+                .then(r => r.json())
+                .then(fresh => {
+                  if (fresh.success && fresh.data && Object.keys(fresh.data).length > 0) {
+                    console.log('[usePortalStore] Phase 2b: Fresh details loaded, updating store.')
+                    set({ attendanceDetails: fresh.data })
+                  }
+                })
+                .catch(err => console.warn('[usePortalStore] Phase 2b scrape failed (non-fatal):', err))
             })
-            .catch(err => console.error('[usePortalStore] Phase 2 (details) failed (non-fatal):', err))
+            .catch(err => console.warn('[usePortalStore] Phase 2a cache read failed:', err))
 
           return true
         } catch (err) {
