@@ -18,7 +18,14 @@ export function useAuth() {
 
   useEffect(() => {
     const getSession = async () => {
-      setIsLoading(true)
+      const currentState = useAuthStore.getState()
+      
+      // Only set global loading state if we don't have a user yet
+      // This prevents child components (like Sidebar) from unmounting the dashboard when they call useAuth
+      if (!currentState.user) {
+        setIsLoading(true)
+      }
+
       try {
         const {
           data: { session },
