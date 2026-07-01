@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
@@ -11,8 +11,10 @@ import type { Profile } from '@/types/database'
 export function useAuth() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
   const { user, setUser, clearUser, setIsLoading } = useAuthStore()
+  
+  // Memoize supabase client to prevent infinite re-renders
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     const getSession = async () => {
@@ -67,6 +69,7 @@ export function useAuth() {
     // Safety timeout: If auth takes more than 5 seconds, stop loading
     const safetyTimeout = setTimeout(() => {
       setLoading(false)
+      setIsLoading(false)
     }, 5000)
 
     const {
@@ -99,13 +102,14 @@ export function useAuth() {
         clearUser()
       }
       setLoading(false)
+      setIsLoading(false)
     })
 
     return () => {
       clearTimeout(safetyTimeout)
       subscription.unsubscribe()
     }
-  }, [supabase, setUser, clearUser])
+  }, [supabase, setUser, clearUser, setIsLoading])
 
   const signIn = async (email: string, password: string) => {
     try {
