@@ -32,6 +32,7 @@ export default function ChatInterface() {
   
   // Speech Recognition State
   const [isListening, setIsListening] = useState(false)
+  const [isSpeechSupported, setIsSpeechSupported] = useState(false)
   const recognitionRef = useRef<any>(null)
   
   // TTS State
@@ -68,6 +69,7 @@ export default function ChatInterface() {
     if (typeof window !== 'undefined') {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
       if (SpeechRecognition) {
+        setIsSpeechSupported(true)
         const recognition = new SpeechRecognition()
         recognition.continuous = false
         recognition.interimResults = true
@@ -492,7 +494,7 @@ export default function ChatInterface() {
               disabled={isLoading}
               className="flex-1 bg-transparent border-none outline-none focus-visible:ring-0 text-sm font-medium h-11 px-0 placeholder:text-muted-foreground/60"
             />
-            {recognitionRef.current && (
+            {isSpeechSupported && (
               <Button
                 type="button"
                 onClick={toggleListening}
