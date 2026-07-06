@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { chatWithGroq } from '@/lib/ai/groq'
-import { chatWithOpenRouter, streamOpenRouter } from '@/lib/ai/openrouter'
+import { chatWithGroq, streamGroq } from '@/lib/ai/groq'
+import { chatWithOpenRouter } from '@/lib/ai/openrouter'
 import { getPortalData } from '@/lib/culko/persistence'
 import { CAMPUS_POI, MESS_MENU } from '@/lib/constants'
 
@@ -240,7 +240,7 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
     }
 
     try {
-      const stream = await streamOpenRouter(enrichedMessages)
+      const stream = await streamGroq(enrichedMessages)
       if (!stream) throw new Error('No stream returned')
 
       let fullResponse = ''
