@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 
 import { AppProvider } from "@/components/providers/AppProvider";
 import { ConfigProvider } from "@/components/providers/ConfigProvider";
+import { UpdateChecker } from "@/components/UpdateChecker";
 
 export default function RootLayout({
   children,
@@ -36,6 +37,7 @@ export default function RootLayout({
           <ConfigProvider>
             <AppProvider>
               {children}
+              <UpdateChecker />
               <Toaster richColors position="top-right" />
             </AppProvider>
           </ConfigProvider>

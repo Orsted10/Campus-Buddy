@@ -34,8 +34,8 @@ export default function SignupPage() {
     
     if (isVerifying) {
       // Handle OTP Verification
-      if (!otpCode || otpCode.length !== 6) {
-        toast.error('Please enter a valid 6-digit code')
+      if (!otpCode || (otpCode.length !== 6 && otpCode.length !== 8)) {
+        toast.error('Please enter a valid verification code')
         return
       }
       setLoading(true)
@@ -77,7 +77,7 @@ export default function SignupPage() {
       if (error) {
         toast.error(error.message)
       } else {
-        toast.success('Account created! Please enter the 6-digit code sent to your email.')
+        toast.success('Account created! Please enter the code sent to your email.')
         setIsVerifying(true)
       }
     } catch {

@@ -65,8 +65,8 @@ export default function LoginPage() {
 
   const handleVerifyRecovery = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!otpCode || otpCode.length !== 6) {
-      toast.error('Please enter a valid 6-digit code')
+    if (!otpCode || (otpCode.length !== 6 && otpCode.length !== 8)) {
+      toast.error('Please enter a valid verification code')
       return
     }
     setLoading(true)
