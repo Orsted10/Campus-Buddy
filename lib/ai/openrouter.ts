@@ -13,8 +13,6 @@ export async function chatWithOpenRouter(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'nvidia/nemotron-4-340b-instruct:free',
-        // Update model to nemotron 3 as requested by user
         model: 'nvidia/nemotron-3-nano-30b-a3b:free',
         messages,
       }),
@@ -35,3 +33,30 @@ export async function chatWithOpenRouter(
     return { success: false, error: error.message }
   }
 }
+
+export async function streamOpenRouter(
+  messages: Array<{ role: 'user' | 'assistant' | 'system', content: string }>
+) {
+  const apiKey = process.env.OPENROUTER_API_KEY
+  if (!apiKey) throw new Error('OpenRouter API Key missing')
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'nvidia/nemotron-3-nano-30b-a3b:free',
+      messages,
+      stream: true
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`OpenRouter API error: ${response.statusText}`)
+  }
+
+  return response.body
+}
+

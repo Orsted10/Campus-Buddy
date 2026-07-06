@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { chatWithGroq } from '@/lib/ai/groq'
-import { chatWithOpenRouter } from '@/lib/ai/openrouter'
+import { chatWithOpenRouter, streamOpenRouter } from '@/lib/ai/openrouter'
 import { getPortalData } from '@/lib/culko/persistence'
 import { CAMPUS_POI, MESS_MENU } from '@/lib/constants'
 
@@ -213,18 +213,9 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
       }))
     ]
 
-    let result = await chatWithGroq(enrichedMessages, true)
-
     let currentChatId = chatId
-    if (!result.success) {
-      return NextResponse.json({
-        success: true,
-        content: "Oops! My neural engine is currently offline. Please configure your `OPENROUTER_API_KEY` or `GROQ_API_KEY` in the environment variables to wake me up! 🤖",
-        chatId: currentChatId
-      })
-    }
 
-    // 5. Persistence
+    // 5. Persistence - Initialize Chat if needed
     if (!currentChatId) {
       const { data: newChat, error: chatError } = await supabase
         .from('ai_chats')
@@ -244,16 +235,65 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
     if (currentChatId) {
       const lastMsg = messages[messages.length - 1]
       await supabase.from('ai_messages').insert([
-        { chat_id: currentChatId, role: 'user', content: lastMsg.content },
-        { chat_id: currentChatId, role: 'assistant', content: result.success ? result.content : "Oops! API Key missing." }
+        { chat_id: currentChatId, role: 'user', content: lastMsg.content }
       ])
     }
 
-    return NextResponse.json({
-      success: true,
-      content: result.content,
-      chatId: currentChatId,
-    })
+    try {
+      const stream = await streamOpenRouter(enrichedMessages)
+      if (!stream) throw new Error('No stream returned')
+
+      let fullResponse = ''
+      let buffer = ''
+      const decoder = new TextDecoder()
+      
+      const transformStream = new TransformStream({
+        transform(chunk, controller) {
+          buffer += decoder.decode(chunk, { stream: true })
+          const lines = buffer.split('\n')
+          buffer = lines.pop() || ''
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ') && line.trim() !== 'data: [DONE]') {
+              try {
+                const data = JSON.parse(line.slice(6))
+                if (data.choices?.[0]?.delta?.content) {
+                  fullResponse += data.choices[0].delta.content
+                }
+              } catch (e) {
+                // ignore parsing errors on partial chunks
+              }
+            }
+          }
+          controller.enqueue(chunk)
+        },
+        async flush() {
+          if (currentChatId && fullResponse) {
+            await supabase.from('ai_messages').insert([
+              { chat_id: currentChatId, role: 'assistant', content: fullResponse }
+            ])
+          }
+        }
+      })
+
+      const responseStream = stream.pipeThrough(transformStream)
+
+      return new Response(responseStream, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'X-Chat-Id': currentChatId || ''
+        }
+      })
+    } catch (e) {
+      console.error('Streaming error:', e)
+      return NextResponse.json({
+        success: true,
+        content: "Oops! My neural engine is currently offline. Please configure your `OPENROUTER_API_KEY` to wake me up! 🤖",
+        chatId: currentChatId
+      })
+    }
   } catch (error) {
     console.error('Chat API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

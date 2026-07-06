@@ -22,6 +22,7 @@ interface Message {
 export default function ChatInterface() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isStreaming, setIsStreaming] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [chatId, setChatId] = useState<string | null>(null)
   
@@ -213,28 +214,67 @@ export default function ChatInterface() {
         new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Network request timed out")), 15000))
       ])
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message')
+        throw new Error('Failed to send message')
       }
-
-      const assistantMessage: Message = {
-        role: 'assistant',
-        content: data.content,
-      }
-
-      setMessages((prev) => [...prev, assistantMessage])
-      setChatId(data.chatId)
       
-      // Auto-speak if it's enabled in preferences, or we can just always speak it
-      speak(data.content)
+      const newChatId = response.headers.get('X-Chat-Id')
+      if (newChatId) setChatId(newChatId)
+
+      if (response.headers.get('Content-Type')?.includes('text/event-stream')) {
+        setIsStreaming(true)
+        setIsLoading(false) // Stop initial spinner
+        
+        const reader = response.body?.getReader()
+        const decoder = new TextDecoder()
+        let assistantContent = ''
+        
+        // Add empty assistant message
+        setMessages((prev) => [...prev, { role: 'assistant', content: '' }])
+        
+        if (reader) {
+          let buffer = ''
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() || ''
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ') && line.trim() !== 'data: [DONE]') {
+                try {
+                  const data = JSON.parse(line.slice(6))
+                  if (data.choices?.[0]?.delta?.content) {
+                    assistantContent += data.choices[0].delta.content
+                    setMessages((prev) => {
+                      const newMessages = [...prev]
+                      newMessages[newMessages.length - 1] = { role: 'assistant', content: assistantContent }
+                      return newMessages
+                    })
+                  }
+                } catch (e) {}
+              }
+            }
+          }
+        }
+        setIsStreaming(false)
+        speak(assistantContent)
+      } else {
+        const data = await response.json()
+        if (data.error) throw new Error(data.error)
+        setMessages((prev) => [...prev, { role: 'assistant', content: data.content }])
+        if (data.chatId) setChatId(data.chatId)
+        speak(data.content)
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to send message'
       toast.error(errorMessage)
       console.error(error)
     } finally {
       setIsLoading(false)
+      setIsStreaming(false)
     }
   }
 
@@ -491,7 +531,7 @@ export default function ChatInterface() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask me about your schedule, attendance, or locate any block..."
-              disabled={isLoading}
+              disabled={isLoading || isStreaming}
               className="flex-1 bg-transparent border-none outline-none focus-visible:ring-0 text-sm font-medium h-11 px-0 placeholder:text-muted-foreground/60"
             />
             {isSpeechSupported && (
@@ -512,7 +552,7 @@ export default function ChatInterface() {
             <Button 
               type="submit"
               onClick={(e) => { e.preventDefault(); handleSubmit(); }}
-              disabled={isLoading || !input.trim()}
+              disabled={isLoading || isStreaming || !input.trim()}
               size="icon"
               className="rounded-xl w-11 h-11 shadow-lg transition-transform active:scale-95 bg-primary text-primary-foreground hover:bg-primary/90"
             >
