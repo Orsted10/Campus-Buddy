@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Send, Bot, User, Loader2, Sparkles, Maximize2, Minimize2, History, Plus, X } from 'lucide-react'
+import { Send, Bot, User, Loader2, Sparkles, Maximize2, Minimize2, History, Plus, X, Mic, MicOff } from 'lucide-react'
 import { toast } from 'sonner'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -29,6 +29,13 @@ export default function ChatInterface() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [chats, setChats] = useState<any[]>([])
+  
+  // Speech Recognition State
+  const [isListening, setIsListening] = useState(false)
+  const recognitionRef = useRef<any>(null)
+  
+  // TTS State
+  const voiceRef = useRef<SpeechSynthesisVoice | null>(null)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const user = useAuthStore((state) => state.user)
@@ -56,6 +63,50 @@ export default function ChatInterface() {
     scrollToBottom()
   }, [messages, isLoading])
 
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition()
+        recognition.continuous = false
+        recognition.interimResults = true
+        recognition.lang = 'en-US'
+
+        recognition.onresult = (event: any) => {
+          const transcript = Array.from(event.results)
+            .map((result: any) => result[0])
+            .map((result) => result.transcript)
+            .join('')
+          
+          setInput(transcript)
+        }
+
+        recognition.onerror = (event: any) => {
+          console.error('Speech recognition error', event.error)
+          setIsListening(false)
+        }
+
+        recognition.onend = () => {
+          setIsListening(false)
+        }
+
+        recognitionRef.current = recognition
+      }
+    }
+  }, [])
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop()
+      setIsListening(false)
+    } else {
+      setInput('') // clear previous text when starting to speak
+      recognitionRef.current?.start()
+      setIsListening(true)
+    }
+  }
+
   const [isSpeaking, setIsSpeaking] = useState(false)
 
   const speak = (text: string) => {
@@ -71,12 +122,14 @@ export default function ChatInterface() {
     if (!textToSpeak) return
 
     const utterance = new SpeechSynthesisUtterance(textToSpeak)
+    // Use cached voice if available, otherwise find one
+    if (!voiceRef.current) {
+      const voices = window.speechSynthesis.getVoices()
+      voiceRef.current = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google UK English Female') || v.name.includes('Zira'))) || voices[0]
+    }
     
-    // Find a nice female English voice
-    const voices = window.speechSynthesis.getVoices()
-    const preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google UK English Female') || v.name.includes('Zira')))
-    if (preferredVoice) {
-      utterance.voice = preferredVoice
+    if (voiceRef.current) {
+      utterance.voice = voiceRef.current
     }
     
     utterance.rate = 1.05
@@ -439,6 +492,21 @@ export default function ChatInterface() {
               disabled={isLoading}
               className="flex-1 bg-transparent border-none outline-none focus-visible:ring-0 text-sm font-medium h-11 px-0 placeholder:text-muted-foreground/60"
             />
+            {recognitionRef.current && (
+              <Button
+                type="button"
+                onClick={toggleListening}
+                variant="ghost"
+                size="icon"
+                className={cn(
+                  "rounded-xl w-11 h-11 transition-all",
+                  isListening ? "bg-red-500/20 text-red-500 hover:bg-red-500/30 hover:text-red-400 animate-pulse" : "text-muted-foreground hover:text-foreground"
+                )}
+                title={isListening ? "Stop listening" : "Start Voice Typing"}
+              >
+                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </Button>
+            )}
             <Button 
               type="submit"
               onClick={(e) => { e.preventDefault(); handleSubmit(); }}

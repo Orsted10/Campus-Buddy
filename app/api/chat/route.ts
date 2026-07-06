@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { chatWithGroq } from '@/lib/ai/groq'
 import { chatWithOpenRouter } from '@/lib/ai/openrouter'
-import { fetchCULKOData } from '@/lib/culko/scraper'
+import { getPortalData } from '@/lib/culko/persistence'
 import { CAMPUS_POI, MESS_MENU } from '@/lib/constants'
 
 // Detect which academic or campus topic the user is asking about
@@ -157,7 +157,7 @@ export async function POST(req: Request) {
         contexts.map(async (ctx: string) => {
           if (ctx === 'mess') return // Mess is static constant for now
           try {
-            dataMap[ctx] = await fetchCULKOData(ctx as any, undefined, { userId: user?.id })
+            dataMap[ctx] = await getPortalData(ctx as any, user?.id)
           } catch {
             // fallback handled in context builders
           }
