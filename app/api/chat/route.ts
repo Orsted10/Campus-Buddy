@@ -286,11 +286,11 @@ ${academicContext || '*Portal not currently synced. Advise the user to connect t
           'X-Chat-Id': currentChatId || ''
         }
       })
-    } catch (e) {
+    } catch (e: any) {
       console.error('Streaming error:', e)
       return NextResponse.json({
         success: true,
-        content: "Oops! My neural engine is currently offline. Please configure your `OPENROUTER_API_KEY` to wake me up! 🤖",
+        content: `Oops! My neural engine encountered an error: ${e.message || 'Unknown error'}. 🤖`,
         chatId: currentChatId
       })
     }
