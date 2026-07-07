@@ -2,21 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { useAuthStore } from '@/store/useAuthStore'
 import { Loader2, AlertCircle, RefreshCw, GraduationCap, ChevronDown, ChevronRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 
 export default function ResultsPage() {
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'final' | 'session'>('final')
-  const [selectedSession, setSelectedSession] = useState<string>('')
   
-  const [sessionData, setSessionData] = useState<any>(null)
-  const [sessionLoading, setSessionLoading] = useState(false)
-  const [sessionError, setSessionError] = useState<string | null>(null)
+  // Track which semesters are showing detailed marks
+  const [detailedViewSemesters, setDetailedViewSemesters] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     fetchResults()
@@ -33,9 +29,6 @@ export default function ResultsPage() {
       
       if (json.success && json.data) {
         setData(json.data)
-        if (json.data.sessions && json.data.sessions.length > 0) {
-          setSelectedSession(json.data.sessions[0].value)
-        }
       } else {
         throw new Error('Could not parse result data')
       }
@@ -46,37 +39,12 @@ export default function ResultsPage() {
     }
   }
 
-  const fetchSessionDetails = async () => {
-    if (!selectedSession) return
-    try {
-      setSessionLoading(true)
-      setSessionError(null)
-      const res = await fetch('/api/culko/results', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionValue: selectedSession })
-      })
-      const json = await res.json()
-      
-      if (!res.ok) throw new Error(json.error || 'Failed to fetch session details')
-      if (json.success) {
-        setSessionData(json.data)
-      } else {
-        throw new Error('Failed to load session marks')
-      }
-    } catch (err) {
-      setSessionError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
-      setSessionLoading(false)
-    }
+  const toggleDetailedView = (semester: string) => {
+    setDetailedViewSemesters(prev => ({
+      ...prev,
+      [semester]: !prev[semester]
+    }))
   }
-
-  // Effect to automatically fetch session details when tab switches to session or session changes
-  useEffect(() => {
-    if (activeTab === 'session' && selectedSession && (!sessionData || sessionData._sessionId !== selectedSession)) {
-      fetchSessionDetails()
-    }
-  }, [activeTab, selectedSession])
 
   if (loading) {
     return (
@@ -124,38 +92,31 @@ export default function ResultsPage() {
         </Card>
       </div>
 
-      <div className="flex bg-secondary p-1 rounded-lg w-fit">
-        <button
-          onClick={() => setActiveTab('final')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            activeTab === 'final' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Final Results
-        </button>
-        <button
-          onClick={() => setActiveTab('session')}
-          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-            activeTab === 'session' ? 'bg-background shadow text-foreground' : 'text-muted-foreground hover:text-foreground'
-          }`}
-        >
-          Detailed Session Marks
-        </button>
-      </div>
+      <div className="space-y-6">
+        {data?.semesters?.length === 0 && (
+          <p className="text-muted-foreground text-center py-10">No final results found.</p>
+        )}
+        {data?.semesters?.map((sem: any, idx: number) => {
+          const isDetailed = detailedViewSemesters[sem.semester] || false;
 
-      {activeTab === 'final' && (
-        <div className="space-y-6">
-          {data?.semesters?.length === 0 && (
-            <p className="text-muted-foreground text-center py-10">No final results found.</p>
-          )}
-          {data?.semesters?.map((sem: any, idx: number) => (
+          return (
             <Card key={idx} className="overflow-hidden shadow-sm">
               <CardHeader className="bg-secondary/50 border-b pb-4">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <CardTitle className="text-lg">Semester {sem.semester}</CardTitle>
-                  <div className="bg-background px-3 py-1 rounded-full border shadow-sm flex gap-2 items-center">
-                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">SGPA</span>
-                    <span className="font-bold text-primary">{sem.sgpa}</span>
+                  
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground font-medium">Detailed Marks</span>
+                      <Switch 
+                        checked={isDetailed} 
+                        onCheckedChange={() => toggleDetailedView(sem.semester)} 
+                      />
+                    </div>
+                    <div className="bg-background px-3 py-1 rounded-full border shadow-sm flex gap-2 items-center">
+                      <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">SGPA</span>
+                      <span className="font-bold text-primary">{sem.sgpa}</span>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
@@ -165,6 +126,12 @@ export default function ResultsPage() {
                     <tr className="border-b bg-muted/20">
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subject Code</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subject Name</th>
+                      {isDetailed && (
+                        <>
+                          <th className="text-right py-3 px-4 font-medium text-muted-foreground">Internal</th>
+                          <th className="text-right py-3 px-4 font-medium text-muted-foreground">External</th>
+                        </>
+                      )}
                       <th className="text-right py-3 px-4 font-medium text-muted-foreground">Credits</th>
                       <th className="text-right py-3 px-4 font-medium text-muted-foreground">Grade</th>
                     </tr>
@@ -173,7 +140,13 @@ export default function ResultsPage() {
                     {sem.subjects.map((sub: any, subIdx: number) => (
                       <tr key={subIdx} className="border-b last:border-0 hover:bg-muted/10 transition-colors">
                         <td className="py-3 px-4 font-medium">{sub.code}</td>
-                        <td className="py-3 px-4 text-muted-foreground">{sub.name}</td>
+                        <td className="py-3 px-4 text-muted-foreground max-w-[200px] truncate" title={sub.name}>{sub.name}</td>
+                        {isDetailed && (
+                          <>
+                            <td className="py-3 px-4 text-right tabular-nums">{sub.internalMarks || '-'}</td>
+                            <td className="py-3 px-4 text-right tabular-nums">{sub.externalMarks || '-'}</td>
+                          </>
+                        )}
                         <td className="py-3 px-4 text-right">{sub.credits}</td>
                         <td className="py-3 px-4 text-right font-bold">{sub.grade}</td>
                       </tr>
@@ -182,92 +155,9 @@ export default function ResultsPage() {
                 </table>
               </div>
             </Card>
-          ))}
-        </div>
-      )}
-
-      {activeTab === 'session' && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Select Session:</span>
-            <Select value={selectedSession} onValueChange={setSelectedSession}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select a session" />
-              </SelectTrigger>
-              <SelectContent>
-                {data?.sessions?.map((s: any) => (
-                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={fetchSessionDetails} disabled={sessionLoading || !selectedSession}>
-              <RefreshCw className={`w-4 h-4 mr-2 ${sessionLoading ? 'animate-spin' : ''}`} /> Refresh
-            </Button>
-          </div>
-
-          {sessionError && (
-            <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm font-medium">
-              {sessionError}
-            </div>
-          )}
-
-          {sessionLoading && !sessionError ? (
-            <div className="flex justify-center py-10">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            </div>
-          ) : sessionData ? (
-            <Card className="overflow-hidden shadow-sm border-primary/20">
-              <CardHeader className="bg-primary/5 border-b pb-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="text-lg">Detailed Marks</CardTitle>
-                    <CardDescription>Internal and External breakdown</CardDescription>
-                  </div>
-                  <div className="bg-background px-3 py-1 rounded-full border shadow-sm flex gap-2 items-center">
-                    <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Session SGPA</span>
-                    <span className="font-bold text-primary">{sessionData.sgpa}</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-muted/20">
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subject Code</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subject Name</th>
-                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Internal</th>
-                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">External</th>
-                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Credits</th>
-                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Grade</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sessionData.subjects?.length === 0 && (
-                      <tr>
-                        <td colSpan={6} className="py-8 text-center text-muted-foreground">No marks found for this session.</td>
-                      </tr>
-                    )}
-                    {sessionData.subjects?.map((sub: any, idx: number) => (
-                      <tr key={idx} className="border-b last:border-0 hover:bg-muted/10 transition-colors">
-                        <td className="py-3 px-4 font-medium">{sub.code}</td>
-                        <td className="py-3 px-4 text-muted-foreground max-w-[200px] truncate" title={sub.name}>{sub.name}</td>
-                        <td className="py-3 px-4 text-right tabular-nums">{sub.internalMarks}</td>
-                        <td className="py-3 px-4 text-right tabular-nums">{sub.externalMarks}</td>
-                        <td className="py-3 px-4 text-right">{sub.credits}</td>
-                        <td className="py-3 px-4 text-right font-bold text-primary">{sub.grade}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          ) : !sessionLoading && (
-            <div className="text-center py-10 text-muted-foreground">
-              Select a session to view detailed marks.
-            </div>
-          )}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </div>
   )
 }

@@ -529,7 +529,28 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
     case 'attendance-details':
       return parseAttendanceHistory(html)
     case 'results':
-      return parseResultsFullHTML(html)
+      const resultsData = parseResultsFullHTML(html);
+      try {
+        await Promise.all(resultsData.sessions.map(async (session) => {
+          try {
+            const sessionDetails = await fetchSessionResult(cookies, session.value);
+            for (const sessionSub of sessionDetails.subjects) {
+              for (const sem of resultsData.semesters) {
+                const targetSub = sem.subjects.find(s => s.code === sessionSub.code);
+                if (targetSub) {
+                  targetSub.internalMarks = sessionSub.internalMarks;
+                  targetSub.externalMarks = sessionSub.externalMarks;
+                }
+              }
+            }
+          } catch (e) {
+            console.error(`Failed to fetch session ${session.value}`, e);
+          }
+        }));
+      } catch (e) {
+        console.error('Failed to fetch session details', e);
+      }
+      return resultsData;
     case 'courses':
       return parseCoursesHTML(html)
     default:
@@ -1845,16 +1866,20 @@ export function parseResultsFullHTML(html: string): ParsedResults {
     viewStateGen: $('#__VIEWSTATEGENERATOR').val() as string || ''
   };
 
-  const cgpaMatch = html.match(/CGPA\s*[:\-]?\s*([\d.]+)/i);
-  if (cgpaMatch) result.cgpa = cgpaMatch[1];
+  const cgpaSpan = $('#ContentPlaceHolder1_wucResult1_lblCGPA').text().trim();
+  if (cgpaSpan) result.cgpa = cgpaSpan;
   else {
-    $('td, span, label, th, b, strong').each((_, el) => {
-      const t = $(el).text().toLowerCase();
-      if (t === 'cgpa' || t.includes('cumulative')) {
-        const val = $(el).next().text().trim() || $(el).parent().next().text().trim();
-        if (/^[\d.]+$/.test(val)) result.cgpa = val;
-      }
-    });
+    const cgpaMatch = html.match(/CGPA\s*[:\-]?\s*([\d.]+)/i);
+    if (cgpaMatch) result.cgpa = cgpaMatch[1];
+    else {
+      $('td, span, label, th, b, strong').each((_, el) => {
+        const t = $(el).text().toLowerCase();
+        if (t === 'cgpa' || t.includes('cumulative')) {
+          const val = $(el).next().text().trim() || $(el).parent().next().text().trim();
+          if (/^[\d.]+$/.test(val)) result.cgpa = val;
+        }
+      });
+    }
   }
 
   // Parse sessions from dropdown
@@ -1868,35 +1893,37 @@ export function parseResultsFullHTML(html: string): ParsedResults {
 
   let currentSemester: SemesterResult | null = null;
   
-  $('table').each((_, table) => {
-    $(table).find('tr').each((_, tr) => {
-      const rowText = $(tr).text();
-      const semMatch = rowText.match(/Semester\s*:\s*(\d+)/i);
-      const sgpaMatch = rowText.match(/SGPA\s*:\s*([\d.]+)/i);
-      if (semMatch) {
-        if (currentSemester) {
-          result.semesters.push(currentSemester);
-        }
-        currentSemester = {
-          semester: semMatch[1],
-          sgpa: sgpaMatch ? sgpaMatch[1] : 'N/A',
-          subjects: []
-        };
-      } else if (currentSemester) {
-        const tds = $(tr).find('td');
-        if (tds.length >= 4) {
-          const code = $(tds[0]).text().trim();
-          if (code && !code.toLowerCase().includes('subject code')) {
-            currentSemester.subjects.push({
-              code,
-              name: $(tds[1]).text().trim(),
-              credits: $(tds[2]).text().trim(),
-              grade: $(tds[tds.length - 1]).text().trim()
-            });
-          }
+  $('table tr').each((_, tr) => {
+    // Avoid nested tables
+    if ($(tr).find('table').length > 0) return;
+
+    const rowText = $(tr).text();
+    const semMatch = rowText.match(/Semester\s*:\s*(\d+)/i);
+    const sgpaMatch = rowText.match(/SGPA\s*:\s*([\d.]+)/i);
+    
+    if (semMatch) {
+      if (currentSemester) {
+        result.semesters.push(currentSemester);
+      }
+      currentSemester = {
+        semester: semMatch[1],
+        sgpa: sgpaMatch ? sgpaMatch[1] : 'N/A',
+        subjects: []
+      };
+    } else if (currentSemester) {
+      const tds = $(tr).find('td');
+      if (tds.length >= 4) {
+        const code = $(tds[0]).text().trim();
+        if (code && !code.toLowerCase().includes('subject code') && !code.toLowerCase().includes('semester')) {
+          currentSemester.subjects.push({
+            code,
+            name: $(tds[1]).text().trim(),
+            credits: $(tds[2]).text().trim(),
+            grade: $(tds[tds.length - 1]).text().trim()
+          });
         }
       }
-    });
+    }
   });
   if (currentSemester) {
     result.semesters.push(currentSemester);
