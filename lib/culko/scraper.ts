@@ -1999,23 +1999,65 @@ export async function fetchSessionResult(cookies: Record<string, string>, sessio
   const html = await getRes.text();
   const $ = cheerio.load(html);
   
-  const viewState = $('#__VIEWSTATE').val() as string || '';
-  const eventValidation = $('#__EVENTVALIDATION').val() as string || '';
-  const viewStateGen = $('#__VIEWSTATEGENERATOR').val() as string || '';
+  let viewState = $('#__VIEWSTATE').val() as string || '';
+  let eventValidation = $('#__EVENTVALIDATION').val() as string || '';
+  let viewStateGen = $('#__VIEWSTATEGENERATOR').val() as string || '';
 
-  const formData = new URLSearchParams();
-  formData.append('__VIEWSTATE', viewState);
-  formData.append('__EVENTVALIDATION', eventValidation);
-  if (viewStateGen) formData.append('__VIEWSTATEGENERATOR', viewStateGen);
+  let sessionResultTypeValue = 'Session';
+  $('#ContentPlaceHolder1_wucResult1_ddlResultType option').each((_, el) => {
+    if ($(el).text().toLowerCase().includes('session')) {
+      sessionResultTypeValue = $(el).attr('value') || 'Session';
+    }
+  });
+
+  // Intermediate POST to trigger AutoPostBack for ddlResultType
+  const formData1 = new URLSearchParams();
+  formData1.append('__EVENTTARGET', 'ctl00$ContentPlaceHolder1$wucResult1$ddlResultType');
+  formData1.append('__EVENTARGUMENT', '');
+  formData1.append('__VIEWSTATE', viewState);
+  formData1.append('__EVENTVALIDATION', eventValidation);
+  if (viewStateGen) formData1.append('__VIEWSTATEGENERATOR', viewStateGen);
   
-  formData.append('ctl00$ContentPlaceHolder1$wucResult1$ddlResultType', 'Session');
-  formData.append('ctl00$ContentPlaceHolder1$wucResult1$ddlSession', sessionValue);
-  formData.append('ctl00$ContentPlaceHolder1$wucResult1$ddlCategory', 'Regular');
-  formData.append('ctl00$ContentPlaceHolder1$wucResult1$btnShowResult', 'Show Result');
+  formData1.append('ctl00$ContentPlaceHolder1$wucResult1$ddlResultType', sessionResultTypeValue);
+
+  const post1Res = await fetch(url, {
+    method: 'POST',
+    body: formData1,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Cookie': Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; '),
+      'User-Agent': USER_AGENT,
+      'Referer': url
+    }
+  });
+  
+  const post1Html = await post1Res.text();
+  const $post1 = cheerio.load(post1Html);
+  
+  viewState = $post1('#__VIEWSTATE').val() as string || viewState;
+  eventValidation = $post1('#__EVENTVALIDATION').val() as string || eventValidation;
+  viewStateGen = $post1('#__VIEWSTATEGENERATOR').val() as string || viewStateGen;
+
+  let regularCategoryValue = 'Regular';
+  $post1('#ContentPlaceHolder1_wucResult1_ddlCategory option').each((_, el) => {
+    if ($(el).text().toLowerCase().includes('regular')) {
+      regularCategoryValue = $(el).attr('value') || 'Regular';
+    }
+  });
+
+  const formData2 = new URLSearchParams();
+  formData2.append('__VIEWSTATE', viewState);
+  formData2.append('__EVENTVALIDATION', eventValidation);
+  if (viewStateGen) formData2.append('__VIEWSTATEGENERATOR', viewStateGen);
+  
+  formData2.append('ctl00$ContentPlaceHolder1$wucResult1$ddlResultType', sessionResultTypeValue);
+  formData2.append('ctl00$ContentPlaceHolder1$wucResult1$ddlSession', sessionValue);
+  formData2.append('ctl00$ContentPlaceHolder1$wucResult1$ddlCategory', regularCategoryValue);
+  formData2.append('ctl00$ContentPlaceHolder1$wucResult1$btnShowResult', 'Show Result');
 
   const postRes = await fetch(url, {
     method: 'POST',
-    body: formData,
+    body: formData2,
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
       'Cookie': Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; '),
