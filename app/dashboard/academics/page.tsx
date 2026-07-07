@@ -32,6 +32,18 @@ export default function AcademicsPage() {
       icon: Clock,
       href: '#',
     },
+    {
+      title: 'Results & Grades',
+      description: 'View CGPA, SGPA, and session marks',
+      icon: BookOpen,
+      href: '/dashboard/academics/results',
+    },
+    {
+      title: 'My Courses',
+      description: 'View course details and download lecture plans',
+      icon: BookOpen,
+      href: '/dashboard/academics/courses',
+    },
   ]
 
   return (

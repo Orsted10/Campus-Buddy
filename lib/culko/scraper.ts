@@ -441,6 +441,8 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
     profile: '/frmStudentProfile.aspx',
     announcements: '/StudentHome.aspx',
     result: '/result.aspx',
+    results: '/result.aspx',
+    courses: '/frmMyCourse.aspx',
     hostel: '/frmStudenHostelDetails.aspx'
   }
 
@@ -526,6 +528,10 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
       return parseHostelDetails(html)
     case 'attendance-details':
       return parseAttendanceHistory(html)
+    case 'results':
+      return parseResultsFullHTML(html)
+    case 'courses':
+      return parseCoursesHTML(html)
     default:
       throw new Error(`Unknown endpoint: ${endpoint}`)
   }
@@ -1803,4 +1809,205 @@ export function parseHostelDetails(html: string) {
   return hostel
 }
 
+export interface SemesterResult {
+  semester: string;
+  sgpa: string;
+  subjects: {
+    code: string;
+    name: string;
+    credits: string;
+    grade: string;
+  }[];
+}
 
+export interface SessionList {
+  value: string;
+  label: string;
+}
+
+export interface ParsedResults {
+  cgpa: string;
+  semesters: SemesterResult[];
+  sessions: SessionList[];
+  viewState: string;
+  eventValidation: string;
+  viewStateGen: string;
+}
+
+export function parseResultsFullHTML(html: string): ParsedResults {
+  const $ = cheerio.load(html);
+  const result: ParsedResults = {
+    cgpa: 'N/A',
+    semesters: [],
+    sessions: [],
+    viewState: $('#__VIEWSTATE').val() as string || '',
+    eventValidation: $('#__EVENTVALIDATION').val() as string || '',
+    viewStateGen: $('#__VIEWSTATEGENERATOR').val() as string || ''
+  };
+
+  const cgpaMatch = html.match(/CGPA\s*[:\-]?\s*([\d.]+)/i);
+  if (cgpaMatch) result.cgpa = cgpaMatch[1];
+  else {
+    $('td, span, label, th, b, strong').each((_, el) => {
+      const t = $(el).text().toLowerCase();
+      if (t === 'cgpa' || t.includes('cumulative')) {
+        const val = $(el).next().text().trim() || $(el).parent().next().text().trim();
+        if (/^[\d.]+$/.test(val)) result.cgpa = val;
+      }
+    });
+  }
+
+  // Parse sessions from dropdown
+  $('select[name*="ddlSession"] option, select[id*="ddlSession"] option').each((_, el) => {
+    const val = $(el).attr('value');
+    const label = $(el).text().trim();
+    if (val && val !== '0' && !label.toLowerCase().includes('select')) {
+      result.sessions.push({ value: val, label });
+    }
+  });
+
+  let currentSemester: SemesterResult | null = null;
+  
+  $('table').each((_, table) => {
+    $(table).find('tr').each((_, tr) => {
+      const rowText = $(tr).text();
+      const semMatch = rowText.match(/Semester\s*:\s*(\d+)/i);
+      const sgpaMatch = rowText.match(/SGPA\s*:\s*([\d.]+)/i);
+      if (semMatch) {
+        if (currentSemester) {
+          result.semesters.push(currentSemester);
+        }
+        currentSemester = {
+          semester: semMatch[1],
+          sgpa: sgpaMatch ? sgpaMatch[1] : 'N/A',
+          subjects: []
+        };
+      } else if (currentSemester) {
+        const tds = $(tr).find('td');
+        if (tds.length >= 4) {
+          const code = $(tds[0]).text().trim();
+          if (code && !code.toLowerCase().includes('subject code')) {
+            currentSemester.subjects.push({
+              code,
+              name: $(tds[1]).text().trim(),
+              credits: $(tds[2]).text().trim(),
+              grade: $(tds[tds.length - 1]).text().trim()
+            });
+          }
+        }
+      }
+    });
+  });
+  if (currentSemester) {
+    result.semesters.push(currentSemester);
+  }
+
+  return result;
+}
+
+export interface CoursePlan {
+  code: string;
+  name: string;
+  section: string;
+  type: string;
+  eventTarget: string;
+}
+
+export function parseCoursesHTML(html: string): CoursePlan[] {
+  const $ = cheerio.load(html);
+  const courses: CoursePlan[] = [];
+
+  $('table tr').each((_, tr) => {
+    const tds = $(tr).find('td');
+    if (tds.length >= 5) {
+      const code = $(tds[0]).text().trim();
+      const name = $(tds[1]).text().trim();
+      const section = $(tds[2]).text().trim();
+      const type = $(tds[3]).text().trim();
+      
+      const downloadLink = $(tds[4]).find('a');
+      let eventTarget = '';
+      if (downloadLink.length > 0) {
+        const href = downloadLink.attr('href') || '';
+        const match = href.match(/__doPostBack\('([^']*)'/);
+        if (match) {
+          eventTarget = match[1];
+        }
+      }
+
+      if (code && !code.toLowerCase().includes('course code')) {
+        courses.push({ code, name, section, type, eventTarget });
+      }
+    }
+  });
+
+  return courses;
+}
+
+export async function fetchSessionResult(cookies: Record<string, string>, sessionValue: string) {
+  const url = BASE_URL + '/result.aspx';
+  
+  const getRes = await fetch(url, {
+    headers: {
+      'Cookie': Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; '),
+      'User-Agent': USER_AGENT
+    }
+  });
+  const html = await getRes.text();
+  const $ = cheerio.load(html);
+  
+  const viewState = $('#__VIEWSTATE').val() as string || '';
+  const eventValidation = $('#__EVENTVALIDATION').val() as string || '';
+  const viewStateGen = $('#__VIEWSTATEGENERATOR').val() as string || '';
+
+  const formData = new URLSearchParams();
+  formData.append('__VIEWSTATE', viewState);
+  formData.append('__EVENTVALIDATION', eventValidation);
+  if (viewStateGen) formData.append('__VIEWSTATEGENERATOR', viewStateGen);
+  
+  formData.append('ctl00$ContentPlaceHolder1$wucResult1$ddlResultType', 'Session');
+  formData.append('ctl00$ContentPlaceHolder1$wucResult1$ddlSession', sessionValue);
+  formData.append('ctl00$ContentPlaceHolder1$wucResult1$ddlCategory', 'Regular');
+  formData.append('ctl00$ContentPlaceHolder1$wucResult1$btnShowResult', 'Show Result');
+
+  const postRes = await fetch(url, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Cookie': Object.entries(cookies).map(([k, v]) => `${k}=${v}`).join('; '),
+      'User-Agent': USER_AGENT,
+      'Referer': url
+    }
+  });
+  
+  const postHtml = await postRes.text();
+  const $post = cheerio.load(postHtml);
+  
+  const resultData: any = {
+    sgpa: 'N/A',
+    subjects: []
+  };
+
+  const sgpaMatch = postHtml.match(/SGPA\s*:\s*([\d.]+)/i);
+  if (sgpaMatch) resultData.sgpa = sgpaMatch[1];
+  
+  $post('table tr').each((_, tr) => {
+    const tds = $post(tr).find('td');
+    if (tds.length >= 6) {
+      const code = $post(tds[0]).text().trim();
+      if (code && !code.toLowerCase().includes('subject code')) {
+        resultData.subjects.push({
+          code,
+          name: $post(tds[1]).text().trim(),
+          internalMarks: $post(tds[2]).text().trim(),
+          externalMarks: $post(tds[3]).text().trim(),
+          credits: $post(tds[4]).text().trim(),
+          grade: $post(tds[5]).text().trim()
+        });
+      }
+    }
+  });
+
+  return resultData;
+}
