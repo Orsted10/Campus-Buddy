@@ -1892,42 +1892,58 @@ export function parseResultsFullHTML(html: string): ParsedResults {
   });
 
   let currentSemester: SemesterResult | null = null;
-  
-  $('table tr').each((_, tr) => {
-    // Avoid nested tables
-    if ($(tr).find('table').length > 0) return;
+  const processedSemesters = new Map<string, SemesterResult>();
 
+  $('tr').each((_, tr) => {
+    const tds = $(tr).children('td, th');
     const rowText = $(tr).text();
+    
+    // Check if this row declares a semester
     const semMatch = rowText.match(/Semester\s*:\s*(\d+)/i);
     const sgpaMatch = rowText.match(/SGPA\s*:\s*([\d.]+)/i);
     
     if (semMatch) {
-      if (currentSemester) {
-        result.semesters.push(currentSemester);
+      const sem = semMatch[1];
+      if (!processedSemesters.has(sem)) {
+        currentSemester = {
+          semester: sem,
+          sgpa: sgpaMatch ? sgpaMatch[1] : 'N/A',
+          subjects: []
+        };
+        processedSemesters.set(sem, currentSemester);
+      } else {
+        currentSemester = processedSemesters.get(sem)!;
+        // Update SGPA if we missed it before but found it now
+        if (sgpaMatch && currentSemester.sgpa === 'N/A') {
+          currentSemester.sgpa = sgpaMatch[1];
+        }
       }
-      currentSemester = {
-        semester: semMatch[1],
-        sgpa: sgpaMatch ? sgpaMatch[1] : 'N/A',
-        subjects: []
-      };
-    } else if (currentSemester) {
-      const tds = $(tr).find('td');
-      if (tds.length >= 4) {
-        const code = $(tds[0]).text().trim();
-        if (code && !code.toLowerCase().includes('subject code') && !code.toLowerCase().includes('semester')) {
-          currentSemester.subjects.push({
-            code,
-            name: $(tds[1]).text().trim(),
-            credits: $(tds[2]).text().trim(),
-            grade: $(tds[tds.length - 1]).text().trim()
-          });
+    }
+    
+    if (currentSemester && tds.length >= 4) {
+      const code = $(tds[0]).text().trim();
+      const creditsStr = $(tds[2]).text().trim();
+      
+      if (code && !code.toLowerCase().includes('subject code') && !code.toLowerCase().includes('semester')) {
+        // Validate it's an actual subject row
+        if (/\d/.test(creditsStr) || /[a-z]/i.test(code)) {
+          const exists = currentSemester.subjects.find(s => s.code === code);
+          if (!exists) {
+            currentSemester.subjects.push({
+              code,
+              name: $(tds[1]).text().trim(),
+              credits: creditsStr,
+              grade: $(tds[tds.length - 1]).text().trim(),
+              internalMarks: null,
+              externalMarks: null
+            });
+          }
         }
       }
     }
   });
-  if (currentSemester) {
-    result.semesters.push(currentSemester);
-  }
+
+  result.semesters = Array.from(processedSemesters.values());
 
   return result;
 }
