@@ -2067,16 +2067,6 @@ export async function fetchSessionResult(cookies: Record<string, string>, sessio
   });
   
   const postHtml = await postRes.text();
-  
-  // Debug: Save HTML to inspect server response
-  try {
-    const fs = require('fs');
-    fs.writeFileSync('debug_session_1.html', post1Html);
-    fs.writeFileSync('debug_session_2.html', postHtml);
-  } catch (err) {
-    console.error('Debug write failed', err);
-  }
-
   const $post = cheerio.load(postHtml);
   
   const resultData: any = {
@@ -2087,19 +2077,23 @@ export async function fetchSessionResult(cookies: Record<string, string>, sessio
   const sgpaMatch = postHtml.match(/SGPA\s*:\s*([\d.]+)/i);
   if (sgpaMatch) resultData.sgpa = sgpaMatch[1];
   
-  $post('table tr').each((_, tr) => {
-    const tds = $post(tr).find('td');
+  $post('tr').each((_, tr) => {
+    const tds = $post(tr).children('td, th');
     if (tds.length >= 6) {
       const code = $post(tds[0]).text().trim();
-      if (code && !code.toLowerCase().includes('subject code')) {
-        resultData.subjects.push({
-          code,
-          name: $post(tds[1]).text().trim(),
-          internalMarks: $post(tds[2]).text().trim(),
-          externalMarks: $post(tds[3]).text().trim(),
-          credits: $post(tds[4]).text().trim(),
-          grade: $post(tds[5]).text().trim()
-        });
+      if (code && !code.toLowerCase().includes('subject code') && !code.toLowerCase().includes('semester')) {
+        const creditsStr = $post(tds[4]).text().trim();
+        // Validate it's an actual subject row
+        if (/\d/.test(creditsStr) || /[a-z]/i.test(code)) {
+          resultData.subjects.push({
+            code,
+            name: $post(tds[1]).text().trim(),
+            internalMarks: $post(tds[2]).text().trim(),
+            externalMarks: $post(tds[3]).text().trim(),
+            credits: creditsStr,
+            grade: $post(tds[5]).text().trim()
+          });
+        }
       }
     }
   });
