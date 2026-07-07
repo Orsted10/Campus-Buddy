@@ -531,7 +531,7 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
     case 'results':
       const resultsData = parseResultsFullHTML(html);
       try {
-        await Promise.all(resultsData.sessions.map(async (session) => {
+        for (const session of resultsData.sessions) {
           try {
             const sessionDetails = await fetchSessionResult(cookies, session.value);
             for (const sessionSub of sessionDetails.subjects) {
@@ -546,7 +546,7 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
           } catch (e) {
             console.error(`Failed to fetch session ${session.value}`, e);
           }
-        }));
+        }
       } catch (e) {
         console.error('Failed to fetch session details', e);
       }

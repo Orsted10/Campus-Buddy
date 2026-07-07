@@ -288,7 +288,7 @@ function ResultsTab() {
         )}
         
         {data?.semesters?.map((sem: any, idx: number) => {
-          const isDetailed = detailedViewSemesters[sem.semester] || false;
+          const isDetailed = detailedViewSemesters[sem.semester] !== false;
 
           return (
             <Card key={idx} className="overflow-hidden glass-panel border-black/5 dark:border-white/10 rounded-2xl transition-all duration-300 hover:bg-card/60 hover:shadow-lg hover:border-primary/20">
@@ -371,7 +371,7 @@ export default function MarksPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="evaluations" className="w-full">
+      <Tabs defaultValue="evaluations" className="w-full flex-col">
         <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-1 h-auto">
           <TabsTrigger value="evaluations" className="rounded-lg py-2.5 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg font-semibold tracking-tight transition-all">
             Evaluations Breakdown
@@ -381,11 +381,11 @@ export default function MarksPage() {
           </TabsTrigger>
         </TabsList>
         
-        <TabsContent value="evaluations" className="mt-0 outline-none">
+        <TabsContent value="evaluations" className="mt-0 outline-none w-full">
           <EvaluationsTab />
         </TabsContent>
         
-        <TabsContent value="results" className="mt-0 outline-none">
+        <TabsContent value="results" className="mt-0 outline-none w-full">
           <ResultsTab />
         </TabsContent>
       </Tabs>
