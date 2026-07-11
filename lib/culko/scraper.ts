@@ -2115,48 +2115,58 @@ function parseFeesHTML(html: string) {
   const history: any[] = []
   
   $('table').each((_, table) => {
-    const headers: string[] = []
-    const firstRow = $(table).find('tr').first()
-    firstRow.find('th, td').each((i, cell) => {
-      headers.push($(cell).text().trim().toLowerCase())
-    })
+    const tableHtml = $(table).html()?.toLowerCase() || ''
     
-    // Check if pending table
-    if (headers.some(h => h.includes('fee head') || h.includes('fee type') || h.includes('pending') || h.includes('balance'))) {
+    // Some heuristics to guess table types
+    const isPending = tableHtml.includes('pending') || tableHtml.includes('balance') || tableHtml.includes('head') || tableHtml.includes('due') || tableHtml.includes('payable')
+    const isHistory = tableHtml.includes('receipt') || tableHtml.includes('transaction') || tableHtml.includes('mode') || tableHtml.includes('paid')
+    
+    if (isPending && !isHistory) {
       $(table).find('tr').each((i, tr) => {
-        if (i === 0) return // skip header
-        const tds = $(tr).find('td')
+        const tds = $(tr).find('td, th')
         if (tds.length >= 2) {
-           pendingFees.push({
-             type: $(tds[0]).text().trim() || $(tds[1]).text().trim(),
-             amount: $(tds[tds.length - 1]).text().trim(), // Usually amount is last or near last
-             dueDate: tds.length >= 3 ? $(tds[2]).text().trim() : '',
-           })
+          const type = $(tds[0]).text().trim() || $(tds[1]).text().trim()
+          const amount = $(tds[tds.length - 1]).text().trim()
+          const dueDate = tds.length >= 3 ? $(tds[2]).text().trim() : ''
+          
+          if (type && type.length > 2 && !type.toLowerCase().includes('pending') && !type.toLowerCase().includes('head') && !type.toLowerCase().includes('fee type')) {
+             if (/[0-9]/.test(amount)) {
+                pendingFees.push({ type, amount, dueDate })
+             }
+          }
         }
       })
     }
     
-    // Check if history table
-    if (headers.some(h => h.includes('receipt') || h.includes('transaction') || h.includes('date'))) {
-      if (!headers.some(h => h.includes('pending') || h.includes('balance'))) {
-          $(table).find('tr').each((i, tr) => {
-            if (i === 0) return
-            const tds = $(tr).find('td')
-          if (tds.length >= 3) {
-             history.push({
-               receiptNo: $(tds[0]).text().trim(),
-               date: $(tds[1]).text().trim(),
-               amount: $(tds[2]).text().trim(),
-               status: tds.length > 3 ? $(tds[3]).text().trim() : '',
-               paymentMode: tds.length > 4 ? $(tds[4]).text().trim() : ''
-             })
-          }
-        })
-      }
+    if (isHistory && !isPending) {
+       $(table).find('tr').each((i, tr) => {
+         const tds = $(tr).find('td, th')
+         if (tds.length >= 3) {
+            const receiptNo = $(tds[0]).text().trim()
+            const date = $(tds[1]).text().trim()
+            const amount = $(tds[2]).text().trim()
+            
+            if (receiptNo && receiptNo.length > 2 && !receiptNo.toLowerCase().includes('receipt') && !receiptNo.toLowerCase().includes('transaction')) {
+               if (/[0-9]/.test(amount) || /[0-9]/.test(date)) {
+                 history.push({
+                   receiptNo,
+                   date,
+                   amount,
+                   status: tds.length > 3 ? $(tds[3]).text().trim() : '',
+                   paymentMode: tds.length > 4 ? $(tds[4]).text().trim() : ''
+                 })
+               }
+            }
+         }
+       })
     }
   })
 
-  return { pendingFees, history, rawHtmlLength: html.length }
+  // Deduplicate in case nested tables caused multiple insertions
+  const uniquePending = Array.from(new Map(pendingFees.map(item => [item.type + item.amount, item])).values())
+  const uniqueHistory = Array.from(new Map(history.map(item => [item.receiptNo + item.amount, item])).values())
+
+  return { pendingFees: uniquePending, history: uniqueHistory, rawHtmlLength: html.length }
 }
 
 function parseReceiptsHTML(html: string) {
