@@ -5,36 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Loader2, AlertCircle, RefreshCw, BookOpen, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+import { usePortalStore } from '@/store/usePortalStore'
+
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { courses, isSyncing: loading, portalStatus } = usePortalStore()
   const [downloading, setDownloading] = useState<string | null>(null)
-
-  useEffect(() => {
-    fetchCourses()
-  }, [])
-
-  const fetchCourses = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const res = await fetch('/api/culko?endpoint=courses')
-      const json = await res.json()
-      
-      if (!res.ok) throw new Error(json.error || 'Failed to fetch courses')
-      
-      if (json.success && json.data) {
-        setCourses(json.data)
-      } else {
-        throw new Error('Could not parse course data')
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleDownload = async (course: any) => {
     if (!course.eventTarget) {
@@ -82,17 +57,14 @@ export default function CoursesPage() {
     )
   }
 
-  if (error) {
+  if (portalStatus === 'error') {
     return (
       <div className="p-6">
         <Card className="border-destructive bg-destructive/5 shadow-none">
           <CardContent className="flex flex-col items-center py-10 text-center">
             <AlertCircle className="w-10 h-10 text-destructive mb-4" />
             <h3 className="text-lg font-semibold text-destructive mb-2">Failed to load courses</h3>
-            <p className="text-sm text-destructive/80 mb-6">{error}</p>
-            <Button onClick={fetchCourses} variant="outline" className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground">
-              <RefreshCw className="w-4 h-4 mr-2" /> Try Again
-            </Button>
+            <p className="text-sm text-destructive/80 mb-6">There was an issue fetching your courses from the portal.</p>
           </CardContent>
         </Card>
       </div>
@@ -124,7 +96,7 @@ export default function CoursesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/20">
-                <th className="text-left py-3 px-4 font-medium text-muted-foreground w-24">Code</th>
+                <th className="text-left py-3 px-4 font-medium text-muted-foreground w-32 whitespace-nowrap">Code</th>
                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">Course Name</th>
                 <th className="text-left py-3 px-4 font-medium text-muted-foreground w-24">Section</th>
                 <th className="text-left py-3 px-4 font-medium text-muted-foreground w-24">Type</th>
@@ -139,7 +111,7 @@ export default function CoursesPage() {
               )}
               {courses.map((course: any, idx: number) => (
                 <tr key={idx} className="border-b last:border-0 hover:bg-muted/10 transition-colors">
-                  <td className="py-3 px-4 font-semibold text-primary">{course.code}</td>
+                  <td className="py-3 px-4 font-semibold text-primary whitespace-nowrap">{course.code}</td>
                   <td className="py-3 px-4 text-foreground font-medium">{course.name}</td>
                   <td className="py-3 px-4 text-muted-foreground">{course.section}</td>
                   <td className="py-3 px-4 text-muted-foreground">

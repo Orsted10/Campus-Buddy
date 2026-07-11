@@ -20,7 +20,8 @@ import {
   Calendar,
   User,
   LogOut,
-  Loader2
+  Loader2,
+  Wallet
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useState } from 'react'
@@ -33,6 +34,7 @@ const studentNavItems = [
   { href: '/dashboard/attendance', label: 'Attendance', icon: CheckSquare },
   { href: '/dashboard/marks', label: 'Marks & Grades', icon: Award },
   { href: '/dashboard/timetable', label: 'Timetable', icon: Calendar },
+  { href: '/dashboard/fees', label: 'Fees & Accounts', icon: Wallet },
   { href: '/dashboard/profile', label: 'Profile ID', icon: User },
   { href: '/dashboard/navigation', label: 'Navigation', icon: MapPin },
   { href: '/dashboard/library', label: 'Library', icon: Library },

@@ -32,12 +32,13 @@ interface TimeSlot {
 
 type TimetableData = Record<string, TimeSlot[]>
 
-function parseSubjectString(subjectStr: string) {
+function parseSubjectString(subjectStr: string, courses: any[] = []) {
   let code = subjectStr
   let type = ""
   let group = ""
   let faculty = "Faculty Assigned"
   let block = "Block Not Assigned"
+  let courseName = ""
   
   try {
     const parts = subjectStr.split(':')
@@ -59,12 +60,18 @@ function parseSubjectString(subjectStr: string) {
           block = byAtSplit[1].trim()
         }
       }
+      
+      // Match course name from courses array
+      const matchedCourse = courses.find((c: any) => c.code === code)
+      if (matchedCourse && matchedCourse.name) {
+        courseName = matchedCourse.name
+      }
     }
   } catch (e) {
     // ignore
   }
   
-  return { code, type, group, faculty, block, raw: subjectStr }
+  return { code, type, group, faculty, block, courseName, raw: subjectStr }
 }
 
 export default function TimetablePage() {
@@ -72,6 +79,7 @@ export default function TimetablePage() {
   const [selectedDay, setSelectedDay] = useState('')
   const { 
     timetable: data, 
+    courses,
     portalStatus, 
     isSyncing: loading, 
     syncAll 
@@ -254,34 +262,39 @@ export default function TimetablePage() {
                         <div className="flex items-start justify-between gap-4">
                            <div className="space-y-2">
                               <div className="flex items-center gap-2 flex-wrap">
-                                {parseSubjectString(slot.subject).type && (
+                                {parseSubjectString(slot.subject, courses).type && (
                                   <span className={cn(
                                     "px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider",
-                                    parseSubjectString(slot.subject).type === 'Lecture' ? "bg-blue-500/10 text-blue-500" : 
-                                    parseSubjectString(slot.subject).type === 'Practical' ? "bg-purple-500/10 text-purple-500" : "bg-orange-500/10 text-orange-500"
+                                    parseSubjectString(slot.subject, courses).type === 'Lecture' ? "bg-blue-500/10 text-blue-500" : 
+                                    parseSubjectString(slot.subject, courses).type === 'Practical' ? "bg-purple-500/10 text-purple-500" : "bg-orange-500/10 text-orange-500"
                                   )}>
-                                    {parseSubjectString(slot.subject).type}
+                                    {parseSubjectString(slot.subject, courses).type}
                                   </span>
                                 )}
-                                {parseSubjectString(slot.subject).group && (
+                                {parseSubjectString(slot.subject, courses).group && (
                                   <span className="px-2 py-0.5 rounded-md bg-foreground/5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                    {parseSubjectString(slot.subject).group}
+                                    {parseSubjectString(slot.subject, courses).group}
                                   </span>
                                 )}
                               </div>
                               
                               <h3 className="text-xl md:text-2xl font-black text-foreground group-hover:text-primary transition-colors leading-tight">
-                                {parseSubjectString(slot.subject).code}
+                                {parseSubjectString(slot.subject, courses).code}
                               </h3>
+                              {parseSubjectString(slot.subject, courses).courseName && (
+                                <p className="text-sm font-medium text-muted-foreground">
+                                  {parseSubjectString(slot.subject, courses).courseName}
+                                </p>
+                              )}
                               
                               <div className="flex flex-wrap gap-4 mt-2">
                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                    <MapPin className="w-3.5 h-3.5 text-primary" />
-                                   <span className="font-bold">{parseSubjectString(slot.subject).block}</span>
+                                   <span className="font-bold">{parseSubjectString(slot.subject, courses).block}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                    <User className="w-3.5 h-3.5 text-primary" />
-                                   <span className="font-bold line-clamp-1">{parseSubjectString(slot.subject).faculty}</span>
+                                   <span className="font-bold line-clamp-1">{parseSubjectString(slot.subject, courses).faculty}</span>
                                 </div>
                               </div>
                            </div>

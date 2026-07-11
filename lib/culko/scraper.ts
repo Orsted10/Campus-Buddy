@@ -443,7 +443,9 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
     result: '/result.aspx',
     results: '/result.aspx',
     courses: '/frmMyCourse.aspx',
-    hostel: '/frmStudenHostelDetails.aspx'
+    hostel: '/frmStudenHostelDetails.aspx',
+    fees: '/frmAccountStudentDetails.aspx',
+    receipts: '/frmAccountsStudentReceiptList.aspx'
   }
 
   const url = BASE_URL + endpointMap[endpoint]
@@ -553,6 +555,10 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
       return resultsData;
     case 'courses':
       return parseCoursesHTML(html)
+    case 'fees':
+      return parseFeesHTML(html)
+    case 'receipts':
+      return parseReceiptsHTML(html)
     default:
       throw new Error(`Unknown endpoint: ${endpoint}`)
   }
@@ -2099,4 +2105,113 @@ export async function fetchSessionResult(cookies: Record<string, string>, sessio
   });
 
   return resultData;
+}
+
+function parseCoursesHTML(html: string) {
+  const $ = cheerio.load(html)
+  const courses: any[] = []
+
+  $('table.table').find('tr').each((i, tr) => {
+    if (i === 0) return // skip header
+    const tds = $(tr).find('td')
+    if (tds.length >= 4) {
+      const downloadBtn = $(tds[tds.length - 1]).find('input[type="submit"], input[type="image"]')
+      const eventTarget = downloadBtn.attr('name')
+
+      courses.push({
+        code: $(tds[1]).text().trim(),
+        name: $(tds[2]).text().trim(),
+        section: $(tds[3]).text().trim(),
+        type: $(tds[4]).text().trim(),
+        eventTarget: eventTarget || null
+      })
+    }
+  })
+
+  return courses
+}
+
+function parseFeesHTML(html: string) {
+  const $ = cheerio.load(html)
+  
+  const pendingFees: any[] = []
+  const history: any[] = []
+  
+  $('table').each((_, table) => {
+    const headers: string[] = []
+    $(table).find('th').each((i, th) => {
+      headers.push($(th).text().trim().toLowerCase())
+    })
+    
+    // Check if pending table
+    if (headers.some(h => h.includes('fee head') || h.includes('fee type') || h.includes('pending') || h.includes('balance'))) {
+      $(table).find('tr').each((i, tr) => {
+        if ($(tr).find('th').length > 0) return // skip header
+        const tds = $(tr).find('td')
+        if (tds.length >= 2) {
+           pendingFees.push({
+             type: $(tds[0]).text().trim() || $(tds[1]).text().trim(),
+             amount: $(tds[tds.length - 1]).text().trim(), // Usually amount is last or near last
+             dueDate: tds.length >= 3 ? $(tds[2]).text().trim() : '',
+           })
+        }
+      })
+    }
+    
+    // Check if history table
+    if (headers.some(h => h.includes('receipt') || h.includes('transaction') || h.includes('date'))) {
+      if (!headers.some(h => h.includes('pending') || h.includes('balance'))) {
+        $(table).find('tr').each((i, tr) => {
+          if ($(tr).find('th').length > 0) return
+          const tds = $(tr).find('td')
+          if (tds.length >= 3) {
+             history.push({
+               receiptNo: $(tds[0]).text().trim(),
+               date: $(tds[1]).text().trim(),
+               amount: $(tds[2]).text().trim(),
+               status: tds.length > 3 ? $(tds[3]).text().trim() : '',
+               paymentMode: tds.length > 4 ? $(tds[4]).text().trim() : ''
+             })
+          }
+        })
+      }
+    }
+  })
+
+  return { pendingFees, history, rawHtmlLength: html.length }
+}
+
+function parseReceiptsHTML(html: string) {
+  const $ = cheerio.load(html)
+  const receipts: any[] = []
+  
+  $('table').each((_, table) => {
+    $(table).find('tr').each((i, tr) => {
+      if ($(tr).find('th').length > 0) return // skip header
+      const tds = $(tr).find('td')
+      if (tds.length >= 3) {
+        const downloadBtn = $(tr).find('input[type="submit"], input[type="image"], button, a').last()
+        let eventTarget = downloadBtn.attr('name')
+        
+        // Sometimes it's inside an href javascript:__doPostBack('eventTarget', '')
+        if (!eventTarget && downloadBtn.attr('href')?.includes('__doPostBack')) {
+          const match = downloadBtn.attr('href')?.match(/__doPostBack\('([^']+)',''\)/)
+          if (match) {
+            eventTarget = match[1]
+          }
+        }
+        
+        if (eventTarget || downloadBtn.length > 0) {
+          receipts.push({
+             receiptNo: $(tds[0]).text().trim() || 'Unknown',
+             date: $(tds[1]).text().trim() || 'Unknown',
+             amount: $(tds[2]).text().trim() || 'Unknown',
+             eventTarget: eventTarget || null
+          })
+        }
+      }
+    })
+  })
+  
+  return receipts
 }

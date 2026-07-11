@@ -8,6 +8,9 @@ interface PortalState {
   attendanceDetails: Record<string, any[]>
   timetable: any
   marks: any[]
+  courses: any[]
+  fees: any
+  receipts: any[]
   profile: any
   hostel: any
   portalStatus: 'connected' | 'no_session' | 'error' | null
@@ -37,6 +40,9 @@ export const usePortalStore = create<PortalState>()(
       attendanceDetails: {},
       timetable: null,
       marks: [],
+      courses: [],
+      fees: null,
+      receipts: [],
       profile: null,
       hostel: null,
       portalStatus: null,
@@ -83,6 +89,9 @@ export const usePortalStore = create<PortalState>()(
         attendanceDetails: {},
         timetable: null,
         marks: [],
+        courses: [],
+        fees: null,
+        receipts: [],
         profile: null,
         hostel: null,
         portalStatus: null,
@@ -151,12 +160,15 @@ export const usePortalStore = create<PortalState>()(
           }
 
           // Phase 1: Fast core data — resolves in ~3-5s
-          const [attendRes, ttRes, profileRes, hostelRes, marksRes] = await Promise.all([
+          const [attendRes, ttRes, profileRes, hostelRes, marksRes, coursesRes, feesRes, receiptsRes] = await Promise.all([
             fetch(getApiUrl('/api/culko?endpoint=attendance'), { headers }),
             fetch(getApiUrl('/api/culko?endpoint=timetable'), { headers }),
             fetch(getApiUrl('/api/culko?endpoint=profile'), { headers }),
             fetch(getApiUrl('/api/culko?endpoint=hostel'), { headers }),
             fetch(getApiUrl('/api/culko?endpoint=marks'), { headers }),
+            fetch(getApiUrl('/api/culko?endpoint=courses'), { headers }),
+            fetch(getApiUrl('/api/culko?endpoint=fees'), { headers }),
+            fetch(getApiUrl('/api/culko?endpoint=receipts'), { headers }),
           ])
 
           // 401 on data endpoints = session truly died
@@ -166,12 +178,15 @@ export const usePortalStore = create<PortalState>()(
             return false
           }
 
-          const [attendance, timetable, profile, hostel, marks] = await Promise.all([
+          const [attendance, timetable, profile, hostel, marks, courses, fees, receipts] = await Promise.all([
             attendRes.json(),
             ttRes.json(),
             profileRes.json(),
             hostelRes.json(),
             marksRes.json(),
+            coursesRes.json(),
+            feesRes.json(),
+            receiptsRes.json(),
           ])
 
           const updates: Partial<PortalState> = {
@@ -204,6 +219,9 @@ export const usePortalStore = create<PortalState>()(
           if (ttRes.ok && timetable.success) updates.timetable = timetable.data
           if (profileRes.ok && profile.success) updates.profile = profile.data
           if (hostelRes.ok && hostel.success) updates.hostel = hostel.data
+          if (coursesRes.ok && courses.success) updates.courses = courses.data
+          if (feesRes.ok && fees.success) updates.fees = fees.data
+          if (receiptsRes.ok && receipts.success) updates.receipts = receipts.data
           
           if (marksRes.ok && marks.success) {
             updates.marks = marks.data || []
@@ -294,6 +312,9 @@ export const usePortalStore = create<PortalState>()(
         attendanceDetails: state.attendanceDetails,
         timetable: state.timetable,
         marks: state.marks,
+        courses: state.courses,
+        fees: state.fees,
+        receipts: state.receipts,
         profile: state.profile,
         hostel: state.hostel,
         lastSync: state.lastSync,

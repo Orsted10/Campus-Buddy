@@ -10,8 +10,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, queries: ['computer science', 'programming', 'engineering'] })
     }
 
-    const systemPrompt = `You are a university librarian AI. Based on the following subjects the student is enrolled in, provide exactly 3 to 5 highly relevant BROAD AND GENERAL ONE-WORD search queries that can be used on Project Gutenberg (Gutendex API) to find useful textbooks, classic literature, or reference books. 
-Since Project Gutenberg mostly contains older classics, map specific modern subjects to their foundational roots (e.g. "Data Structures" -> "mathematics" or "logic", "Computer Science" -> "science" or "engineering", "Network Security" -> "technology").
+    const systemPrompt = `You are a university librarian AI helping a student find books on Project Gutenberg (Gutendex API). 
+Based on the following subjects the student is enrolled in, provide exactly 3 to 5 highly relevant BROAD AND GENERAL ONE-WORD search queries.
+CRITICAL: If the subjects are technical (e.g., Computer Science, Data Structures, Engineering), DO NOT recommend humanities like "philosophy", "sociology", or "psychology". Map modern tech subjects to foundational sciences like "mathematics", "logic", "science", "algorithms", or "programming".
 Respond ONLY with a valid JSON array of strings in all lowercase. Do not include any markdown formatting, backticks, or other text.
 Example output: ["science", "mathematics", "physics", "logic"]
 
