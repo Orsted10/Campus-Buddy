@@ -2107,29 +2107,6 @@ export async function fetchSessionResult(cookies: Record<string, string>, sessio
   return resultData;
 }
 
-function parseCoursesHTML(html: string) {
-  const $ = cheerio.load(html)
-  const courses: any[] = []
-
-  $('table.table').find('tr').each((i, tr) => {
-    if (i === 0) return // skip header
-    const tds = $(tr).find('td')
-    if (tds.length >= 4) {
-      const downloadBtn = $(tds[tds.length - 1]).find('input[type="submit"], input[type="image"]')
-      const eventTarget = downloadBtn.attr('name')
-
-      courses.push({
-        code: $(tds[1]).text().trim(),
-        name: $(tds[2]).text().trim(),
-        section: $(tds[3]).text().trim(),
-        type: $(tds[4]).text().trim(),
-        eventTarget: eventTarget || null
-      })
-    }
-  })
-
-  return courses
-}
 
 function parseFeesHTML(html: string) {
   const $ = cheerio.load(html)
