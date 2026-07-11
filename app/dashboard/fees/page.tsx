@@ -93,7 +93,7 @@ export default function FeesPage() {
         </div>
       </header>
 
-      <Tabs defaultValue="pending" className="w-full">
+      <Tabs defaultValue="pending" className="w-full flex-col">
         <TabsList className="bg-muted/50 p-1 rounded-xl h-auto mb-6 inline-flex flex-wrap w-full sm:w-auto items-center justify-start sm:justify-center">
           <TabsTrigger value="pending" className="rounded-lg px-6 py-2.5 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
             Pending Dues
