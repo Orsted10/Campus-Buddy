@@ -32,6 +32,41 @@ interface TimeSlot {
 
 type TimetableData = Record<string, TimeSlot[]>
 
+function parseSubjectString(subjectStr: string) {
+  let code = subjectStr
+  let type = ""
+  let group = ""
+  let faculty = "Faculty Assigned"
+  let block = "Block Not Assigned"
+  
+  try {
+    const parts = subjectStr.split(':')
+    if (parts.length > 1) {
+      code = parts[0].trim()
+      type = parts[1].trim()
+      if (type === 'L') type = 'Lecture'
+      else if (type === 'P') type = 'Practical'
+      else if (type === 'T') type = 'Tutorial'
+      
+      const gpPart = parts.find(p => p.includes('GP-'))
+      if (gpPart) group = gpPart.trim()
+      
+      const lastPart = parts[parts.length - 1].trim()
+      if (lastPart.startsWith('By ')) {
+        const byAtSplit = lastPart.split(' at ')
+        faculty = byAtSplit[0].replace('By ', '').trim()
+        if (byAtSplit.length > 1) {
+          block = byAtSplit[1].trim()
+        }
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  
+  return { code, type, group, faculty, block, raw: subjectStr }
+}
+
 export default function TimetablePage() {
   const router = useRouter()
   const [selectedDay, setSelectedDay] = useState('')
@@ -217,18 +252,36 @@ export default function TimetablePage() {
                       {/* Info Block */}
                       <div className="flex-1 space-y-4">
                         <div className="flex items-start justify-between gap-4">
-                           <div>
-                              <h3 className="text-lg font-black text-foreground group-hover:text-primary transition-colors leading-tight">
-                                {slot.subject}
+                           <div className="space-y-2">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {parseSubjectString(slot.subject).type && (
+                                  <span className={cn(
+                                    "px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider",
+                                    parseSubjectString(slot.subject).type === 'Lecture' ? "bg-blue-500/10 text-blue-500" : 
+                                    parseSubjectString(slot.subject).type === 'Practical' ? "bg-purple-500/10 text-purple-500" : "bg-orange-500/10 text-orange-500"
+                                  )}>
+                                    {parseSubjectString(slot.subject).type}
+                                  </span>
+                                )}
+                                {parseSubjectString(slot.subject).group && (
+                                  <span className="px-2 py-0.5 rounded-md bg-foreground/5 text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                    {parseSubjectString(slot.subject).group}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <h3 className="text-xl md:text-2xl font-black text-foreground group-hover:text-primary transition-colors leading-tight">
+                                {parseSubjectString(slot.subject).code}
                               </h3>
+                              
                               <div className="flex flex-wrap gap-4 mt-2">
                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                    <MapPin className="w-3.5 h-3.5 text-primary" />
-                                   <span className="font-bold">BLOCK E</span>
+                                   <span className="font-bold">{parseSubjectString(slot.subject).block}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                    <User className="w-3.5 h-3.5 text-primary" />
-                                   <span className="font-bold">Faculty Assigned</span>
+                                   <span className="font-bold line-clamp-1">{parseSubjectString(slot.subject).faculty}</span>
                                 </div>
                               </div>
                            </div>
