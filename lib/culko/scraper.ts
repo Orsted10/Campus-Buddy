@@ -2116,14 +2116,15 @@ function parseFeesHTML(html: string) {
   
   $('table').each((_, table) => {
     const headers: string[] = []
-    $(table).find('th').each((i, th) => {
-      headers.push($(th).text().trim().toLowerCase())
+    const firstRow = $(table).find('tr').first()
+    firstRow.find('th, td').each((i, cell) => {
+      headers.push($(cell).text().trim().toLowerCase())
     })
     
     // Check if pending table
     if (headers.some(h => h.includes('fee head') || h.includes('fee type') || h.includes('pending') || h.includes('balance'))) {
       $(table).find('tr').each((i, tr) => {
-        if ($(tr).find('th').length > 0) return // skip header
+        if (i === 0) return // skip header
         const tds = $(tr).find('td')
         if (tds.length >= 2) {
            pendingFees.push({
@@ -2138,9 +2139,9 @@ function parseFeesHTML(html: string) {
     // Check if history table
     if (headers.some(h => h.includes('receipt') || h.includes('transaction') || h.includes('date'))) {
       if (!headers.some(h => h.includes('pending') || h.includes('balance'))) {
-        $(table).find('tr').each((i, tr) => {
-          if ($(tr).find('th').length > 0) return
-          const tds = $(tr).find('td')
+          $(table).find('tr').each((i, tr) => {
+            if (i === 0) return
+            const tds = $(tr).find('td')
           if (tds.length >= 3) {
              history.push({
                receiptNo: $(tds[0]).text().trim(),
@@ -2164,7 +2165,7 @@ function parseReceiptsHTML(html: string) {
   
   $('table').each((_, table) => {
     $(table).find('tr').each((i, tr) => {
-      if ($(tr).find('th').length > 0) return // skip header
+      if (i === 0) return // skip header
       const tds = $(tr).find('td')
       if (tds.length >= 3) {
         const downloadBtn = $(tr).find('input[type="submit"], input[type="image"], button, a').last()

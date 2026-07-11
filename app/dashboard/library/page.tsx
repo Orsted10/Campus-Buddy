@@ -32,9 +32,9 @@ export default function LibraryPage() {
         const data = await res.json()
         if (data.success && data.queries) {
           setAiQueries(data.queries)
-          // Fetch books for the first query as initial recommendations
+          // Fetch books for the first query as initial recommendations without blocking UI
           if (data.queries.length > 0) {
-            await fetchBooks(data.queries[0], true)
+            fetchBooks(data.queries[0], true).catch(console.error)
           }
         }
       } catch (e) {

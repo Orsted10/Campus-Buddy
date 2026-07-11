@@ -20,7 +20,7 @@ export default function FeesPage() {
     }
 
     try {
-      setDownloading(receipt.receiptNo)
+      setDownloading(receipt.eventTarget)
       const res = await fetch('/api/culko/download-receipt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,7 +94,7 @@ export default function FeesPage() {
       </header>
 
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="bg-muted/50 p-1 rounded-xl h-auto mb-6">
+        <TabsList className="bg-muted/50 p-1 rounded-xl h-auto mb-6 inline-flex flex-wrap w-full sm:w-auto items-center justify-start sm:justify-center">
           <TabsTrigger value="pending" className="rounded-lg px-6 py-2.5 font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm">
             Pending Dues
           </TabsTrigger>
@@ -220,14 +220,14 @@ export default function FeesPage() {
                             size="sm" 
                             className="rounded-xl font-bold bg-primary text-background shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
                             onClick={() => handleDownload(receipt)}
-                            disabled={downloading === receipt.receiptNo}
+                            disabled={downloading === receipt.eventTarget}
                           >
-                            {downloading === receipt.receiptNo ? (
+                            {downloading === receipt.eventTarget ? (
                               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             ) : (
                               <Download className="w-4 h-4 mr-2" />
                             )}
-                            {downloading === receipt.receiptNo ? 'Downloading' : 'Download'}
+                            {downloading === receipt.eventTarget ? 'Downloading' : 'Download'}
                           </Button>
                         ) : (
                           <span className="text-xs font-bold text-muted-foreground">Not Available</span>
