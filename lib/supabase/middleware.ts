@@ -33,7 +33,7 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup')
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname === '/'
   
   // 1. Redirect authenticated users away from Login/Signup
   if (user && isAuthPage) {

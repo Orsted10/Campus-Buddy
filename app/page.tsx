@@ -105,7 +105,6 @@ const stats = [
 export default function LandingPage() {
   const isApp = isNativeApp()
   const router = useRouter()
-  const [checkingAuth, setCheckingAuth] = useState(true)
   const targetRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -120,14 +119,10 @@ export default function LandingPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         router.push('/dashboard')
-      } else {
-        setCheckingAuth(false)
       }
     }
     checkUser()
   }, [router])
-
-  if (checkingAuth) return null
 
   // NATIVE APP INTRO
   if (isApp) {
