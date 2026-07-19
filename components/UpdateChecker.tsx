@@ -23,6 +23,11 @@ interface GitHubRelease {
 export function UpdateChecker() {
   const [updateAvailable, setUpdateAvailable] = useState<GitHubRelease | null>(null)
   const [isDismissed, setIsDismissed] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     // Only check for updates if we are running as a native app
@@ -69,7 +74,7 @@ export function UpdateChecker() {
     return false
   }
 
-  if (!updateAvailable || isDismissed) return null
+  if (!mounted || !updateAvailable || isDismissed) return null
 
   // Try to find the APK asset directly
   const apkAsset = updateAvailable.assets.find(a => a.name.endsWith('.apk'))
