@@ -219,9 +219,7 @@ export default function LandingPage() {
         />
 
         <motion.div
-          initial={{ opacity: 0, y: 20, filter: 'blur(10px)' }}
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col items-center relative z-10"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-border text-xs font-semibold tracking-wide text-muted-foreground mb-8">
@@ -261,9 +259,7 @@ export default function LandingPage() {
 
         {/* Hero Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
           className="mt-28 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-5xl w-full relative z-10"
         >
           {stats.map((stat, i) => {
