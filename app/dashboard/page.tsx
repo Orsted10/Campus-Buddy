@@ -10,7 +10,7 @@ import {
   Calendar as CalendarIcon, Utensils, AlertTriangle, 
   ChevronRight, ArrowRight, Zap, BookOpen, 
   RefreshCw, MapPin, Settings as SettingsIcon,
-  Smile, Sun, Moon, Coffee, UtensilsCrossed, Sparkles, Users
+  Smile, Sun, Moon, Coffee, UtensilsCrossed, Sparkles, Users, User
 } from 'lucide-react'
 
 const parseScheduleString = (rawStr: string) => {
