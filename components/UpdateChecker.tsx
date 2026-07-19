@@ -50,7 +50,8 @@ export function UpdateChecker() {
           setUpdateAvailable(release)
         }
       } catch (error) {
-        console.error('Failed to check for updates:', error)
+        // Silently ignore Capacitor errors on web
+        return
       }
     }
 

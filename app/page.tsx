@@ -103,15 +103,12 @@ const stats = [
 ]
 
 export default function LandingPage() {
-  const isApp = isNativeApp()
+  const [isApp, setIsApp] = useState(false)
   const router = useRouter()
-  const targetRef = useRef(null)
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end start"]
-  })
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
+  useEffect(() => {
+    setIsApp(isNativeApp())
+  }, [])
 
   useEffect(() => {
     async function checkUser() {
@@ -183,6 +180,18 @@ export default function LandingPage() {
   }
 
   // STANDARD WEB LANDING
+  return <WebLanding />
+}
+
+function WebLanding() {
+  const targetRef = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start start", "end start"]
+  })
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary">
       
