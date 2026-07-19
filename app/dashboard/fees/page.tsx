@@ -196,14 +196,13 @@ export default function FeesPage() {
                   <tr className="border-b bg-muted/20">
                     <th className="text-left py-4 px-6 font-bold text-muted-foreground">Receipt No.</th>
                     <th className="text-left py-4 px-6 font-bold text-muted-foreground">Date</th>
-                    <th className="text-left py-4 px-6 font-bold text-muted-foreground">Amount</th>
                     <th className="text-right py-4 px-6 font-bold text-muted-foreground">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {receiptList.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-12 text-center text-muted-foreground font-medium">No downloadable receipts found.</td>
+                      <td colSpan={3} className="py-12 text-center text-muted-foreground font-medium">No downloadable receipts found.</td>
                     </tr>
                   )}
                   {receiptList.map((receipt: any, idx: number) => (
@@ -213,7 +212,6 @@ export default function FeesPage() {
                         {receipt.receiptNo}
                       </td>
                       <td className="py-4 px-6 text-muted-foreground font-medium">{receipt.date}</td>
-                      <td className="py-4 px-6 font-black text-foreground">₹{receipt.amount}</td>
                       <td className="py-4 px-6 text-right">
                         {receipt.eventTarget ? (
                           <Button 

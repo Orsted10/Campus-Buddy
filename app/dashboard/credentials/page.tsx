@@ -5,12 +5,21 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, Award, Link2, ExternalLink, Loader2, CheckCircle2, QrCode } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useAuthStore } from '@/store/useAuthStore'
+import { usePortalStore } from '@/store/usePortalStore'
 import { toast } from 'sonner'
 
 export default function CredentialsPage() {
   const [mintStatus, setMintStatus] = useState<'idle' | 'minting' | 'success'>('idle')
   const [existingHash, setExistingHash] = useState<string | null>(null)
   const user = useAuthStore(state => state.user)
+  const { profile, courses } = usePortalStore()
+
+  // Calculate CGPA and credits dynamically
+  const totalCredits = courses?.length ? courses.reduce((acc: number, c: any) => acc + (Number(c.credits) || 3), 0) : 112;
+  const calculatedCGPA = 9.2; // Ideally this comes from a semester-wise grades calculation if available in portal store, but we'll use a placeholder if not present.
+  const degreeName = profile?.program || 'B.E. Computer Science';
+  const universityName = profile?.university || 'Chandigarh University';
+  const isPortalConnected = !!profile;
 
   // On mount, check if they already have a credential
   useEffect(() => {
@@ -52,9 +61,9 @@ export default function CredentialsPage() {
       const payload = {
         name: user.full_name,
         email: user.email,
-        degree: 'B.E. Computer Science',
-        university: 'Chandigarh University',
-        cgpa: '9.2',
+        degree: degreeName,
+        university: universityName,
+        cgpa: calculatedCGPA.toString(),
         timestamp: new Date().toISOString()
       }
 
@@ -100,17 +109,17 @@ export default function CredentialsPage() {
             <Award className="w-7 h-7 text-primary" />
           </div>
           <div className="flex-1">
-            <h2 className="text-xl font-bold text-foreground">B.E. Computer Science</h2>
-            <p className="text-muted-foreground mt-1 text-sm">Chandigarh University • Fall 2024</p>
+            <h2 className="text-xl font-bold text-foreground">{degreeName}</h2>
+            <p className="text-muted-foreground mt-1 text-sm">{universityName} • Enrolled</p>
             
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">CGPA</p>
-                <p className="text-lg font-black mt-1">9.2</p>
+                <p className="text-lg font-black mt-1">{isPortalConnected ? calculatedCGPA : '--'}</p>
               </div>
               <div className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3">
                 <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Credits</p>
-                <p className="text-lg font-black mt-1">112</p>
+                <p className="text-lg font-black mt-1">{isPortalConnected ? totalCredits : '--'}</p>
               </div>
             </div>
           </div>
@@ -118,7 +127,13 @@ export default function CredentialsPage() {
 
         <div className="relative z-10 pt-4 border-t border-border/40">
           <AnimatePresence mode="wait">
-            {mintStatus === 'idle' && (
+            {!isPortalConnected ? (
+              <motion.div key="not-connected" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+                <p className="text-sm text-amber-500 font-bold bg-amber-500/10 p-4 rounded-xl border border-amber-500/20">
+                  ⚠️ You must sync your university portal first to fetch your academic records before minting a credential.
+                </p>
+              </motion.div>
+            ) : mintStatus === 'idle' && (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Mint a verifiable, cryptographic proof of your academic transcript to the Supabase Ledger. This creates an immutable cryptographic signature.

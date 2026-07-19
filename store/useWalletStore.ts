@@ -20,6 +20,7 @@ interface WalletState {
   setNfcActive: (active: boolean) => void
   fetchWallet: () => Promise<void>
   transferCoins: (receiverEmail: string, amount: number, title: string) => Promise<boolean>
+  addFunds: (amount: number) => Promise<boolean>
 }
 
 export const useWalletStore = create<WalletState>((set, get) => ({
@@ -110,6 +111,32 @@ export const useWalletStore = create<WalletState>((set, get) => ({
       return true
     } catch (err: any) {
       toast.error('An unexpected error occurred during transfer')
+      return false
+    }
+  },
+
+  addFunds: async (amount: number) => {
+    const supabase = createClient()
+    try {
+      const { data, error } = await supabase.rpc('add_funds_from_bank', {
+        deposit_amount: amount
+      })
+
+      if (error) {
+         toast.error(error.message)
+         return false
+      }
+
+      if (data && !data.success) {
+         toast.error(data.error || 'Deposit failed')
+         return false
+      }
+
+      toast.success(`Successfully added ₹${amount} to your wallet!`)
+      await get().fetchWallet()
+      return true
+    } catch (err: any) {
+      toast.error('An unexpected error occurred during deposit')
       return false
     }
   }

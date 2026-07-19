@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS public.wallet_transactions (
   receiver_id UUID REFERENCES auth.users(id),
   amount NUMERIC(10, 2) NOT NULL,
   title TEXT NOT NULL,
-  type TEXT CHECK (type IN ('debit', 'credit', 'transfer')),
+  type TEXT CHECK (type IN ('debit', 'credit', 'transfer', 'deposit')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -98,6 +98,35 @@ BEGIN
 
   INSERT INTO public.wallet_transactions (sender_id, receiver_id, amount, title, type)
   VALUES (sender_uuid, receiver_uuid, transfer_amount, transfer_title, 'transfer');
+
+  RETURN json_build_object('success', true);
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- RPC for adding funds from a bank
+CREATE OR REPLACE FUNCTION public.add_funds_from_bank(
+  deposit_amount NUMERIC
+)
+RETURNS JSON AS $$
+DECLARE
+  user_uuid UUID;
+BEGIN
+  user_uuid := auth.uid();
+  
+  IF user_uuid IS NULL THEN
+    RETURN json_build_object('success', false, 'error', 'Not authenticated');
+  END IF;
+
+  IF deposit_amount <= 0 THEN
+    RETURN json_build_object('success', false, 'error', 'Amount must be greater than 0');
+  END IF;
+
+  -- Perform deposit (Transactional)
+  UPDATE public.wallet_balances SET balance = balance + deposit_amount WHERE user_id = user_uuid;
+
+  INSERT INTO public.wallet_transactions (sender_id, receiver_id, amount, title, type)
+  VALUES (NULL, user_uuid, deposit_amount, 'Bank Deposit via Card', 'deposit');
 
   RETURN json_build_object('success', true);
 END;

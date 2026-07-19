@@ -13,8 +13,8 @@ import {
   Smile, Sun, Moon, Coffee, UtensilsCrossed, Sparkles, Users, User
 } from 'lucide-react'
 
-const parseScheduleString = (rawStr: string) => {
-  if (!rawStr) return { subjectCode: 'TBA', type: '', facultyStr: '', location: '', rawStr: '' };
+const parseScheduleString = (rawStr: string, courses?: any[]) => {
+  if (!rawStr) return { subjectCode: 'TBA', subjectName: 'Unknown Subject', type: '', facultyStr: '', location: '', rawStr: '' };
   try {
     const atParts = rawStr.split(' at ');
     const location = atParts.length > 1 ? atParts[atParts.length - 1].trim() : 'TBA';
@@ -28,9 +28,17 @@ const parseScheduleString = (rawStr: string) => {
     const subjectCode = prefixParts[0];
     const type = prefixParts.length > 1 && prefixParts[1] ? prefixParts[1].replace(':', '') : '';
 
-    return { subjectCode, type, facultyStr, location, rawStr };
+    let subjectName = subjectCode;
+    if (courses && courses.length > 0) {
+       const foundCourse = courses.find((c: any) => c.code === subjectCode);
+       if (foundCourse && foundCourse.title) {
+          subjectName = foundCourse.title;
+       }
+    }
+
+    return { subjectCode, subjectName, type, facultyStr, location, rawStr };
   } catch (e) {
-    return { subjectCode: rawStr, type: '', facultyStr: '', location: '', rawStr };
+    return { subjectCode: rawStr, subjectName: rawStr, type: '', facultyStr: '', location: '', rawStr };
   }
 }
 
@@ -48,13 +56,9 @@ export default function DashboardPage() {
   const user = useAuthStore((state: any) => state.user)
   const { notifications, setNotifications } = useNotificationStore()
   const router = useRouter()
+  const { timetable: timetableData, attendance: attendanceData, marks: marksData, courses, portalStatus, isSyncing, syncAll, lastSync } = usePortalStore()
 
   const [currentTime, setCurrentTime] = useState(getISTDate())
-  const { 
-    attendance: attendanceData, 
-    marks: marksData,
-    timetable: timetableData, 
-    portalStatus, 
     isSyncing, 
     syncAll, 
     lastSync 
@@ -285,11 +289,11 @@ export default function DashboardPage() {
                         <p className="text-[10px] font-black text-primary uppercase">RIGHT NOW</p>
                         
                         {(() => {
-                           const parsed = parseScheduleString(classStatus.current.subject);
+                           const parsed = parseScheduleString(classStatus.current.subject, courses);
                            return (
                               <div className="mt-1 space-y-2">
                                  <h3 className="font-black text-foreground text-lg leading-tight group-hover:text-primary transition-colors">
-                                    {parsed.subjectCode} {parsed.type && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-md align-middle ml-1">{parsed.type}</span>}
+                                    <span className="opacity-50 text-sm mr-2">{parsed.subjectCode}</span>{parsed.subjectName} {parsed.type && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-md align-middle ml-1">{parsed.type}</span>}
                                  </h3>
                                  <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground font-semibold">
                                     <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {classStatus.current.time}</span>
@@ -306,11 +310,11 @@ export default function DashboardPage() {
                         <p className="text-[10px] font-black text-primary/80 uppercase mb-1">NOTHING ACTIVE • NEXT UP</p>
                         
                         {(() => {
-                           const parsed = parseScheduleString(classStatus.next.subject);
+                           const parsed = parseScheduleString(classStatus.next.subject, courses);
                            return (
                               <div className="space-y-2">
                                  <h3 className="font-black text-foreground text-xl tracking-tight leading-tight">
-                                    {parsed.subjectCode} {parsed.type && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-md align-middle ml-1">{parsed.type}</span>}
+                                    <span className="opacity-50 text-sm mr-2">{parsed.subjectCode}</span>{parsed.subjectName} {parsed.type && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-md align-middle ml-1">{parsed.type}</span>}
                                  </h3>
                                  <div className="flex flex-col gap-1.5 mt-2">
                                     <span className="text-sm text-primary font-bold flex items-center gap-2">
@@ -337,10 +341,10 @@ export default function DashboardPage() {
                         <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-black/20 dark:bg-white/20" />
                         <p className="text-[10px] font-black uppercase text-muted-foreground mb-0.5">UP NEXT</p>
                         {(() => {
-                           const parsed = parseScheduleString(classStatus.next.subject);
+                           const parsed = parseScheduleString(classStatus.next.subject, courses);
                            return (
                               <>
-                                 <h3 className="font-bold text-foreground text-sm line-clamp-1">{parsed.subjectCode}</h3>
+                                 <h3 className="font-bold text-foreground text-sm line-clamp-1">{parsed.subjectName}</h3>
                                  <p className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1.5 mt-0.5">
                                     <Clock className="w-3 h-3" /> {classStatus.next.time}
                                     <span className="w-1 h-1 rounded-full bg-border mx-0.5" />

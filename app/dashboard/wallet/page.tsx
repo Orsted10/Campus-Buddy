@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Wallet, History, ArrowUpRight, ArrowDownLeft, Utensils, Book, QrCode, Send, RefreshCw } from 'lucide-react'
+import { Wallet, History, ArrowUpRight, ArrowDownLeft, Utensils, Book, QrCode, Send, RefreshCw, Plus } from 'lucide-react'
 import { useWalletStore } from '@/store/useWalletStore'
 import { NfcSimulator } from '@/components/NfcSimulator'
 import { format } from 'date-fns'
 import { useAuthStore } from '@/store/useAuthStore'
+import { useRouter } from 'next/navigation'
 
 const getIcon = (type: string) => {
   switch (type) {
@@ -17,6 +18,7 @@ const getIcon = (type: string) => {
 }
 
 export default function WalletPage() {
+  const router = useRouter()
   const { balance, transactions, fetchWallet, isLoading, transferCoins } = useWalletStore()
   const user = useAuthStore(state => state.user)
   
@@ -91,7 +93,13 @@ export default function WalletPage() {
       </motion.div>
 
       <div className="grid grid-cols-2 gap-4 mt-6">
-        <NfcSimulator />
+        <button
+          onClick={() => router.push('/dashboard/wallet/add-money')}
+          className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-500/10 text-green-500 font-bold rounded-2xl hover:bg-green-500/20 transition-colors border border-green-500/20"
+        >
+          <Plus className="w-5 h-5" />
+          Add Money
+        </button>
         <button
           onClick={() => setShowTransfer(true)}
           className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-500/10 text-blue-500 font-bold rounded-2xl hover:bg-blue-500/20 transition-colors border border-blue-500/20"
