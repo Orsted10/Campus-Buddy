@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from './ThemeToggle'
 import { NotificationBell } from './NotificationBell'
+import { BleAttendanceBeacon } from '@/components/BleAttendanceBeacon'
 import { LogOut, Loader2, Sparkles, Menu } from 'lucide-react'
 import { useState } from 'react'
 
@@ -36,6 +37,7 @@ export default function Topbar() {
         </div>
 
         <div className="flex items-center gap-1.5 md:gap-3">
+          <BleAttendanceBeacon />
           <NotificationBell />
           <div className="w-px h-5 bg-border/60 mx-1 hidden md:block"></div>
           <ThemeToggle />
