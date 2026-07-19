@@ -1,0 +1,39 @@
+{
+  "name": "CampusBuddy",
+  "short_name": "CampusBuddy",
+  "description": "Your CULKO Academic Hub — live attendance, marks, timetable and AI.",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "background_color": "#0a0a0a",
+  "theme_color": "#84cc16",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Attendance",
+      "url": "/dashboard/attendance",
+      "description": "View your attendance analytics"
+    },
+    {
+      "name": "Timetable",
+      "url": "/dashboard/timetable",
+      "description": "Check today's classes"
+    }
+  ]
+}

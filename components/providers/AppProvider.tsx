@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { isNativeApp } from '@/lib/api-config'
 import { useAuth } from '@/hooks/useAuth'
+import { QueryProvider } from '@/components/providers/QueryProvider'
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -13,6 +14,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useAuth()
 
   useEffect(() => {
+    // Register PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((reg) => console.log('[SW] Registered:', reg.scope))
+        .catch((err) => console.warn('[SW] Registration failed:', err))
+    }
+
     // Handle Deep Linking for Auth (Session Injection)
     const handleUrlOpen = async (event: any) => {
       const url = new URL(event.url)
@@ -43,5 +52,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [router, supabase])
 
-  return <>{children}</>
+  return (
+    <QueryProvider>
+      {children}
+    </QueryProvider>
+  )
 }
+

@@ -19,6 +19,13 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Campus Buddy — Your CULKO Academic Hub",
   description: "Live attendance, marks, timetable and an AI that actually knows your data. Built for CULKO students.",
+  manifest: '/manifest.json',
+  themeColor: '#84cc16',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'CampusBuddy',
+  },
 };
 
 import { AppProvider } from "@/components/providers/AppProvider";

@@ -6,11 +6,121 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import {
   ExternalLink, RefreshCw, Loader2, GraduationCap,
-  Calendar, CheckCircle2, Link2, Terminal, Eye, EyeOff, AlertCircle
+  Calendar, CheckCircle2, Link2, Terminal, Eye, EyeOff, AlertCircle,
+  Shield, Database, Lock, Server, Clock, UserCheck
 } from 'lucide-react'
 import { usePortalStore } from '@/store/usePortalStore'
+import { createClient } from '@/lib/supabase/client'
 
 import { getApiUrl } from '@/lib/api-config'
+
+// ─── Legal ToS Modal ──────────────────────────────────────────────────────────
+function LegalToSModal({ onAccept, onClose }: { onAccept: () => void; onClose: () => void }) {
+  const [accepted, setAccepted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleAccept = async () => {
+    if (!accepted) return
+    setIsSubmitting(true)
+    try {
+      const supabase = createClient()
+      await supabase.auth.updateUser({ data: { tos_accepted: true, tos_accepted_at: new Date().toISOString() } })
+    } catch (e) {
+      console.warn('[ToS] Could not persist acceptance to server (non-fatal):', e)
+    }
+    onAccept()
+  }
+
+  const points = [
+    { icon: UserCheck, title: 'You are in control', desc: 'CampusBuddy acts exclusively as your digital proxy. It only automates the exact keystrokes YOU would make to log into your university portal.' },
+    { icon: Lock, title: 'No security bypass', desc: 'We never bypass CAPTCHAs, DRM, or security perimeters. Your CAPTCHA is always solved manually by you.' },
+    { icon: Database, title: 'Data is yours, only', desc: 'Your scraped data is stored securely in your personal Supabase database row with Row Level Security. No other user can ever access your data.' },
+    { icon: Clock, title: 'Encrypted & volatile sessions', desc: 'Portal session cookies are stored encrypted and are automatically invalidated after 24 hours. We never store your password.' },
+    { icon: Server, title: 'Rate-limited & respectful', desc: 'Syncing is throttled to prevent any excessive load on the university\'s servers, adhering to Fair Use doctrine.' },
+    { icon: Shield, title: 'Personal use only', desc: 'This tool is for your personal academic data display only, not for bulk data collection, redistribution, or any commercial purpose.' },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 24, scale: 0.96 }}
+        transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+        className="w-full max-w-lg max-h-[90vh] rounded-3xl bg-background border border-primary/20 flex flex-col overflow-hidden shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="p-6 border-b border-border/30 bg-primary/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="flex items-center gap-3 relative z-10">
+            <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+              <Shield className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-black text-foreground">Data Access Agreement</h2>
+              <p className="text-xs text-muted-foreground">Please read before connecting your portal</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            CampusBuddy is a <strong className="text-foreground">personal academic dashboard</strong> that accesses your university portal data on your behalf. By connecting, you agree to the following terms:
+          </p>
+          <div className="space-y-3">
+            {points.map((point, i) => (
+              <div key={i} className="flex gap-3 p-3 rounded-xl bg-muted/30 border border-border/20">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <point.icon className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-foreground mb-0.5">{point.title}</div>
+                  <div className="text-[11px] text-muted-foreground leading-relaxed">{point.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted-foreground/60 leading-relaxed pt-2">
+            This agreement is governed by Indian IT Act 2000 (Sec 43A) and aligns with responsible use principles. CampusBuddy is an independent tool and is not affiliated with Chandigarh University or CULKO.
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="p-6 border-t border-border/30 space-y-3">
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <div
+              onClick={() => setAccepted(!accepted)}
+              className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all shrink-0 mt-0.5 ${
+                accepted ? 'bg-primary border-primary' : 'border-border/60 group-hover:border-primary/40'
+              }`}
+            >
+              {accepted && <CheckCircle2 className="w-3.5 h-3.5 text-background" />}
+            </div>
+            <span className="text-xs text-muted-foreground leading-relaxed">
+              I understand that CampusBuddy acts as my digital proxy and I authorize it to fetch my personal portal data solely for my own personal use and display within this application.
+            </span>
+          </label>
+          <button
+            onClick={handleAccept}
+            disabled={!accepted || isSubmitting}
+            className="w-full bg-primary text-background font-black py-3.5 rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:opacity-90 flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <><RefreshCw className="w-4 h-4 animate-spin" /> Saving...</>
+            ) : (
+              <><CheckCircle2 className="w-4 h-4" /> I Agree &amp; Connect Portal</>
+            )}
+          </button>
+          <button onClick={onClose} className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1">
+            Cancel
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
 
 type Step = 'credentials' | 'waiting' | 'captcha' | 'submitting' | 'done'
 
@@ -25,6 +135,8 @@ export default function CULKOConnectionManager() {
   const [step, setStep] = useState<Step>('credentials')
   const [isConnected, setIsConnected] = useState(false)
   const [statusMsg, setStatusMsg] = useState('Starting browser...')
+  const [showToS, setShowToS] = useState(false)
+  const [tosAccepted, setTosAccepted] = useState(false)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -32,6 +144,19 @@ export default function CULKOConnectionManager() {
     const storeStatus = usePortalStore.getState().portalStatus
     if (storeStatus === 'connected') setIsConnected(true)
     checkConnection()
+    // Check if ToS was already accepted from Supabase user metadata
+    const checkToS = async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user?.user_metadata?.tos_accepted) {
+          setTosAccepted(true)
+        }
+      } catch (e) {
+        // Non-fatal — if we can't check, the modal will show
+      }
+    }
+    checkToS()
     return () => { if (pollRef.current) clearInterval(pollRef.current) }
   }, [])
 
@@ -68,6 +193,11 @@ export default function CULKOConnectionManager() {
 
   const handleInit = async () => {
     if (!uid.trim() || !password.trim()) return
+    // Gate: must accept ToS before connecting
+    if (!tosAccepted) {
+      setShowToS(true)
+      return
+    }
     setStep('waiting')
     setStatusMsg('Connecting to portal...')
 
@@ -204,6 +334,20 @@ export default function CULKOConnectionManager() {
 
   return (
     <div className="glass rounded-2xl p-6 max-w-xl mx-auto border border-white/8 space-y-6">
+      {/* Legal ToS Modal */}
+      <AnimatePresence>
+        {showToS && (
+          <LegalToSModal
+            onAccept={() => {
+              setTosAccepted(true)
+              setShowToS(false)
+              // Proceed with connection after acceptance
+              setTimeout(() => handleInit(), 100)
+            }}
+            onClose={() => setShowToS(false)}
+          />
+        )}
+      </AnimatePresence>
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">

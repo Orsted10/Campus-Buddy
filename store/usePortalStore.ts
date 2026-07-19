@@ -16,6 +16,7 @@ interface PortalState {
   portalStatus: 'connected' | 'no_session' | 'error' | null
   lastSync: string | null
   isSyncing: boolean
+  syncProgress: string | null
   culkoCookies: Record<string, string> | null
   notifications: Array<{ id: string, type: string, message: string, read: boolean, timestamp: string }>
   
@@ -48,6 +49,7 @@ export const usePortalStore = create<PortalState>()(
       portalStatus: null,
       lastSync: null,
       isSyncing: false,
+      syncProgress: null,
       culkoCookies: null,
       notifications: [],
       forceSyncAll: async () => { return false },
@@ -97,6 +99,7 @@ export const usePortalStore = create<PortalState>()(
         portalStatus: null,
         lastSync: null,
         isSyncing: false,
+        syncProgress: null,
         culkoCookies: null,
         notifications: []
       }),
