@@ -196,10 +196,10 @@ export default function CULKOConnectionManager() {
     toast.info('Session disconnected')
   }
 
-  const handleInit = async () => {
+  const handleInit = async (skipTosCheck = false) => {
     if (!uid.trim() || !password.trim()) return
     // Gate: must accept ToS before connecting
-    if (!tosAccepted) {
+    if (!skipTosCheck && !tosAccepted) {
       setShowToS(true)
       return
     }
@@ -346,8 +346,8 @@ export default function CULKOConnectionManager() {
             onAccept={() => {
               setTosAccepted(true)
               setShowToS(false)
-              // Proceed with connection after acceptance
-              setTimeout(() => handleInit(), 100)
+              // Proceed with connection after acceptance, pass true to bypass stale closure
+              setTimeout(() => handleInit(true), 100)
             }}
             onClose={() => setShowToS(false)}
           />
