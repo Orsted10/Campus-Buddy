@@ -35,7 +35,9 @@ export function UpdateChecker() {
 
     const checkForUpdates = async () => {
       try {
-        const appInfo = await App.getInfo()
+        const appInfo = await App.getInfo().catch(() => null)
+        if (!appInfo) return // Capacitor App plugin not available on web
+
         const currentVersion = appInfo.version // e.g., '1.0' or '1.0.0'
         
         const response = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`)
