@@ -112,12 +112,6 @@ export default function LandingPage() {
   })
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   useEffect(() => {
     async function checkUser() {
@@ -131,7 +125,7 @@ export default function LandingPage() {
   }, [router])
 
   // NATIVE APP INTRO
-  if (mounted && isApp) {
+  if (isApp) {
     return (
       <div className="h-screen w-full bg-background overflow-hidden relative flex flex-col pt-safe pb-safe dot-pattern">
         <div className="absolute top-[-20%] left-[-20%] w-[140%] h-[60%] bg-primary/20 rounded-full blur-[140px] pointer-events-none" />
@@ -189,8 +183,6 @@ export default function LandingPage() {
   }
 
   // STANDARD WEB LANDING
-  if (!mounted) return null // Prevent hydration mismatch
-
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/30 selection:text-primary">
       
