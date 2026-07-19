@@ -59,11 +59,6 @@ export default function DashboardPage() {
   const { timetable: timetableData, attendance: attendanceData, marks: marksData, courses, portalStatus, isSyncing, syncAll, lastSync } = usePortalStore()
 
   const [currentTime, setCurrentTime] = useState(getISTDate())
-    isSyncing, 
-    syncAll, 
-    lastSync 
-  } = usePortalStore()
-
   // Safety Catch: If user is missing (corrupted session), redirect immediately
   useEffect(() => {
     if (!user) {
