@@ -19,15 +19,20 @@ function LegalToSModal({ onAccept, onClose }: { onAccept: () => void; onClose: (
   const [accepted, setAccepted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleAccept = async () => {
+  const handleAccept = () => {
     if (!accepted) return
     setIsSubmitting(true)
+    
     try {
       const supabase = createClient()
-      await supabase.auth.updateUser({ data: { tos_accepted: true, tos_accepted_at: new Date().toISOString() } })
+      // Fire and forget to prevent UI from hanging if network stalls
+      supabase.auth.updateUser({ data: { tos_accepted: true, tos_accepted_at: new Date().toISOString() } })
+        .catch(e => console.warn('[ToS] Could not persist acceptance to server (non-fatal):', e))
     } catch (e) {
-      console.warn('[ToS] Could not persist acceptance to server (non-fatal):', e)
+      console.warn('[ToS] Client error:', e)
     }
+    
+    // Proceed immediately
     onAccept()
   }
 
