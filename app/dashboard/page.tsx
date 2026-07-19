@@ -12,6 +12,28 @@ import {
   RefreshCw, MapPin, Settings as SettingsIcon,
   Smile, Sun, Moon, Coffee, UtensilsCrossed, Sparkles, Users
 } from 'lucide-react'
+
+const parseScheduleString = (rawStr: string) => {
+  if (!rawStr) return { subjectCode: 'TBA', type: '', facultyStr: '', location: '', rawStr: '' };
+  try {
+    const atParts = rawStr.split(' at ');
+    const location = atParts.length > 1 ? atParts[atParts.length - 1].trim() : 'TBA';
+    const beforeAt = atParts[0];
+
+    const byParts = beforeAt.split(': By ');
+    const facultyStr = byParts.length > 1 ? byParts[1].trim() : 'Unknown Faculty';
+    const prefix = byParts[0];
+
+    const prefixParts = prefix.split(':');
+    const subjectCode = prefixParts[0];
+    const type = prefixParts.length > 1 && prefixParts[1] ? prefixParts[1].replace(':', '') : '';
+
+    return { subjectCode, type, facultyStr, location, rawStr };
+  } catch (e) {
+    return { subjectCode: rawStr, type: '', facultyStr: '', location: '', rawStr };
+  }
+}
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -261,21 +283,48 @@ export default function DashboardPage() {
                      <div className="relative pl-6 border-l-2 border-primary/30 py-1">
                         <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" />
                         <p className="text-[10px] font-black text-primary uppercase">RIGHT NOW</p>
-                        <h3 className="font-black text-foreground text-lg leading-tight group-hover:text-primary transition-colors">{classStatus.current.subject}</h3>
-                        <p className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                           <Clock className="w-3 h-3" /> {classStatus.current.time}
-                           <span className="w-1 h-1 rounded-full bg-black/10 dark:bg-white/10" />
-                           <MapPin className="w-3 h-3" /> BLOCK E
-                        </p>
+                        
+                        {(() => {
+                           const parsed = parseScheduleString(classStatus.current.subject);
+                           return (
+                              <div className="mt-1 space-y-2">
+                                 <h3 className="font-black text-foreground text-lg leading-tight group-hover:text-primary transition-colors">
+                                    {parsed.subjectCode} {parsed.type && <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-md align-middle ml-1">{parsed.type}</span>}
+                                 </h3>
+                                 <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground font-semibold">
+                                    <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {classStatus.current.time}</span>
+                                    <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {parsed.location}</span>
+                                    <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" /> {parsed.facultyStr}</span>
+                                 </div>
+                              </div>
+                           );
+                        })()}
                      </div>
                    ) : classStatus?.next ? (
                      <div className="relative pl-6 border-l-2 border-primary/20 py-4 bg-primary/5 rounded-r-xl">
                         <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/50 animate-pulse" />
-                        <p className="text-[10px] font-black text-primary/80 uppercase">NOTHING ACTIVE • NEXT UP</p>
-                        <h3 className="font-black text-foreground text-xl tracking-tight leading-tight mt-1">{classStatus.next.subject}</h3>
-                        <p className="text-sm text-primary font-bold mt-1.5 flex items-center gap-2">
-                           <Clock className="w-4 h-4" /> Starts at {(classStatus.next.time || '').split(' - ')[0]}
-                        </p>
+                        <p className="text-[10px] font-black text-primary/80 uppercase mb-1">NOTHING ACTIVE • NEXT UP</p>
+                        
+                        {(() => {
+                           const parsed = parseScheduleString(classStatus.next.subject);
+                           return (
+                              <div className="space-y-2">
+                                 <h3 className="font-black text-foreground text-xl tracking-tight leading-tight">
+                                    {parsed.subjectCode} {parsed.type && <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-md align-middle ml-1">{parsed.type}</span>}
+                                 </h3>
+                                 <div className="flex flex-col gap-1.5 mt-2">
+                                    <span className="text-sm text-primary font-bold flex items-center gap-2">
+                                       <Clock className="w-4 h-4" /> Starts at {(classStatus.next.time || '').split(' - ')[0]}
+                                    </span>
+                                    <div className="flex items-center gap-3 text-[11px] font-bold text-muted-foreground mt-1">
+                                       <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-foreground/50" /> {parsed.location}</span>
+                                       <span className="w-1 h-1 rounded-full bg-border" />
+                                       <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-foreground/50" /> {parsed.facultyStr}</span>
+                                    </div>
+                                 </div>
+                              </div>
+                           );
+                        })()}
                      </div>
                    ) : (
                      <div className="py-2 text-center">
@@ -284,11 +333,22 @@ export default function DashboardPage() {
                    )}
 
                    {!classStatus?.isLunchBreak && classStatus?.current && classStatus?.next && (
-                     <div className="relative pl-6 border-l-2 border-black/5 dark:border-black/5 dark:border-white/5 py-1 opacity-50">
-                        <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-black/20 dark:bg-black/20 dark:bg-white/20" />
-                        <p className="text-[10px] font-black uppercase text-muted-foreground">UP NEXT</p>
-                        <h3 className="font-bold text-foreground text-sm line-clamp-1">{classStatus.next.subject}</h3>
-                        <p className="text-[10px] text-muted-foreground">{classStatus.next.time}</p>
+                     <div className="relative pl-6 border-l-2 border-black/5 dark:border-white/5 py-1 opacity-60 hover:opacity-100 transition-opacity">
+                        <div className="absolute -left-[5px] top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-black/20 dark:bg-white/20" />
+                        <p className="text-[10px] font-black uppercase text-muted-foreground mb-0.5">UP NEXT</p>
+                        {(() => {
+                           const parsed = parseScheduleString(classStatus.next.subject);
+                           return (
+                              <>
+                                 <h3 className="font-bold text-foreground text-sm line-clamp-1">{parsed.subjectCode}</h3>
+                                 <p className="text-[10px] font-semibold text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                                    <Clock className="w-3 h-3" /> {classStatus.next.time}
+                                    <span className="w-1 h-1 rounded-full bg-border mx-0.5" />
+                                    {parsed.location}
+                                 </p>
+                              </>
+                           );
+                        })()}
                      </div>
                    )}
                 </CardContent>

@@ -2191,9 +2191,9 @@ function parseReceiptsHTML(html: string) {
         
         if (eventTarget || downloadBtn.length > 0) {
           receipts.push({
-             receiptNo: $(tds[0]).text().trim() || 'Unknown',
-             date: $(tds[1]).text().trim() || 'Unknown',
-             amount: $(tds[2]).text().trim() || 'Unknown',
+             receiptNo: $(tds[1]).text().trim() || 'Unknown',
+             date: $(tds[2]).text().trim() || 'Unknown',
+             amount: $(tds[3]) ? $(tds[3]).text().trim() : 'Unknown',
              eventTarget: eventTarget || null
           })
         }
