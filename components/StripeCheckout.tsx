@@ -100,6 +100,7 @@ function CheckoutForm({ amount, onSuccess }: { amount: number, onSuccess: () => 
 export function StripeCheckoutWrapper({ amount, onSuccess }: { amount: number, onSuccess: () => void }) {
   const [clientSecret, setClientSecret] = useState<string>('')
   const [mockMode, setMockMode] = useState(false)
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi'>('card')
 
   useEffect(() => {
     // Create PaymentIntent as soon as the component loads
@@ -138,34 +139,46 @@ export function StripeCheckoutWrapper({ amount, onSuccess }: { amount: number, o
             <div className="grid grid-cols-2 gap-4">
               <button
                 type="button"
-                className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 border-primary bg-primary/5 text-primary transition-all"
+                onClick={() => setPaymentMethod('card')}
+                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${paymentMethod === 'card' ? 'border-primary bg-primary/5 text-primary' : 'border-border bg-background text-muted-foreground'}`}
               >
                 <CreditCard className="w-6 h-6" />
                 <span className="font-bold text-sm">Credit/Debit</span>
               </button>
               <button
                 type="button"
-                className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 border-border bg-background text-muted-foreground transition-all opacity-50 cursor-not-allowed"
+                onClick={() => setPaymentMethod('upi')}
+                className={`flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${paymentMethod === 'upi' ? 'border-primary bg-primary/5 text-primary' : 'border-border bg-background text-muted-foreground'}`}
               >
                 <Smartphone className="w-6 h-6" />
-                <span className="font-bold text-sm">UPI (Disabled)</span>
+                <span className="font-bold text-sm">UPI</span>
               </button>
             </div>
 
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 to-black text-white p-6 shadow-xl mb-6 aspect-[1.8]">
-                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
-                 <div className="flex justify-between items-center mb-6 relative z-10">
-                    <div className="w-10 h-7 bg-yellow-400/80 rounded-md" />
-                 </div>
-                 <div className="space-y-1 relative z-10">
-                    <p className="font-mono text-lg tracking-[0.2em]">4242 4242 4242 4242</p>
-                    <div className="flex justify-between text-xs opacity-70 font-mono mt-2">
-                       <span>SIMULATED CARD</span>
-                       <span>12/30</span>
-                    </div>
-                 </div>
-              </div>
+              {paymentMethod === 'card' ? (
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 to-black text-white p-6 shadow-xl mb-6 aspect-[1.8]">
+                   <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
+                   <div className="flex justify-between items-center mb-6 relative z-10">
+                      <div className="w-10 h-7 bg-yellow-400/80 rounded-md" />
+                   </div>
+                   <div className="space-y-1 relative z-10">
+                      <p className="font-mono text-lg tracking-[0.2em]">4242 4242 4242 4242</p>
+                      <div className="flex justify-between text-xs opacity-70 font-mono mt-2">
+                         <span>SIMULATED CARD</span>
+                         <span>12/30</span>
+                      </div>
+                   </div>
+                </div>
+              ) : (
+                <div className="p-8 border border-border rounded-xl text-center space-y-4 mb-6 bg-background">
+                  <div className="mx-auto w-32 h-32 bg-primary/10 rounded-2xl flex items-center justify-center border-2 border-primary/20 border-dashed">
+                    <span className="text-primary font-black opacity-50">QR CODE</span>
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">Scan with PhonePe, GPay, or Paytm</p>
+                  <p className="text-xs text-muted-foreground/70 italic">Or click Simulate below</p>
+                </div>
+              )}
 
               <button
                 type="button"

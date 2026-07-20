@@ -42,15 +42,21 @@ export default function CredentialsPage() {
     }
     
     const fetchCGPA = async () => {
+      // First try to use store profile data
+      if (profile?.cgpa) {
+         setCalculatedCGPA(profile.cgpa)
+         setTotalCredits(courses?.length ? courses.length * 3 : fallbackCredits)
+         return
+      }
+
       try {
         const res = await fetch('/api/culko?endpoint=results')
         const json = await res.json()
         if (json.success && json.data?.cgpa) {
           setCalculatedCGPA(json.data.cgpa)
-          // Estimate credits from semesters if real credits aren't provided by endpoint
           if (json.data.semesters) {
              const sems = json.data.semesters.length;
-             setTotalCredits(sems * 22) // Rough estimate for B.E. (22 credits per sem)
+             setTotalCredits(sems * 22)
           }
         }
       } catch(e) {
