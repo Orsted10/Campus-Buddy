@@ -160,8 +160,8 @@ export default function SyllabusTrackerPage() {
                 <div className="h-2 bg-secondary rounded-full overflow-hidden">
                   <motion.div 
                     initial={{ width: 0 }}
-                    animate={{ width: \`\${activeWeek.difficulty}%\` }}
-                    className={\`h-full \${activeWeek.redZone ? 'bg-red-500' : 'bg-blue-500'}\`}
+                    animate={{ width: `${activeWeek.difficulty}%` }}
+                    className={`h-full ${activeWeek.redZone ? 'bg-red-500' : 'bg-blue-500'}`}
                   />
                 </div>
               </div>
@@ -172,7 +172,7 @@ export default function SyllabusTrackerPage() {
                 </h4>
                 <p className="text-sm leading-relaxed text-foreground/80">
                   {activeWeek.redZone 
-                    ? \`Warning: You have \${activeWeek.assignments} major assignments colliding with complex topics this week. The AI has automatically redistributed 4 hours of reading to the preceding weekend to prevent a late-night cram session.\`
+                    ? `Warning: You have ${activeWeek.assignments} major assignments colliding with complex topics this week. The AI has automatically redistributed 4 hours of reading to the preceding weekend to prevent a late-night cram session.`
                     : "Manageable workload. Great week to get ahead on reading or start long-term projects early."
                   }
                 </p>

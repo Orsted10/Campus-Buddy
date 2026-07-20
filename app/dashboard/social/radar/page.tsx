@@ -57,7 +57,7 @@ export default function CampusRadarPage() {
     // Listen for incoming file transfer requests
     channel.on('broadcast', { event: 'file-transfer' }, ({ payload }) => {
       if (payload.target === user.id) {
-        toast(\`Incoming file from \${payload.senderName}\`, {
+        toast(`Incoming file from ${payload.senderName}`, {
           action: {
             label: 'Accept',
             onClick: () => {
@@ -177,9 +177,9 @@ export default function CampusRadarPage() {
           <div className="relative z-10 flex flex-col items-center gap-4">
             <button 
               onClick={isScanning ? () => setIsScanning(false) : startScan}
-              className={\`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-xl \${isScanning ? 'bg-primary/20 text-primary' : 'bg-primary text-background hover:scale-105'}\`}
+              className={`w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-xl ${isScanning ? 'bg-primary/20 text-primary' : 'bg-primary text-background hover:scale-105'}`}
             >
-              <Search className={\`w-10 h-10 \${isScanning ? 'animate-pulse' : ''}\`} />
+              <Search className={`w-10 h-10 ${isScanning ? 'animate-pulse' : ''}`} />
             </button>
             <p className="font-bold text-foreground">
               {isScanning ? "Scanning for nearby devices..." : "Tap to Scan"}
@@ -199,7 +199,7 @@ export default function CampusRadarPage() {
                   <button 
                     key={peer.id}
                     onClick={() => setSelectedPeer(peer)}
-                    className={\`w-full flex items-center justify-between p-3 rounded-xl transition-all \${selectedPeer?.id === peer.id ? 'bg-primary/10 border-primary border' : 'bg-muted/50 hover:bg-muted border border-transparent'}\`}
+                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedPeer?.id === peer.id ? 'bg-primary/10 border-primary border' : 'bg-muted/50 hover:bg-muted border border-transparent'}`}
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold">
@@ -241,7 +241,7 @@ export default function CampusRadarPage() {
                   {file ? file.name : "Select or drop a file"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {file ? \`\${(file.size / (1024 * 1024)).toFixed(2)} MB\` : "PDF, JPG, PNG up to 100MB"}
+                  {file ? `${(file.size / (1024 * 1024)).toFixed(2)} MB` : "PDF, JPG, PNG up to 100MB"}
                 </p>
               </div>
             </div>
@@ -261,7 +261,7 @@ export default function CampusRadarPage() {
                   <div className="h-2 bg-secondary rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-primary transition-all duration-300"
-                      style={{ width: \`\${progress}%\` }}
+                      style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
