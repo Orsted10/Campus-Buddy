@@ -2,13 +2,11 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, MicOff, AlertCircle, Loader2, PlayCircle, StopCircle, ArrowLeft } from 'lucide-react'
+import { Mic, AlertCircle, Loader2, PlayCircle, StopCircle, ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { usePortalStore } from '@/store/usePortalStore'
-
-// Use browser native speech APIs to keep it completely free
-const SpeechRecognition = typeof window !== 'undefined' ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition : null;
+import RecordRTC from 'recordrtc'
 
 export default function MockInterviewPage() {
   const router = useRouter()
@@ -20,7 +18,8 @@ export default function MockInterviewPage() {
   const [status, setStatus] = useState<'idle' | 'listening' | 'processing' | 'speaking' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   
-  const recognitionRef = useRef<any>(null)
+  const recorderRef = useRef<RecordRTC | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
   const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null)
   const chatRef = useRef<HTMLDivElement>(null)
 
@@ -28,16 +27,23 @@ export default function MockInterviewPage() {
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight
     }
-  }, [messages, transcript])
+  }, [messages, transcript, status])
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop())
+      }
+      if (recorderRef.current) {
+        recorderRef.current.destroy()
+      }
+      window.speechSynthesis.cancel()
+    }
+  }, [])
 
   // Start the interview
   const startInterview = async () => {
-    if (!SpeechRecognition) {
-      setErrorMsg("Your browser doesn't support the native Speech API. Please use Chrome or Edge.")
-      setStatus('error')
-      return
-    }
-
     try {
       setMessages([])
       setStatus('processing')
@@ -92,51 +98,76 @@ export default function MockInterviewPage() {
     window.speechSynthesis.speak(utterance)
   }
 
-  const toggleRecording = () => {
+  const toggleRecording = async () => {
     if (status === 'speaking') {
        window.speechSynthesis.cancel()
+       setStatus('idle')
     }
 
     if (isRecording) {
-      recognitionRef.current?.stop()
+      // Stop recording
       setIsRecording(false)
-      setStatus('idle')
-      if (transcript.trim()) {
-         submitAnswer(transcript)
+      setStatus('processing')
+      
+      if (recorderRef.current) {
+        recorderRef.current.stopRecording(async () => {
+          const blob = recorderRef.current!.getBlob()
+          
+          try {
+            // 1. Transcribe audio using Whisper API
+            const formData = new FormData()
+            formData.append('file', blob)
+            
+            const transRes = await fetch('/api/ai/transcribe', {
+              method: 'POST',
+              body: formData
+            })
+            
+            const transData = await transRes.json()
+            if (transData.error) throw new Error(transData.error)
+            
+            const answerText = transData.text
+            
+            if (answerText.trim()) {
+               submitAnswer(answerText)
+            } else {
+               toast.info("Couldn't hear anything. Try again.")
+               setStatus('idle')
+            }
+          } catch (e: any) {
+             console.error("Transcription error", e)
+             toast.error(e.message || "Transcription failed")
+             setStatus('idle')
+          }
+        })
       }
     } else {
-      if (!SpeechRecognition) return
-      
-      setTranscript('')
-      recognitionRef.current = new SpeechRecognition()
-      recognitionRef.current.continuous = true
-      recognitionRef.current.interimResults = true
-      recognitionRef.current.lang = 'en-US'
-
-      recognitionRef.current.onresult = (event: any) => {
-        let currentTranscript = ''
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          currentTranscript += event.results[i][0].transcript
-        }
-        setTranscript(currentTranscript)
+      // Start recording
+      try {
+        setTranscript('')
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        streamRef.current = stream
+        
+        recorderRef.current = new RecordRTC(stream, {
+          type: 'audio',
+          mimeType: 'audio/webm',
+          recorderType: RecordRTC.StereoAudioRecorder,
+          numberOfAudioChannels: 1
+        })
+        
+        recorderRef.current.startRecording()
+        setIsRecording(true)
+        setStatus('listening')
+      } catch (err) {
+        console.error('Mic access denied:', err)
+        toast.error('Microphone access is required for mock interviews.')
       }
-
-      recognitionRef.current.onerror = (event: any) => {
-        console.error('Speech recognition error', event.error)
-        setIsRecording(false)
-        setStatus('idle')
-      }
-
-      recognitionRef.current.start()
-      setIsRecording(true)
-      setStatus('listening')
     }
   }
 
   const submitAnswer = async (answerText: string) => {
     const updatedMessages = [...messages, { role: 'user', text: answerText }]
     setMessages(updatedMessages as any)
-    setTranscript('')
     setStatus('processing')
     
     try {
@@ -221,15 +252,7 @@ export default function MockInterviewPage() {
                <div className="flex justify-start">
                   <div className="bg-card border border-border shadow-md rounded-2xl rounded-tl-sm p-4 flex items-center gap-3">
                      <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                     <span className="text-sm font-medium text-muted-foreground">AI is thinking...</span>
-                  </div>
-               </div>
-            )}
-
-            {isRecording && transcript && (
-               <div className="flex justify-end">
-                  <div className="max-w-[80%] p-4 rounded-2xl bg-primary/20 text-primary border border-primary/30 rounded-tr-sm">
-                    <p className="text-sm italic">{transcript} <span className="animate-pulse">|</span></p>
+                     <span className="text-sm font-medium text-muted-foreground">AI is thinking/transcribing...</span>
                   </div>
                </div>
             )}
@@ -258,7 +281,7 @@ export default function MockInterviewPage() {
           </div>
           
           {isRecording && (
-            <p className="text-center text-xs font-bold text-red-500 animate-pulse uppercase tracking-widest">Listening... tap to stop</p>
+            <p className="text-center text-xs font-bold text-red-500 animate-pulse uppercase tracking-widest">Listening... tap to stop and transcribe</p>
           )}
           {status === 'speaking' && !isRecording && (
             <p className="text-center text-xs font-bold text-primary animate-pulse uppercase tracking-widest">AI is speaking... tap mic to interrupt</p>
