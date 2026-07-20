@@ -21,16 +21,16 @@ export default function AcademicsPage() {
       href: '/dashboard/academics/calendar',
     },
     {
-      title: 'Study Resources',
-      description: 'Access lecture notes and materials',
+      title: 'Predictive Grading',
+      description: 'Simulate required final marks',
       icon: BookOpen,
-      href: '#',
+      href: '/dashboard/academics/grade-simulator',
     },
     {
-      title: 'Upcoming Deadlines',
-      description: 'Never miss an important date',
+      title: 'Syllabus Tracker',
+      description: 'AI-predicted difficulty and progress',
       icon: Clock,
-      href: '#',
+      href: '/dashboard/academics/syllabus',
     },
     {
       title: 'Results & Grades',

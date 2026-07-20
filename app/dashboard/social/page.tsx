@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { useAuthStore } from '@/store/useAuthStore'
+import Link from 'next/link'
 import { 
   Hash, 
   MessageSquare, 
@@ -16,7 +17,8 @@ import {
   Smile,
   Loader2,
   Phone,
-  Video
+  Video,
+  Wifi
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
@@ -173,6 +175,12 @@ export default function SocialHubPage() {
         >
           <MessageSquare className="w-6 h-6" />
         </button>
+        
+        <Link href="/dashboard/social/radar" title="Campus Radar Drop">
+          <button className="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-500 flex items-center justify-center hover:bg-indigo-500 hover:text-white hover:rounded-xl transition-all duration-300">
+            <Wifi className="w-6 h-6" />
+          </button>
+        </Link>
         <div className="w-8 h-[2px] bg-black/10 dark:bg-white/10 rounded-full" />
         
         {servers.map(server => (
