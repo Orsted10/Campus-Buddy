@@ -17,17 +17,26 @@ export default function CareerAgentPage() {
   }, [])
 
   const fetchMatches = async () => {
-    const supabase = createClient()
-    const { data, error } = await supabase
-      .from('career_matches')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10)
+    try {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('career_matches')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10)
 
-    if (!error && data) {
-      setMatches(data)
+      if (error) {
+        toast.error("Failed to fetch matches. Run Phase 3 SQL schema.")
+        console.error(error)
+      } else if (data) {
+        setMatches(data)
+      }
+    } catch (e) {
+      console.error("Network error fetching matches:", e)
+      toast.error("Network error fetching career matches.")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleCopy = (text: string) => {

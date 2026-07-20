@@ -36,18 +36,22 @@ export default function CredentialsPage() {
   // On mount, check if they already have a credential and fetch real CGPA
   useEffect(() => {
     const fetchCredential = async () => {
-      if (!user) return
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('credential_ledger')
-        .select('cryptographic_hash')
-        .eq('user_id', user.id)
-        .eq('credential_type', 'B.E. Computer Science')
-        .single()
-        
-      if (data && data.cryptographic_hash) {
-        setExistingHash(data.cryptographic_hash)
-        setMintStatus('success')
+      try {
+        if (!user) return
+        const supabase = createClient()
+        const { data, error } = await supabase
+          .from('credential_ledger')
+          .select('cryptographic_hash')
+          .eq('user_id', user.id)
+          .eq('credential_type', degreeName)
+          .single()
+          
+        if (data && data.cryptographic_hash) {
+          setExistingHash(data.cryptographic_hash)
+          setMintStatus('success')
+        }
+      } catch (e) {
+        console.error("Network error fetching credential:", e)
       }
     }
     

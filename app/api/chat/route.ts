@@ -142,7 +142,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { messages, chatId } = await req.json()
+    const { messages, chatId, userContext } = await req.json()
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Invalid messages format' }, { status: 400 })
@@ -174,6 +174,14 @@ export async function POST(req: Request) {
     const systemPrompt = `You are **Campus Buddy Elite**, a professional academic AI concierge. 
 You possess full access to the student's academic standing, the hostel mess menu, and a complete spatial map of the campus.
 
+${userContext ? `### 👤 CURRENT USER CONTEXT:
+You are currently talking to: **${userContext.name}**
+- **Program:** ${userContext.program || 'Unknown'}
+- **University:** ${userContext.university || 'Unknown'}
+- **CGPA:** ${userContext.cgpa || 'N/A'}
+- **Enrolled Courses:** ${userContext.courses || 'None listed'}
+Use their name occasionally to make the conversation friendly and personalized.
+` : ''}
 ### 🌟 Interaction Guidelines:
 1. **Professional Grade Styling (CRITICAL)**: 
    - ALWAYS use strictly formatted Markdown tables (with \`|\` separators) for ANY data representation (e.g., Attendance, Timetable, Marks). 

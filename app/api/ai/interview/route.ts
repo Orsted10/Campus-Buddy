@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     const { action, degree, history } = await req.json()
 
     if (action === 'start') {
-       const systemPrompt = `You are an expert technical recruiter conducting a mock interview for a university student studying ${degree}. 
+       const systemPrompt = `You are Alex, an expert technical recruiter conducting a mock interview for a university student studying ${degree}. 
        Introduce yourself briefly (1 sentence) and ask the very first warm-up interview question. 
        Keep your response short and conversational (max 2-3 sentences total). Do not use markdown.`
        

@@ -80,9 +80,15 @@ export default function MockInterviewPage() {
     
     const utterance = new SpeechSynthesisUtterance(text)
     
-    // Try to find a good English voice
+    // Try to find a good high-quality voice (Microsoft Natural, Google, Apple Siri)
     const voices = window.speechSynthesis.getVoices()
-    const preferredVoice = voices.find(v => v.lang.includes('en-US') && v.name.includes('Google')) || voices.find(v => v.lang.includes('en-GB'))
+    const preferredVoice = 
+      voices.find(v => v.name.includes('Natural') && v.lang.includes('en')) ||
+      voices.find(v => v.name.includes('Google') && v.lang.includes('en-US')) || 
+      voices.find(v => v.name.includes('Samantha')) ||
+      voices.find(v => v.lang.includes('en-GB')) ||
+      voices[0]
+      
     if (preferredVoice) {
       utterance.voice = preferredVoice
     }

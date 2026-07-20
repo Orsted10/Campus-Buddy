@@ -165,23 +165,31 @@ export default function FeesPage() {
                       <td colSpan={5} className="py-12 text-center text-muted-foreground font-medium">No payment history found.</td>
                     </tr>
                   )}
-                  {history.map((record: any, idx: number) => (
-                    <tr key={idx} className="border-b last:border-0 hover:bg-muted/10 transition-colors">
-                      <td className="py-4 px-6 font-bold text-foreground">{record.receiptNo}</td>
-                      <td className="py-4 px-6 text-muted-foreground font-medium">{record.date}</td>
-                      <td className="py-4 px-6 text-muted-foreground">
-                        <span className="bg-secondary px-3 py-1 rounded-full text-xs font-bold">
-                          {record.paymentMode || 'N/A'}
-                        </span>
-                      </td>
-                      <td className="py-4 px-6 text-right font-black text-foreground">₹{record.amount}</td>
-                      <td className="py-4 px-6 text-right">
-                        <span className="text-xs font-black uppercase tracking-wider text-green-500 bg-green-500/10 px-3 py-1 rounded-full">
-                          {record.status || 'Success'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {history.map((record: any, idx: number) => {
+                    let parsedAmount = record.amount
+                    if (typeof parsedAmount === 'string') {
+                      const match = parsedAmount.match(/Total:\s*Rs\.?\s*([\d.]+)/i)
+                      if (match) parsedAmount = match[1]
+                    }
+                    
+                    return (
+                      <tr key={idx} className="border-b last:border-0 hover:bg-muted/10 transition-colors">
+                        <td className="py-4 px-6 font-bold text-foreground">{record.receiptNo}</td>
+                        <td className="py-4 px-6 text-muted-foreground font-medium">{record.date}</td>
+                        <td className="py-4 px-6 text-muted-foreground">
+                          <span className="bg-secondary px-3 py-1 rounded-full text-xs font-bold">
+                            {record.paymentMode || 'N/A'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6 text-right font-black text-foreground">₹{parsedAmount}</td>
+                        <td className="py-4 px-6 text-right">
+                          <span className="text-xs font-black uppercase tracking-wider text-green-500 bg-green-500/10 px-3 py-1 rounded-full">
+                            {record.status || 'Success'}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
 import { getApiUrl } from '@/lib/api-config'
 import { Volume2, VolumeX } from 'lucide-react'
+import { usePortalStore } from '@/store/usePortalStore'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -41,6 +42,7 @@ export default function ChatInterface() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const user = useAuthStore((state) => state.user)
+  const { profile, courses } = usePortalStore()
   const supabase = useMemo(() => createClient(), [])
 
   // Load chat history list
@@ -206,6 +208,13 @@ export default function ChatInterface() {
         body: JSON.stringify({
           messages: [...messages, userMessage],
           chatId,
+          userContext: profile ? {
+             name: user?.full_name || 'Student',
+             program: profile.program,
+             university: profile.university,
+             cgpa: profile.cgpa,
+             courses: courses?.map(c => c.name).join(', ')
+          } : undefined
         }),
       })
 
