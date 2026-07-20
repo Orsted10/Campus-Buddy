@@ -92,7 +92,8 @@ export default function SyllabusTrackerPage() {
                   No courses synced yet. Go to Academics to sync.
                 </div>
               ) : (
-              <div className="h-[400px] w-full mt-4">
+              <>
+                <div className="h-[400px] w-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={dynamicData}
@@ -141,6 +142,7 @@ export default function SyllabusTrackerPage() {
                   <span className="text-foreground font-bold">Red Zone (High Effort)</span>
                 </div>
               </div>
+              </>
               )}
             </CardContent>
           </Card>
