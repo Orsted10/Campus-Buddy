@@ -189,54 +189,64 @@ export default function FeesPage() {
         </TabsContent>
 
         <TabsContent value="receipts" className="outline-none animate-in fade-in slide-in-from-bottom-4">
-          <Card className="glass-panel border-black/5 dark:border-white/5 rounded-3xl overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/20">
-                    <th className="text-left py-4 px-6 font-bold text-muted-foreground">Receipt No.</th>
-                    <th className="text-left py-4 px-6 font-bold text-muted-foreground">Date</th>
-                    <th className="text-right py-4 px-6 font-bold text-muted-foreground">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {receiptList.length === 0 && (
-                    <tr>
-                      <td colSpan={3} className="py-12 text-center text-muted-foreground font-medium">No downloadable receipts found.</td>
-                    </tr>
-                  )}
-                  {receiptList.map((receipt: any, idx: number) => (
-                    <tr key={idx} className="border-b last:border-0 hover:bg-muted/10 transition-colors">
-                      <td className="py-4 px-6 font-bold text-foreground flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-primary" />
-                        {receipt.receiptNo}
-                      </td>
-                      <td className="py-4 px-6 text-muted-foreground font-medium">{receipt.date}</td>
-                      <td className="py-4 px-6 text-right">
-                        {receipt.eventTarget ? (
-                          <Button 
-                            size="sm" 
-                            className="rounded-xl font-bold bg-primary text-background shadow-lg shadow-primary/20 hover:scale-105 transition-transform"
-                            onClick={() => handleDownload(receipt)}
-                            disabled={downloading === receipt.eventTarget}
-                          >
-                            {downloading === receipt.eventTarget ? (
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                              <Download className="w-4 h-4 mr-2" />
-                            )}
-                            {downloading === receipt.eventTarget ? 'Downloading' : 'Download'}
-                          </Button>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {receiptList.length === 0 && (
+              <div className="col-span-full py-12 text-center text-muted-foreground font-medium bg-card rounded-3xl border border-border border-dashed">
+                No downloadable receipts found.
+              </div>
+            )}
+            {receiptList.map((receipt: any, idx: number) => {
+               // The scraped 'receiptNo' might contain verbose text like "Total: Rs 148750.00..."
+               // Let's parse it to look premium
+               let amount = "Paid"
+               const match = receipt.receiptNo?.match(/Total:\s*Rs\.?\s*([\d.]+)/i)
+               if (match) {
+                 amount = `₹${match[1]}`
+               } else {
+                 const num = receipt.receiptNo?.match(/[\d]{3,}/)
+                 if (num) amount = `#${num[0]}`
+               }
+               
+               return (
+                <Card key={idx} className="glass-panel border-black/5 dark:border-white/5 rounded-3xl overflow-hidden shadow-premium-sm hover:shadow-premium-md transition-all group">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                        <FileText className="w-6 h-6 text-primary" />
+                      </div>
+                      <span className="text-xs font-bold px-3 py-1 bg-muted rounded-full">
+                        {receipt.date || 'Recent'}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-1 mb-6">
+                      <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Receipt</p>
+                      <h3 className="text-2xl font-black text-foreground tracking-tight">{amount}</h3>
+                    </div>
+
+                    {receipt.eventTarget ? (
+                      <Button 
+                        className="w-full rounded-xl font-bold bg-secondary hover:bg-primary hover:text-background text-foreground transition-all group-hover:shadow-lg shadow-primary/20"
+                        onClick={() => handleDownload(receipt)}
+                        disabled={downloading === receipt.eventTarget}
+                      >
+                        {downloading === receipt.eventTarget ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         ) : (
-                          <span className="text-xs font-bold text-muted-foreground">Not Available</span>
+                          <Download className="w-4 h-4 mr-2" />
                         )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
+                        {downloading === receipt.eventTarget ? 'Downloading...' : 'Download PDF'}
+                      </Button>
+                    ) : (
+                      <Button disabled className="w-full rounded-xl font-bold bg-muted text-muted-foreground">
+                        Not Available
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+               )
+            })}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

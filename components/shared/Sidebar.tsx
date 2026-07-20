@@ -24,7 +24,8 @@ import {
   Loader2,
   Wallet,
   CreditCard,
-  ShieldCheck
+  ShieldCheck,
+  GraduationCap
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useState } from 'react'
@@ -121,7 +122,7 @@ export default function Sidebar({ mobile }: SidebarProps) {
       {/* Brand Header */}
       <div className="p-6 pb-4 relative z-10 flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-premium-sm glow-primary-sm">
-          <span className="text-white font-bold text-sm tracking-tighter">CB</span>
+          <GraduationCap className="w-5 h-5 text-white" />
         </div>
         <h1 className="text-xl font-bold tracking-tight text-foreground">
           Campus Buddy

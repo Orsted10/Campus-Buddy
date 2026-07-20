@@ -19,7 +19,17 @@ export default function CredentialsPage() {
 
   // Fallback to courses length multiplied by avg credits if api fails
   const fallbackCredits = courses?.length ? courses.length * 3 : 112;
-  const degreeName = profile?.program || 'B.E. Computer Science';
+  const formatProgramName = (prog: string) => {
+    if (!prog) return 'B.E. Computer Science'
+    const clean = prog.split('::').pop() || prog
+    return clean
+      .replace(/BTECH_?/, 'B.Tech ')
+      .replace(/CSE_?/, 'CSE ')
+      .replace(/-AIML/, ' (AIML)')
+      .replace(/_/g, ' ')
+      .trim()
+  }
+  const degreeName = profile?.program ? formatProgramName(profile.program) : 'B.E. Computer Science';
   const universityName = profile?.university || 'Chandigarh University';
   const isPortalConnected = !!profile;
 
@@ -69,10 +79,18 @@ export default function CredentialsPage() {
   }, [user])
 
   const generateHash = async (message: string) => {
-    const msgBuffer = new TextEncoder().encode(message)
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    try {
+      if (typeof crypto !== 'undefined' && crypto.subtle) {
+        const msgBuffer = new TextEncoder().encode(message)
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer)
+        const hashArray = Array.from(new Uint8Array(hashBuffer))
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+      }
+    } catch (e) {
+      console.warn("crypto.subtle failed, using fallback")
+    }
+    // Fallback for non-secure contexts or when crypto is unavailable
+    return "0000" + Date.now().toString(16) + Math.random().toString(16).slice(2)
   }
 
   const handleMint = async () => {

@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS public.wallet_transactions (
   receiver_id UUID REFERENCES auth.users(id),
   amount NUMERIC(10, 2) NOT NULL,
   title TEXT NOT NULL,
-  type TEXT CHECK (type IN ('debit', 'credit', 'transfer', 'deposit')),
+  type TEXT CHECK (type IN ('debit', 'credit', 'transfer')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -128,7 +128,7 @@ BEGIN
   UPDATE public.wallet_balances SET balance = balance + deposit_amount WHERE user_id = user_uuid;
 
   INSERT INTO public.wallet_transactions (sender_id, receiver_id, amount, title, type)
-  VALUES (NULL, user_uuid, deposit_amount, 'Bank Deposit via Card', 'deposit');
+  VALUES (NULL, user_uuid, deposit_amount, 'Bank Deposit via Card', 'credit');
 
   RETURN json_build_object('success', true);
 END;
