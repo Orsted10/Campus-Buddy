@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useCompletion } from 'ai/react'
+import { useCompletion } from '@ai-sdk/react'
 import { FileText, Building2, Briefcase, Sparkles, Loader2, Copy, Check, ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
