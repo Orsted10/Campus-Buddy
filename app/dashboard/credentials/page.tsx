@@ -11,17 +11,19 @@ import { toast } from 'sonner'
 export default function CredentialsPage() {
   const [mintStatus, setMintStatus] = useState<'idle' | 'minting' | 'success'>('idle')
   const [existingHash, setExistingHash] = useState<string | null>(null)
+  const [calculatedCGPA, setCalculatedCGPA] = useState<string | number>('--')
+  const [totalCredits, setTotalCredits] = useState<string | number>('--')
+  
   const user = useAuthStore(state => state.user)
   const { profile, courses } = usePortalStore()
 
-  // Calculate CGPA and credits dynamically
-  const totalCredits = courses?.length ? courses.reduce((acc: number, c: any) => acc + (Number(c.credits) || 3), 0) : 112;
-  const calculatedCGPA = 9.2; // Ideally this comes from a semester-wise grades calculation if available in portal store, but we'll use a placeholder if not present.
+  // Fallback to courses length multiplied by avg credits if api fails
+  const fallbackCredits = courses?.length ? courses.length * 3 : 112;
   const degreeName = profile?.program || 'B.E. Computer Science';
   const universityName = profile?.university || 'Chandigarh University';
   const isPortalConnected = !!profile;
 
-  // On mount, check if they already have a credential
+  // On mount, check if they already have a credential and fetch real CGPA
   useEffect(() => {
     const fetchCredential = async () => {
       if (!user) return
@@ -38,7 +40,26 @@ export default function CredentialsPage() {
         setMintStatus('success')
       }
     }
+    
+    const fetchCGPA = async () => {
+      try {
+        const res = await fetch('/api/culko?endpoint=results')
+        const json = await res.json()
+        if (json.success && json.data?.cgpa) {
+          setCalculatedCGPA(json.data.cgpa)
+          // Estimate credits from semesters if real credits aren't provided by endpoint
+          if (json.data.semesters) {
+             const sems = json.data.semesters.length;
+             setTotalCredits(sems * 22) // Rough estimate for B.E. (22 credits per sem)
+          }
+        }
+      } catch(e) {
+        setTotalCredits(fallbackCredits)
+      }
+    }
+    
     fetchCredential()
+    fetchCGPA()
   }, [user])
 
   const generateHash = async (message: string) => {

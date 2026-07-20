@@ -31,8 +31,8 @@ const parseScheduleString = (rawStr: string, courses?: any[]) => {
     let subjectName = subjectCode;
     if (courses && courses.length > 0) {
        const foundCourse = courses.find((c: any) => c.code === subjectCode);
-       if (foundCourse && foundCourse.title) {
-          subjectName = foundCourse.title;
+       if (foundCourse && foundCourse.name) {
+          subjectName = foundCourse.name;
        }
     }
 

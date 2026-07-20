@@ -9,7 +9,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js'
 import { motion } from 'framer-motion'
-import { Loader2, ShieldCheck, AlertCircle } from 'lucide-react'
+import { Loader2, ShieldCheck, AlertCircle, CreditCard, Smartphone } from 'lucide-react'
 import { toast } from 'sonner'
 import { useWalletStore } from '@/store/useWalletStore'
 
@@ -123,14 +123,70 @@ export function StripeCheckoutWrapper({ amount, onSuccess }: { amount: number, o
 
   if (mockMode) {
      return (
-        <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-3xl text-center space-y-4">
-           <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
-           <h3 className="font-bold text-lg text-amber-500">Stripe Keys Missing</h3>
-           <p className="text-sm text-muted-foreground">
-             The frontend and backend Stripe API keys are not configured in your `.env.local` file. 
-             <br/><br/>
-             Please add <strong>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</strong> and <strong>STRIPE_SECRET_KEY</strong> to test the real Stripe integration.
-           </p>
+        <div className="space-y-6">
+          <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-3xl text-center space-y-4">
+             <AlertCircle className="w-10 h-10 text-amber-500 mx-auto" />
+             <h3 className="font-bold text-lg text-amber-500">Real Banking Unavailable (Invite Only)</h3>
+             <p className="text-sm text-muted-foreground">
+               Because Stripe is invite-only in your region, we have fallen back to the <strong className="text-foreground">Simulated Payment Gateway</strong>.
+             </p>
+          </div>
+          
+          <div className="p-6 bg-background border border-border rounded-2xl space-y-6">
+            <h4 className="font-bold text-sm uppercase tracking-widest text-muted-foreground">Simulated Checkout</h4>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 border-primary bg-primary/5 text-primary transition-all"
+              >
+                <CreditCard className="w-6 h-6" />
+                <span className="font-bold text-sm">Credit/Debit</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center gap-3 p-4 rounded-xl border-2 border-border bg-background text-muted-foreground transition-all opacity-50 cursor-not-allowed"
+              >
+                <Smartphone className="w-6 h-6" />
+                <span className="font-bold text-sm">UPI (Disabled)</span>
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-slate-800 to-black text-white p-6 shadow-xl mb-6 aspect-[1.8]">
+                 <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
+                 <div className="flex justify-between items-center mb-6 relative z-10">
+                    <div className="w-10 h-7 bg-yellow-400/80 rounded-md" />
+                 </div>
+                 <div className="space-y-1 relative z-10">
+                    <p className="font-mono text-lg tracking-[0.2em]">4242 4242 4242 4242</p>
+                    <div className="flex justify-between text-xs opacity-70 font-mono mt-2">
+                       <span>SIMULATED CARD</span>
+                       <span>12/30</span>
+                    </div>
+                 </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  toast.loading('Processing Simulated Payment...', { id: 'sim' })
+                  await new Promise(r => setTimeout(r, 2000))
+                  const { useWalletStore } = await import('@/store/useWalletStore')
+                  const success = await useWalletStore.getState().addFunds(amount)
+                  if (success) {
+                    toast.success('Simulated Payment Successful!', { id: 'sim' })
+                    onSuccess()
+                  } else {
+                    toast.error('Wallet funding failed', { id: 'sim' })
+                  }
+                }}
+                className="w-full py-4 rounded-xl font-black text-lg bg-primary text-background glow-olive-sm hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                Simulate Payment of ₹{amount}
+              </button>
+            </div>
+          </div>
         </div>
      )
   }
