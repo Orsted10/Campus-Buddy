@@ -9,6 +9,7 @@ import {
   Home,
   MessageSquare,
   Building,
+  BrainCircuit,
   BookOpen,
   MapPin,
   Library,
@@ -31,6 +32,7 @@ import { useState } from 'react'
 const studentNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/dashboard/chat', label: 'AI Chatbot', icon: MessageSquare },
+  { href: '/dashboard/ai-hub', label: 'AI Hub (Phase 3)', icon: BrainCircuit },
   { href: '/dashboard/hostel', label: 'Hostel', icon: Building },
   { href: '/dashboard/academics', label: 'Academics Portal', icon: BookOpen },
   { href: '/dashboard/attendance', label: 'Attendance', icon: CheckSquare },

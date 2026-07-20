@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS public.wallet_balances (
 -- RLS for wallet_balances
 ALTER TABLE public.wallet_balances ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own balance" ON public.wallet_balances;
 CREATE POLICY "Users can view their own balance" 
 ON public.wallet_balances FOR SELECT 
 USING (auth.uid() = user_id);
@@ -49,6 +50,7 @@ CREATE TABLE IF NOT EXISTS public.wallet_transactions (
 
 ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own transactions" ON public.wallet_transactions;
 CREATE POLICY "Users can view their own transactions" 
 ON public.wallet_transactions FOR SELECT 
 USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
@@ -145,10 +147,12 @@ CREATE TABLE IF NOT EXISTS public.credential_ledger (
 
 ALTER TABLE public.credential_ledger ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view their own credentials" ON public.credential_ledger;
 CREATE POLICY "Users can view their own credentials" 
 ON public.credential_ledger FOR SELECT 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own credentials" ON public.credential_ledger;
 CREATE POLICY "Users can insert their own credentials" 
 ON public.credential_ledger FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
