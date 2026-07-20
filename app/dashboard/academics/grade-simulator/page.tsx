@@ -29,11 +29,14 @@ export default function GradeSimulatorPage() {
         let max = 0
         subject.evaluations.forEach((ev: any) => {
           // If type doesn't contain "End Term" or "Final", add to internals
-          if (!ev.type.toLowerCase().includes('end term') && !ev.type.toLowerCase().includes('final')) {
+          if (ev.type && !ev.type.toLowerCase().includes('end term') && !ev.type.toLowerCase().includes('final')) {
             const mark = parseFloat(ev.marks)
-            const evMax = ev.max_marks ? parseFloat(ev.max_marks) : 20 // Fallback if missing
-            if (!isNaN(mark)) total += mark
-            if (!isNaN(evMax)) max += evMax
+            const evMax = ev.grade ? parseFloat(ev.grade) : 0 // grade field holds the max marks based on marks page
+            
+            if (!isNaN(mark) && !isNaN(evMax)) {
+              total += mark
+              max += evMax
+            }
           }
         })
         setInternalMarks(total || 0)
