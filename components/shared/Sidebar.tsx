@@ -29,28 +29,63 @@ import {
 import { useAuth } from '@/hooks/useAuth'
 import { useState } from 'react'
 
-const studentNavItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/dashboard/chat', label: 'AI Chatbot', icon: MessageSquare },
-  { href: '/dashboard/ai-hub', label: 'AI Hub (Phase 3)', icon: BrainCircuit },
-  { href: '/dashboard/hostel', label: 'Hostel', icon: Building },
-  { href: '/dashboard/academics', label: 'Academics Portal', icon: BookOpen },
-  { href: '/dashboard/attendance', label: 'Attendance', icon: CheckSquare },
-  { href: '/dashboard/marks', label: 'Marks & Grades', icon: Award },
-  { href: '/dashboard/timetable', label: 'Timetable', icon: Calendar },
-  { href: '/dashboard/wallet', label: 'Smart Wallet', icon: Wallet },
-  { href: '/dashboard/fees', label: 'Fees & Accounts', icon: CreditCard },
-  { href: '/dashboard/credentials', label: 'Blockchain ID', icon: ShieldCheck },
-  { href: '/dashboard/profile', label: 'Profile ID', icon: User },
-  { href: '/dashboard/navigation', label: 'Navigation', icon: MapPin },
-  { href: '/dashboard/library', label: 'Library', icon: Library },
-  { href: '/dashboard/notifications', label: 'Notifications', icon: Bell },
-  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+const studentNavGroups = [
+  {
+    title: 'Overview',
+    items: [
+      { href: '/dashboard', label: 'Dashboard', icon: Home },
+    ]
+  },
+  {
+    title: 'Academics',
+    items: [
+      { href: '/dashboard/academics', label: 'Academics Portal', icon: BookOpen },
+      { href: '/dashboard/attendance', label: 'Attendance', icon: CheckSquare },
+      { href: '/dashboard/marks', label: 'Marks & Grades', icon: Award },
+      { href: '/dashboard/timetable', label: 'Timetable', icon: Calendar },
+    ]
+  },
+  {
+    title: 'AI Hub & Career',
+    items: [
+      { href: '/dashboard/ai-hub', label: 'AI Hub (Phase 3)', icon: BrainCircuit },
+      { href: '/dashboard/chat', label: 'Campus AI Chatbot', icon: MessageSquare },
+    ]
+  },
+  {
+    title: 'Campus Life',
+    items: [
+      { href: '/dashboard/wallet', label: 'Smart Wallet', icon: Wallet },
+      { href: '/dashboard/hostel', label: 'Hostel', icon: Building },
+      { href: '/dashboard/navigation', label: 'Campus Map', icon: MapPin },
+      { href: '/dashboard/library', label: 'Library', icon: Library },
+    ]
+  },
+  {
+    title: 'Identity & Finance',
+    items: [
+      { href: '/dashboard/fees', label: 'Fees & Accounts', icon: CreditCard },
+      { href: '/dashboard/credentials', label: 'Blockchain ID', icon: ShieldCheck },
+    ]
+  },
+  {
+    title: 'Account',
+    items: [
+      { href: '/dashboard/profile', label: 'Profile', icon: User },
+      { href: '/dashboard/notifications', label: 'Notifications', icon: Bell },
+      { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+    ]
+  }
 ]
 
-const adminNavItems = [
-  ...studentNavItems,
-  { href: '/dashboard/admin', label: 'Admin Panel', icon: Shield },
+const adminNavGroups = [
+  {
+    title: 'Administration',
+    items: [
+      { href: '/dashboard/admin', label: 'Admin Panel', icon: Shield },
+    ]
+  },
+  ...studentNavGroups
 ]
 
 interface SidebarProps {
@@ -72,9 +107,9 @@ export default function Sidebar({ mobile }: SidebarProps) {
     }
   }
 
-  const navItems = user?.role === 'admin' || user?.role === 'hostel_staff' 
-    ? adminNavItems 
-    : studentNavItems
+  const navGroups = user?.role === 'admin' || user?.role === 'hostel_staff' 
+    ? adminNavGroups 
+    : studentNavGroups
 
   return (
     <aside className={cn(
@@ -94,43 +129,52 @@ export default function Sidebar({ mobile }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto scrollbar-hide py-2 relative z-10">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname === item.href
+      <nav className="flex-1 px-3 space-y-4 overflow-y-auto scrollbar-hide py-2 relative z-10">
+        {navGroups.map((group, gIdx) => (
+          <div key={gIdx} className="space-y-1">
+             <h4 className="px-3 text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground/60 mb-2 mt-2">
+               {group.title}
+             </h4>
+             <div className="space-y-0.5">
+               {group.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href
 
-          return (
-            <Link key={item.href} href={item.href} className="block relative focus:outline-none">
-              <motion.div
-                whileHover={{ backgroundColor: "var(--color-secondary)" }}
-                whileTap={{ scale: 0.98 }}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors relative z-10 group',
-                  isActive
-                    ? 'text-foreground font-semibold'
-                    : 'text-muted-foreground font-medium hover:text-foreground'
-                )}
-              >
-                {/* Active Indicator Background */}
-                {isActive && (
-                  <motion.div
-                    layoutId="activeTabBackground"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="absolute inset-0 bg-secondary/80 border border-border/50 rounded-lg -z-10 shadow-premium-inner"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
-                )}
-                <Icon className={cn(
-                  "w-[18px] h-[18px] transition-colors", 
-                  isActive ? "text-primary" : "opacity-70 group-hover:opacity-100"
-                )} />
-                <span className="text-sm tracking-tight">{item.label}</span>
-              </motion.div>
-            </Link>
-          )
-        })}
+                  return (
+                    <Link key={item.href} href={item.href} className="block relative focus:outline-none">
+                      <motion.div
+                        whileHover={{ backgroundColor: "var(--color-secondary)" }}
+                        whileTap={{ scale: 0.98 }}
+                        className={cn(
+                          'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors relative z-10 group',
+                          isActive
+                            ? 'text-foreground font-semibold'
+                            : 'text-muted-foreground font-medium hover:text-foreground'
+                        )}
+                      >
+                        {/* Active Indicator Background */}
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeTabBackground"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-secondary/80 border border-border/50 rounded-lg -z-10 shadow-premium-inner"
+                            transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                          />
+                        )}
+                        <Icon className={cn(
+                          "w-[18px] h-[18px] transition-colors", 
+                          isActive ? "text-primary" : "opacity-70 group-hover:opacity-100"
+                        )} />
+                        <span className="text-sm tracking-tight">{item.label}</span>
+                      </motion.div>
+                    </Link>
+                  )
+               })}
+             </div>
+          </div>
+        ))}
       </nav>
 
       {/* User Footer Profile */}
