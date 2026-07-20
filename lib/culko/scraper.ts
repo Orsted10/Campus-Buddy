@@ -109,8 +109,23 @@ export async function initCULKOLogin(uid: string) {
     const step2Html = await step2Res.text()
     const state2 = extractASPState(step2Html)
 
+    // Extract the actual CAPTCHA image URL from the HTML
+    const $ = cheerio.load(step2Html)
+    const captchaImgTag = $('img').filter((i, el) => {
+      const src = $(el).attr('src')
+      return src ? src.toLowerCase().includes('generatecaptcha.aspx') : false
+    })
+    
+    let captchaUrl = `${BASE_URL}/GenerateCaptcha.aspx`
+    if (captchaImgTag.length > 0) {
+      const src = captchaImgTag.attr('src')
+      if (src) {
+        captchaUrl = src.startsWith('http') ? src : `${BASE_URL}/${src}`
+      }
+    }
+
     // 4. GET CAPTCHA image
-    const captchaRes = await fetch(`${BASE_URL}/GenerateCaptcha.aspx`, {
+    const captchaRes = await fetch(captchaUrl, {
       headers: {
         'Cookie': serializeCookies(jar),
         'User-Agent': USER_AGENT
@@ -122,7 +137,7 @@ export async function initCULKOLogin(uid: string) {
 
     return {
       success: true,
-      captchaImg: `data:image/png;base64,${captchaB64}`,
+      captchaImg: `data:image/jpeg;base64,${captchaB64}`,
       sessionData: JSON.stringify({ jar, state: state2, url: finalUrl })
     }
   } catch (error) {
