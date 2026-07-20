@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShieldCheck, Award, Link2, ExternalLink, Loader2, CheckCircle2, QrCode } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -32,13 +32,13 @@ export default function CredentialsPage() {
   const degreeName = profile?.program ? formatProgramName(profile.program) : 'B.E. Computer Science';
   const universityName = profile?.university || 'Chandigarh University';
   const isPortalConnected = !!profile;
+  const supabase = useMemo(() => createClient(), [])
 
   // On mount, check if they already have a credential and fetch real CGPA
   useEffect(() => {
     const fetchCredential = async () => {
       try {
         if (!user) return
-        const supabase = createClient()
         const { data, error } = await supabase
           .from('credential_ledger')
           .select('cryptographic_hash')
@@ -121,7 +121,6 @@ export default function CredentialsPage() {
       const hexSignature = `0x${hash}`
 
       // Save to Supabase ledger
-      const supabase = createClient()
       const { error } = await supabase.from('credential_ledger').insert({
         user_id: user.id,
         credential_type: payload.degree,

@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
+import { useMemo } from 'react'
 
 export default function CareerAgentPage() {
   const router = useRouter()
   const [matches, setMatches] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const supabase = useMemo(() => createClient(), [])
 
   useEffect(() => {
     fetchMatches()
@@ -18,7 +20,6 @@ export default function CareerAgentPage() {
 
   const fetchMatches = async () => {
     try {
-      const supabase = createClient()
       const { data, error } = await supabase
         .from('career_matches')
         .select('*')
