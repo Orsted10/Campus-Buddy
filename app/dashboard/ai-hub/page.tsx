@@ -27,6 +27,26 @@ export default function AIHubPage() {
       border: 'border-green-500/20',
       badge: 'Zero Effort',
       link: '/dashboard/ai-hub/career'
+    },
+    {
+      id: 'ocr-notes',
+      title: 'Smart Notes OCR',
+      description: 'Snap a picture of handwritten notes or whiteboards to instantly generate a mock test using WASM Tesseract.js.',
+      icon: <FileText className="w-8 h-8 text-amber-500" />,
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/20',
+      badge: 'WASM Local',
+      link: '/dashboard/ai-hub/ocr'
+    },
+    {
+      id: 'lecture-summarizer',
+      title: 'Lecture Summarizer',
+      description: 'Upload a lecture recording to automatically generate high-yield bullet points and Tinder-style flashcards.',
+      icon: <Mic className="w-8 h-8 text-purple-500" />,
+      bg: 'bg-purple-500/10',
+      border: 'border-purple-500/20',
+      badge: 'Flashcards',
+      link: '/dashboard/ai-hub/summarizer'
     }
   ]
 
