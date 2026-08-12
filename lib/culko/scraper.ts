@@ -452,7 +452,7 @@ async function fetchCULKOResource(endpoint: string, cookies: Record<string, stri
   const endpointMap: Record<string, string> = {
     attendance: '/frmStudentCourseWiseAttendanceSummary.aspx?type=etgkYfqBdH1fSfc255iYGw==',
     marks: '/frmStudentMarksView.aspx',
-    timetable: '/frmMyTimeTable.aspx',
+    timetable: '/frmWinningCampMyTimetable.aspx',
     profile: '/frmStudentProfile.aspx',
     announcements: '/StudentHome.aspx',
     result: '/result.aspx',
